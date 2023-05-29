@@ -21,26 +21,107 @@
  
 \sloppy
 
-\title{Estudo relativo ao desempenho em função do consumo sobre alta demanda de dados em sistemas web desenvolvidos com Node.js e React}
+\title{Estudo relativo ao desempenho em função do consumo sobre alta demanda de dados em sistemas web desenvolvidos com \textit{Node.JS} e \textit{React.JS}}
 
-\author{Marcos Renan Krul\inst{1}, Renato Cristiano Ruppel\inst{2}}
+\author{Marcos Renan Krul\inst{1}, Renato Cristiano Ruppel\inst{1}, Prof. Dr. Adriano Ferrsa\inst{1}}
 
 
-\address{Universidade Estadual de Ponta Grossa (UEPG)}
+\address{Universidade Estadual de Ponta Grossa (UEPG)
+    \email{19022626@uepg.br, 19010426@uepg.br, ferrasa@uepg.br}
+}
+
 
 \begin{document} 
 
 \maketitle
-     
-\begin{resumo} 
- 
 
+
+\begin{resumo} 
 \end{resumo}
+
+
+\begin{abstract} 
+\end{abstract}
+
 
 \section{Introdução}
 
+O desenvolvimento de novas aplicações e a migração das já existentes para a plataforma \textit{web} 
+vêm crescendo e se tornando uma tendência \cite{SOUZAB}. Existem benefícios que justificam esse comportamento,
+como facilidades em instalações e atualizações, alcance global instantâneo e alta portabilidade. Porém,
+sob outra perspectiva, apresentam-se questões críticas que devem ser analisadas antes de aderir à plataforma, como
+o desempenho em situações com alta demanda de dados.
 
-\section{Desenvolvimento}
+Aplicações como \textit{streaming} de vídeo (ADICIONAR OUTROS EXEMPLOS) devem processar arquivos de 
+grande porte, de forma rápida e estável. Contudo, existem limitações inerentes ao uso da 
+plataforma \textit{web}, como o processamento de diversas requisições que exijam muitos dados, 
+tratamento do alto fluxo de dados pela máquina cliente e os limites impostos pelas tecnologias escolhidas.
 
+Para sobrepujar os problemas supracitados, existem técnicas desenvolvidas para a \textit{web} que buscam
+atenuar os problemas de alta demanda e torná-los irrisórios na experiência do usuário, como o processamento
+assíncrono (\textit{streams}) e \textit{caching}.
+
+O uso de \textit{Node.JS} e \textit{React.JS}, duas tecnologias em crescente uso e relevância no
+desenvolvimento \textit{web}, justifica-se pelo fato de que estas permitem uma abordagem de alta
+performance e apresentam recursos para otimização e escalabilidade. O \textit{Node.JS}, em específico, apresenta
+um ótimo desempenho em casos que necessitem da persistência de centenas ou milhares de conexões
+simultâneas, onde a comunicação é realizada com o envio de pequenos fragmentos do arquivo de destino
+\cite[p. 112]{EJSMONT}. Quanto à camada \textit{front-end}, a biblioteca \textit{React.JS} traz como
+carro chefe o gerenciamento de estado da aplicação, orientado a dados que podem mudar com o passar do tempo.
+Ao incluir estado em uma aplicação utilizando \textit{React.JS}, inclui-se a possibilidade de criar, ler
+e modificar dados dinâmicos enviados pelo servidor, que modificam a árvore de componentes e acarretam 
+mudanças na interface em que o usuário interage \cite[p. 97]{BANKSEPORCELLO}.
+
+
+% Caching is one of the most important techniques when it comes to scaling the
+% front end of your web application. Instead of trying to add more servers or make
+% them respond faster to clients’ requests, use caching to avoid having to serve
+% these requests in the first place. In fact, caching is so critical to the scalability of
+% web applications that Chapter 6 is dedicated to it. To avoid repeating parts of that
+% deeper dive, let’s just highlight a few components relevant to the front-end layer
+% of your application here. (p 133 livro);
+
+
+% À medida que a computação como um todo evoluiu, desde a comunicação
+% utilizando apenas bits, para a comunicação com dados mais complexos e robustos,
+% a criação e implementação de novas técnicas que adaptem a manipulação de novas
+% formas de dados mantendo performance, simplicidade e robustez, torna-se um
+% desafio.
+
+% Todo projeto de software precisa de estimativas e planejamento, mas quando
+% tem-se um sistema desenvolvido para a web, principalmente onde exista grandes
+% volumes de dados, o termo escalabilidade deve se tornar muito mais presente na
+% concepção do projeto.
+
+% O termo escalabilidade pode ser definido como a maneira de ajustar a
+% capacidade de um sistema para atender demandas, de forma que o custo desta
+% operação não seja tão elevado. \cite[p. 3]{EJSMONT}. A incorporação de
+% escalabilidade em um sistema pode compreender a capacidade de lidar com um
+% crescimento de usuários, solicitações e transações, para este projeto, seu uso será
+% voltado para a requisição e transferência de grandes volumes de dados.
+
+
+\section{Revisão de bibliografia e trabalhos relacionados}
+
+
+\section{Metodologia}
+
+
+\section{Análises preliminares}
+
+
+\section{Considerações finais}
+
+
+\section{Referências}
+\bibliographystyle{sbc}
+\bibliography{referencias}
 
 \end{document}
+
+% Resumo
+% Introdução (Contexto do tema, problemática, justificativa e objetivos do estudo)
+% Revisão da bibliografia e trabalhos relacionados
+% Metodologia (Materiais e/ ou métodos utilizados)
+% Análises preliminares
+% Considerações finais (sobre o que já foi apresentado até o momento da entrega desta versão)
