@@ -52,15 +52,6 @@ como facilidades em instalações e atualizações, alcance global instantâneo 
 sob outra perspectiva, apresentam-se questões críticas que devem ser analisadas antes de aderir à plataforma, como
 o desempenho em situações com alta demanda de dados.
 
-Aplicações como \textit{streaming} de vídeo (ADICIONAR OUTROS EXEMPLOS) devem processar arquivos de 
-grande porte, de forma rápida e estável. Contudo, existem limitações inerentes ao uso da 
-plataforma \textit{web}, como o processamento de diversas requisições que exijam muitos dados, 
-tratamento do alto fluxo de dados pela máquina cliente e os limites impostos pelas tecnologias escolhidas.
-
-Para sobrepujar os problemas supracitados, existem técnicas desenvolvidas para a \textit{web} que buscam
-atenuar os problemas de alta demanda e torná-los irrisórios na experiência do usuário, como o processamento
-assíncrono (\textit{streams}) e \textit{caching}.
-
 O uso de \textit{Node.JS} e \textit{React.JS}, duas tecnologias em crescente uso e relevância no
 desenvolvimento \textit{web}, justifica-se pelo fato de que estas permitem uma abordagem de alta
 performance e apresentam recursos para otimização e escalabilidade. O \textit{Node.JS}, em específico, apresenta
@@ -72,6 +63,16 @@ Ao incluir estado em uma aplicação utilizando \textit{React.JS}, inclui-se a p
 e modificar dados dinâmicos enviados pelo servidor, que modificam a árvore de componentes e acarretam 
 mudanças na interface em que o usuário interage \cite[p. 97]{BANKSEPORCELLO}.
 
+Aplicações como \textit{streaming} de vídeo (ADICIONAR OUTROS EXEMPLOS) devem processar arquivos de 
+grande porte, de forma rápida e estável. Contudo, existem limitações inerentes ao uso da 
+plataforma \textit{web}, como o processamento de diversas requisições que exijam muitos dados, 
+tratamento do alto fluxo de dados pela máquina cliente e os limites impostos pelas tecnologias escolhidas.
+
+Para sobrepujar os problemas supracitados, existem técnicas desenvolvidas para a \textit{web} que buscam
+atenuar os problemas de alta demanda e torná-los irrisórios na experiência do usuário, como o processamento
+assíncrono (\textit{streams}) e \textit{caching}. Faz-se necessário, portanto, desenvolver um estudo das 
+técnicas escolhidas para aumentar o desempenho em alta demanda de dados utilizando os \textit{frameworks} 
+escolhidos.
 
 % Caching is one of the most important techniques when it comes to scaling the
 % front end of your web application. Instead of trying to add more servers or make
@@ -103,8 +104,70 @@ mudanças na interface em que o usuário interage \cite[p. 97]{BANKSEPORCELLO}.
 
 \section{Revisão de bibliografia e trabalhos relacionados}
 
+\subsection{Padrões de projeto no Node.JS}
+
+Padrões de projeto são soluções previamente definidas para problemas específicos que, geralmente,
+são comuns ao desenvolvimento do \textit{software} de diversas aplicações. Não são, necessariamente, 
+bibliotecas ou módulos prontos, apenas carregam o conceito de uma solução já comprovada e testada para um 
+determinado caso, sendo, dessa forma, necessária a implementação destes na 
+linguagem escolhida. \cite[p. 13]{DIOGORESENDE}
+
+Um único \textit{software} pode ser implementado com diferentes padrões de projeto e, até mesmo, com a união
+de dois ou mais. Os padrões apresentam diversos benefícios, como aumento da produtividade, manutenção e comunicação
+entre a equipe de desenvolvimento. Contudo, a definição das soluções arquiteturais adotadas deve ser 
+cuidadosa, visto que escolhas incorretas podem acarretar em novos empecilhos. Dentre outras, 
+alguns \textit{designs} adicionam camadas extras de processamento para obter maior flexibilidade, podendo, dessa forma, 
+afetar as métricas de desempenho do sistema final. \cite[p. 13 - p. 14]{DIOGORESENDE}
+
+Dentre a maioria dos padrões de projeto conhecidos, existem aqueles que são amplamente utilizados no 
+\textit{Node.JS}, devido à sua estrutura e ao seu modelo de interface. Dentre eles, evidenciam-se
+os padrões de fluxo de eventos e os orientados a eventos, já presentes e fundamentados na interface principal 
+da plataforma. É possível, por exemplo, substituir o modo de leitura de um arquivo de 
+uma simples função somada à uma \textit{callback}, que irá consumir mais recursos de máquina, para um fluxo de 
+leitura onde é possível verificar os eventos de dados e de conclusão, ou até mesmo encaminhar o fluxo para 
+outra camada de processamento. Da mesma forma que ocorre com os arquivos, o controle dos eventos 
+de conexão, recebimento de dados e encerramento está presente em módulos principais como, por exemplo, 
+o \textit{http}. Em suma, eventos são recursos fundamentais do \textit{Node.JS}. \cite[p. 15]{DIOGORESENDE}
+
+
+\subsection{Arquitetura orientada a eventos}
+
+Este padrão de projeto baseia-se na ideia de produção e consumo de eventos, sendo que o consumo pode ser feito por um
+ou mais ouvintes ao mesmo tempo. A implementação da parte consumidora deve garantir que haja uma reação ao 
+acontecimento de eventos, ao invés de simplesmente tentar detectar mudanças nos dados recebidos. \cite[p. 27]{DIOGORESENDE}
+
+Ao adotar este tipo de arquitetura em um projeto, a aplicação passa a ter o fluxo de informação controlado pelo disparo
+de eventos, o que, dependendo do caso, pode ser a melhor escolha de padrão, porém, ainda é preciso se atentar a alguns
+detalhes e desvantagens ao utilizar esta abordagem. Como o fluxo de dados da aplicação é dependente do acontecimento
+de certos eventos, é preciso ter cuidado extra no código para não permitir brechas que podem levar a um \textit{deadlock},
+em outras palavras, uma trava que impossibilita o prosseguimento do fluxo imaginado para a aplicação. Um 
+\textit{deadlock} pode ocorrer quando, por motivos de implementação incorreta, um evento alvo esperado pelo
+consumidor não é acionado, fazendo com que este fique preso em um ponto exato, não podendo avançar nem regredir.
+A segunda questão a ser observada, que também vale para outros tipos de padrões, é o tratamento de erros consistente
+e robusto. Ao passo que o ponto anterior pode não ser fatal para a aplicação como um todo, ignorar erros, principalmente
+os lançados por módulos principais, acarretará em paradas fatais da aplicação. \cite[p. 28]{DIOGORESENDE}
+
+
+\subsection{\textit{Stream}}
+
+
+\subsection{\textit{Buffer}}
+
+
+\subsection{\textit{Cache}}
+
 
 \section{Metodologia}
+
+% 1. Revisão bibliográfica de documentação e artigos referentes à
+% linguagem e frameworks escolhidos para o tratamento de alta
+% demanda de dados.
+% 2. Análise de casos e implementações feitas pela comunidade
+% desenvolvedora de software.
+% 3. Comparação de diferentes implementações feitas em sistemas web
+% para a manipulação e transferência de alto volume de dados.
+% 4. Desenvolvimento de aplicações cliente e servidor para transferência de
+% alto volume de dados.
 
 
 \section{Análises preliminares}
