@@ -153,6 +153,17 @@ os lançados por módulos principais, acarretará em paradas fatais da aplicaç�
 
 \subsection{\textit{Buffer}}
 
+Os \textit{buffers}, no \textit{Node.JS}, são objetos especiais utilizados para armazenamento e processamento 
+de dados binários, o que não seria possível operando com tipos primitivos do \textit{JavaScript} como \textit{strings},
+por exemplo, visto que estas são codificadas em \textit{Unicode}. \cite[p. 29]{DIOGORESENDE}
+
+Além da possibilidade de manipulação de dados binários e da facilidade em leituras e escritas de números de diferentes 
+tamanhos, os \textit{buffers} são uma importante estrutura na plataforma do \textit{Node.JS} em relação à arquitetura
+orientada a eventos, dada a compatibilidade binária existente entre os principais módulos da plataforma que 
+utilizam estes nos eventos de dados. Dessa forma, é possível que arquivos sejam transmitidos ao cliente de maneira 
+simplificada, ao modo que esta operação se resume ao encadeamento de fluxos com a troca de 
+\textit{buffers} entre cliente e servidor. \cite[p. 29]{DIOGORESENDE}
+
 
 \subsection{\textit{Cache}}
 
