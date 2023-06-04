@@ -37,6 +37,7 @@
 
 
 \begin{resumo} 
+% especificar quantos gb/tb
 \end{resumo}
 
 
@@ -124,20 +125,70 @@ o \textit{http}. Em suma, eventos são recursos fundamentais do \textit{Node.JS}
 
 \subsection{Arquitetura orientada a eventos}
 
-Este padrão de projeto baseia-se na ideia de produção e consumo de eventos, sendo que o consumo pode ser feito por um
-ou mais ouvintes ao mesmo tempo. A implementação da parte consumidora deve garantir que haja uma reação ao 
-acontecimento de eventos, ao invés de simplesmente tentar detectar mudanças nos dados recebidos. \cite[p. 27]{DIOGORESENDE}
+A arquitetura orientada a eventos (\textit{Event-Driven Architecture}, EDA) baseia-se na ideia de produção e consumo 
+de eventos, sendo que o consumo pode ser feito por um ou mais ouvintes ao mesmo tempo. A implementação da parte consumidora 
+deve garantir que haja uma reação ao acontecimento de eventos, ao invés de simplesmente tentar detectar 
+mudanças nos dados recebidos. \cite[p. 27]{DIOGORESENDE} 
 
-Ao adotar este tipo de arquitetura em um projeto, a aplicação passa a ter o fluxo de informação controlado pelo disparo
-de eventos, o que, dependendo do caso, pode ser a melhor escolha de padrão, porém, ainda é preciso se atentar a alguns
-detalhes e desvantagens ao utilizar esta abordagem. Como o fluxo de dados da aplicação é dependente do acontecimento
-de certos eventos, é preciso ter cuidado extra no código para não permitir brechas que podem levar a um \textit{deadlock},
+Operações envolvendo \textit{sockets}, \textit{streams} e arquivos são, em grande parte, 
+realizados de forma assíncrona em aplicações escritas na plataforma do \textit{Node.JS}, da forma que o processamento
+dos ouvintes é executado diante de algum disparo de evento. \cite{MFO} Ao adotar este tipo de arquitetura em um projeto, 
+a aplicação passa a ter o fluxo de informação controlado pelos disparos, o que, dependendo do caso, pode ser a melhor 
+escolha de padrão. Contudo, ainda é preciso se atentar a alguns detalhes e desvantagens ao utilizar esta abordagem,
+visto que diversos erros de programação podem ser observados como, por exemplo, eventos não tratados e ouvintes
+registrados tarde demais. \cite[p. 28]{DIOGORESENDE}
+
+Como o fluxo de dados da aplicação passa a ser dependente do acontecimento de certos eventos, é preciso ter cuidado 
+extra no código para não permitir brechas que podem levar a um \textit{deadlock},
 em outras palavras, uma trava que impossibilita o prosseguimento do fluxo imaginado para a aplicação. Um 
 \textit{deadlock} pode ocorrer quando, por motivos de implementação incorreta, um evento alvo esperado pelo
 consumidor não é acionado, fazendo com que este fique preso em um ponto exato, não podendo avançar nem regredir.
 A segunda questão a ser observada, que também vale para outros tipos de padrões, é o tratamento de erros consistente
 e robusto. Ao passo que o ponto anterior pode não ser fatal para a aplicação como um todo, ignorar erros, principalmente
 os lançados por módulos principais, acarretará em paradas fatais da aplicação. \cite[p. 28]{DIOGORESENDE}
+
+O modelo orientado a eventos implementado na plataforma do \textit{Node.JS} é composto por duas partes: 
+\textit{loop thread} e \textit{worker pool} (também conhecida como \textit{threadpool}). A primeira, em específico, 
+diz respeito à uma única \textit{thread} responsável por executar o código fornecido pelo usuário, além 
+das próprias \textit{callbacks} definidas para as respostas dos disparos de eventos. Como o todo o código principal 
+é executado em uma única \textit{thread}, o \textit{Node.JS} transfere certas operações mais custosas à \textit{worker pool}, 
+com o objetivo de não travar a \textit{thread} principal responsável por receber novas solicitações de clientes \cite{BUGS}, 
+como, por exemplo, operações de I/O para as quais sistemas operacionais não oferecem uma versão não-bloqueante 
+\cite{NODEBLOCKEVENTLOOP}. 
+
+\begin{figure}[h]
+\centering
+\caption{Modelo da abordagem EDA no \textit{Node.JS}}
+\includegraphics[width=0.8\textwidth]{images/eda-arch-nodejs.png}
+\label{fig:nodejs_eda_model}
+
+Fonte: Adaptado de \cite{BUGS}.
+\end{figure}
+
+A \autoref{fig:nodejs_eda_model} apresenta o modelo utilizado na arquitetura orientada a eventos da plataforma do 
+\textit{Node.JS}. No fluxo de processamento de eventos, a primeira etapa realizada pela \textit{loop thread} é 
+a busca de um evento no \textit{event loop} e, caso sua \textit{callback} não possa ser executada na mesma, ocorre
+a transferência para a \textit{worker pool}, registrando uma nova \textit{callback} associada. 
+Na figura, é possível observar este comportamento nas etapas 1.1 e 1.2, onde as ações de criação e leitura de 
+um arquivo são transferidas à \textit{worker pool}, visto que são operações custosas e bloqueantes. Dada 
+a transferência, a \textit{thread} principal permanece não-bloqueada e pode continuar seu processamento. 
+Dentro da \textit{worker pool}, novas \textit{threads} podem ser criadas para realizar a execução das operações
+assíncronas de I/O e, ao término, os eventos serão inseridos na fila específica para I/O (\textit{Node.JS} 
+possui sete filas de eventos para diferentes tipos, sendo eles: temporizador, I/O, pendente, ocioso, preparação, 
+verificação e fechamento \cite{NODEEVENTLOOP}). Na figura, as etapas 2.1 e 2.2 representam este comportamento.
+Por fim, a \textit{loop thread} busca estes novos eventos na fila e executa suas 
+\textit{callbacks} (etapas 3.1 e 3.2).\cite{BUGS}
+
+
+\subsection{EDA \textit{vs.} OPTC}
+
+A abordagem EDA, descrita na seção anterior, realiza multiplexação de uma única \textit{thread} para processar 
+as requisições dos clientes, reduzindo, dessa forma, o consumo de recursos de máquina. 
+A arquitetura de \textit{multithreading}, abordagem tradicional de aplicações \textit{web}, por sua vez, baseia-se
+no conceito de uma \textit{thread} por cliente (\textit{One Thread Per Client}, OTPC), ou seja, cada requisição
+recebida pelo servidor é atribuida à uma nova \textit{thread} para processamento isolado dos clientes, reduzindo
+problemas relacionados à interferências. Contudo, cada requisição recebida resulta em sobrecarga no uso de
+recursos de máquina e em trocas de contexto. \cite{JGD}
 
 
 \subsection{\textit{Stream}}
