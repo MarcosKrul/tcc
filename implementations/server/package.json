@@ -1,0 +1,16 @@
+{
+  "name": "implementations",
+  "engines": {
+    "node": "18.12.0"
+  },
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Node.js performance",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch src/index.js"
+  },
+  "keywords": [],
+  "author": "Marcos Renan Krul <marcoskrul2k@gmail.com> & Renato Cristiano Ruppel <heruppel2@gmail.com>",
+  "license": "ISC"
+}
