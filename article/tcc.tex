@@ -78,7 +78,7 @@ escolhidos.
 
 \section{Revisão de bibliografia e trabalhos relacionados}
 
-\subsection{Padrões de projeto no Node.JS}
+\subsection{Padrões de projeto no \textit{Node.JS}}
 
 Padrões de projeto são soluções previamente definidas para problemas específicos que, geralmente,
 são comuns ao desenvolvimento do \textit{software} de diversas aplicações. Não são, necessariamente, 
@@ -133,7 +133,8 @@ O modelo orientado a eventos implementado na plataforma do \textit{Node.JS} é c
 diz respeito à uma única \textit{thread} responsável por executar o código fornecido pelo usuário, além 
 das próprias \textit{callbacks} definidas para as respostas dos disparos de eventos. Como todo o código principal 
 é executado em uma única \textit{thread}, o \textit{Node.JS} transfere certas operações mais custosas à \textit{worker pool}, 
-com o objetivo de não travar a \textit{thread} principal responsável por receber novas solicitações de clientes \cite{BUGS}, 
+com o objetivo de não travar a \textit{thread} principal responsável por receber novas solicitações de 
+clientes \cite{BUGS} \cite{ATOMICITY}, 
 como, por exemplo, operações de I/O para as quais sistemas operacionais não oferecem uma versão não-bloqueante 
 \cite{NODEBLOCKEVENTLOOP}. 
 
@@ -280,7 +281,6 @@ A pesquisa a ser desenvolvida tem caráter semi-experimental, qualitativo e com 
 \section{Conclusão}
 
 
-\section{Referências}
 \bibliographystyle{sbc}
 \bibliography{referencias}
 
