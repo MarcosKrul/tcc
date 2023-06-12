@@ -6,6 +6,7 @@
 \usepackage[brazil]{babel}
 \usepackage{fancyvrb}
 \usepackage{caption}
+\usepackage{enumerate}
 \usepackage{subcaption}
 
 \newcommand\slsh{\char`\\}
@@ -21,7 +22,7 @@
  
 \sloppy
 
-\title{Estudo relativo ao desempenho em função do consumo sobre alta demanda de dados em sistemas web desenvolvidos com \textit{Node.JS} e \textit{React.JS}}
+\title{Estudo relativo ao desempenho em função do consumo sobre alta demanda de dados em sistemas web desenvolvidos com \textit{Node.JS}}
 
 \author{Marcos Renan Krul\inst{1}, Renato Cristiano Ruppel\inst{1}, Prof. Dr. Adriano Ferrsa\inst{1}}
 
@@ -58,11 +59,7 @@ desenvolvimento \textit{web}, justifica-se pelo fato de que estas permitem uma a
 performance e apresentam recursos para otimização e escalabilidade. O \textit{Node.JS}, em específico, apresenta
 bons resultados em casos que necessitem da persistência de centenas ou milhares de conexões
 simultâneas, onde a comunicação é realizada com o envio de pequenos fragmentos do arquivo de destino
-\cite[p. 112]{EJSMONT}. Quanto à camada \textit{front-end}, a biblioteca \textit{React.JS} traz como
-carro chefe o gerenciamento de estado da aplicação, orientado a dados que podem mudar com o passar do tempo.
-Ao incluir estado em uma aplicação utilizando \textit{React.JS}, inclui-se a possibilidade de criar, ler
-e modificar dados dinâmicos enviados pelo servidor, que modificam a árvore de componentes e acarretam 
-mudanças na interface em que o usuário interage \cite[p. 97]{BANKSEPORCELLO}.
+\cite[p. 112]{EJSMONT}.
 
 Aplicações como colaboração de documentos e tarefas, jogos e \textit{streaming} de vídeo \cite{ZRHR} devem processar 
 arquivos de grande porte, de forma rápida e estável. Contudo, existem limitações inerentes ao uso da 
@@ -216,53 +213,55 @@ simplificada, ao modo que esta operação se resume ao encadeamento de \textit{s
 
 \section{Metodologia}
 
+% ler um arquivo - definir tamanho, ex.: 50GB
+% comparação - leitura badaras x leitura com arquitetura baseada em eventos
+% métricas para comparação - uso de memória e tempo
+% seção sobre a base de dados utilizada (dados, tamanho, link download)
+
 
 Nesta seção será descrita a metodologia proposta para a pesquisa do tema, esta que tem caráter semi-experimental, qualitativo
-e escopo exploratório. Sendo o objetivo desta pesquisa investigar o impacto do consumo de recursos no desempenho de sistemas
-web baseados em Node.JS quando confrontados com uma demanda intensa de dados.
+e escopo exploratório. Sendo o objetivo desta pesquisa analisar o desempenho de sistemas
+\textit{web} baseados em \textit{Node.JS} quando confrontados com uma demanda intensa de dados, 
+com tamanhos de arquivo na ordem de \textit{gigabytes}.
 
-4.?. Planejamento Experimental
 
-O estudo será realizado em um ambiente controlado, onde serão desenvolvidos cenários de teste representativos de diferentes 
-níveis de consumo de dados. Serão definidos parâmetros, como tamanhos de dados a serem transferidos e cargas 
-de trabalho, para simular situações de baixa, média e alta demanda de dados.
+\subsection{Planejamento experimental}
 
-4.?. Construção do Ambiente de Teste
+A parte prática do estudo será realizada em um ambiente controlado, onde serão desenvolvidos cenários de teste com diferentes 
+implementações de arquitetura para a resolução do problema de envio de dados. Sendo um implementação convencional, com uma
+arquitetura não escalável e não pensada para o caso específico de transferência de um grande volume de dados, e outra aplicando
+técnicas focadas na manipulação de maiores volumes de dados.
 
-Será configurado um ambiente de teste composto por uma aplicação servidor e uma aplicação cliente. . 
-O servidor de aplicação será baseado em Node.JS, utilizando a versão xx.xx.xx. 
-A aplicação cliente terá uma interface básica construída apenas com HTML5.
 
-% 4.3. Definição dos Cenários de Teste
+\subsection{Construção do ambiente de teste}
 
-% Serão definidos três cenários de teste para avaliar o desempenho do sistema em diferentes níveis de consumo de dados. Cada cenário 
-% representará uma carga de trabalho específica, com diferentes quantidades de requisições simultâneas e tamanhos de dados a serem 
-% processados. Os cenários de teste serão nomeados da seguinte forma:
+Será configurado um ambiente de teste composto por uma aplicação servidor e uma aplicação cliente.
+O servidor de aplicação será baseado em \textit{Node.JS}, utilizando a versão xx.xx.xx. 
+A aplicação cliente terá uma interface básica para consumo de dados, construída apenas com HTML5.
 
-% Cenário 1: Baixa demanda de dados - 100 requisições simultâneas com uma carga de dados pequena (100KB).
-% Cenário 2: Média demanda de dados - 500 requisições simultâneas com uma carga de dados moderada (1MB).
-% Cenário 3: Alta demanda de dados - 1000 requisições simultâneas com uma carga de dados grande (10MB).
-% 4.4. Coleta de Dados
+\subsection{Base de dados utilizada}
 
-% Serão definidos indicadores de desempenho a serem coletados durante a execução dos cenários de teste. Os principais indicadores 
-% incluirão o tempo de resposta das requisições, a taxa de transferência, a utilização de CPU e memória, e a latência do banco de dados. 
-% Serão utilizadas ferramentas de coleta de dados adequadas, como o Apache JMeter e o MongoDB Profiler, para garantir a precisão 
-% e consistência dos resultados.
+A base de dados a ser utilizada será a mesma para ambos os cenários, ...
 
-% 4.5. Análise de Dados
+\subsection{Definição dos cenários de teste}
 
-% Os dados coletados serão analisados estatisticamente para identificar padrões, tendências e relações entre o consumo de dados e 
-% o desempenho do sistema. Serão utilizadas técnicas de análise descritiva e inferencial para interpretar os resultados e obter 
-% insights significativos. Serão realizadas comparações entre os cenários de teste para identificar diferenças significativas 
-% em termos de desempenho.
+Serão definidos dois cenários de teste para avaliar o desempenho das implementações quando confrontadas com uma transferência de
+um volume de dados de XX \textit{gigabytes}. Os cenários de teste serão nomeados da seguinte forma:
 
-% 4.6. Considerações Éticas
+\begin{enumerate}[a)]
+    \item Cenário 1: Implementação com arquitetura não específica para transferências volumosas.
+    \item Cenário 2: Implementação com arquitetura escalável para transferências volumosas.
+\end{enumerate}
 
-% Serão adotadas medidas para garantir a ética na condução da pesquisa. Será assegurada a anonimização dos dados coletados e 
-% a conformidade com as diretrizes de ética em pesquisa. Além disso, serão respeitadas as normas de privacidade e proteção 
-% de dados, e o ambiente de teste será isolado para evitar qualquer impacto negativo em sistemas em produção.
+\subsection{Coleta e análise de dados}
 
-\subsection{Revisão sistemática da literatura}
+Serão definidos dois indicadores de desempenho a serem coletados durante a execução dos cenários de teste. Sendo os indicadores
+consumo de memória \textit{RAM} da máquina em que o servidor será executado e o tempo de execução para o envio dos dados.
+
+Os dados coletados serão analisados para identificar padrões, tendências e relações entre o consumo de dados e a implementação.
+Serão realizadas comparações entre os cenários de teste para identificar diferenças significativas em termos de desempenho, 
+levando em consideração as métricas previamente definidas.
+
 
 % 1. Revisão bibliográfica de documentação e artigos referentes à
 % linguagem e frameworks escolhidos para o tratamento de alta
