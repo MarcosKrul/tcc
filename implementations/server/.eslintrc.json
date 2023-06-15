@@ -1,0 +1,56 @@
+{
+  "env": {
+    "es6": true,
+    "node": true,
+    "jest": true
+  },
+  "extends": [
+    "airbnb-base",
+    "plugin:prettier/recommended"
+  ],
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parserOptions": {
+    "ecmaVersion": 11,
+    "sourceType": "module"
+  },
+  "plugins": [
+    "prettier",
+    "eslint-plugin-import-helpers"
+  ],
+  "rules": {
+    "no-nested-ternary": "off",
+    "no-param-reassign": "off",
+    "operator-assignment": "off",
+    "no-new": "off",
+    "no-prototype-builtins": "off",
+    "no-restricted-syntax": "off",
+    "max-classes-per-file": "off",
+    "no-console": "off",
+    "import/prefer-default-export": "off",
+    "no-useless-constructor": "off",
+    "no-underscore-dangle": "off",
+    "prettier/prettier": "error",
+    "class-methods-use-this": "off",
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      { "ts": "never" }
+    ],
+    "import-helpers/order-imports": [
+      "warn",
+      {
+        "newlinesBetween": "always",
+        "groups": [
+          "module",
+          "/^@server\/shared/",
+          "/^@/",
+          ["parent", "sibling", "index"]
+        ],
+        "alphabetize": { "order": "asc", "ignoreCase": true }
+      }
+    ]
+  }
+}
