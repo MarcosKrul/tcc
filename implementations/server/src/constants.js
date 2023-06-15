@@ -1,6 +1,6 @@
 const PORT = 3000;
 
-const filename = "./temp/metadata.csv";
+const filename = "./database/metadata.csv";
 
 const abortController = new AbortController();
 

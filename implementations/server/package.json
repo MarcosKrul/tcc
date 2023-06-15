@@ -8,7 +8,8 @@
   "description": "Node.js performance",
   "main": "index.js",
   "scripts": {
-    "dev": "node --watch src/http-server.js",
+    "dev:sync": "node --watch src/http-server-sync.js",
+    "dev:async": "node --watch src/http-server-async.js",
     "lint": "eslint . --ext js,ts"
   },
   "keywords": [],
