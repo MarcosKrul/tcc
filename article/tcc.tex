@@ -38,11 +38,23 @@
 
 
 \begin{resumo} 
-% especificar quantos gb/tb
+O trabalho realiza um estudo sobre técnicas presentes na plataforma do \textit{Node.JS} para desenvolvimento de servidores \textit{web} 
+que exijam processamento de grandes volumes de dados. Dentre os principais padrões de projeto, destaca-se a arquitetura orientada a eventos,
+fortemente enraizada nos principais núcleos da plataforma, que, juntamente com as \textit{streams}, possibilita a leitura de arquivos 
+com tamanho na ordem de \textit{gigabytes}. Serão desenvolvidas aplicações cliente e servidor para validar a possibilidade de consumo em alta
+demanda em aplicações \textit{web}, além de aferir o consumo de recursos de máquina no lado servidor diante da leitura e processamento
+de um arquivo com 1.65 GB. Espera-se concluir que a arquitetura orientada a eventos provê a melhor solução para desenvolvimento de aplicações
+\textit{web} com alta demanda de dados na plataforma do \textit{Node.JS}.
 \end{resumo}
 
 
 \begin{abstract} 
+The work carries out a study on techniques present in the Node.js platform for developing web servers that require 
+processing large volumes of data. Among the main design patterns, the event-driven architecture stands out, deeply 
+rooted in the platform's core, which, together with streams, enables reading files with gigabyte-sized dimensions. Client and 
+server applications will be developed to validate the possibility of high-demand consumption in web applications, as well as to 
+assess the server-side resource consumption when reading and processing a 1.65 GB file. It is expected to conclude that 
+the event-driven architecture provides the best solution for developing data-intensive web applications on the Node.js platform.
 \end{abstract}
 
 
@@ -54,9 +66,9 @@ como facilidades em instalações e atualizações, alcance global instantâneo 
 sob outra perspectiva, apresentam-se questões críticas que devem ser analisadas antes de aderir à plataforma, como
 o desempenho em situações com alta demanda de dados.
 
-O uso de \textit{Node.JS} e \textit{React.JS}, duas tecnologias em crescente uso e relevância no
-desenvolvimento \textit{web}, justifica-se pelo fato de que estas permitem uma abordagem de alta
-performance e apresentam recursos para otimização e escalabilidade. O \textit{Node.JS}, em específico, apresenta
+O uso de \textit{Node.JS}, tecnologia em crescente uso e relevância no
+desenvolvimento \textit{web}, justifica-se pelo fato de que este permite uma abordagem de alta
+performance e apresenta recursos para otimização e escalabilidade. Esse \textit{framework} apresenta
 bons resultados em casos que necessitem da persistência de centenas ou milhares de conexões
 simultâneas, onde a comunicação é realizada com o envio de pequenos fragmentos do arquivo de destino
 \cite[p. 112]{EJSMONT}.
@@ -177,7 +189,7 @@ recursos de máquina e em trocas de contexto \cite{JGD}. Dessa forma, os custos 
 As \textit{streams} representam uma das mais importantes estruturas na plataforma do \textit{Node.JS}, por motivos
 como aumento em desempenho e eficiência, possibilidade de criação de códigos elegantes e pela sua compatibilidade
 no modelo da arquitetura orientada a eventos do \textit{Node.JS} \cite[p. 119]{MARIO}. Oferecem uma interface facilitada 
-e rápida para leitura, gravação e transformação, da forma que é possível encadear dados entre estas operações 
+e rápida para leitura, gravação e transformação, de forma que é possível encadear dados entre estas operações 
 para processá-los e, se necessário, transformá-los. Além dessas, essa estrutura está relacionada com os eventos, visto que
 utilizam destes para enviar notificações aos consumidores quando os dados estão prontos para consumo ou quando o
 processamento chegou ao fim \cite[p. 28]{DIOGORESENDE}.
@@ -187,13 +199,13 @@ em plataformas baseadas em eventos, a maneira mais eficiente para tratamento de 
 Dessa forma, a aplicação irá consumir os dados de entrada a medida que estes estão disponíveis, e o envio dos dados
 de saída será de acordo com o rítimo de produção da aplicação \cite[p. 119]{MARIO}.
 
-As \textit{streams}, além desta, são utilizadas em problemas que não apresentam soluções tecnicamente
+As \textit{streams}, além das características apresentadas, são utilizadas em problemas que não apresentam soluções tecnicamente
 possíveis com outras interfaces presentes na plataforma do \textit{Node.JS}, como, por exemplo, a leitura de 
 arquivos suficientemente grandes com funções que retornam um \textit{buffer} ao término da leitura completa. Arquivos com 
 centenas de \textit{megabytes} ou até mesmo \textit{gigabytes}, precisariam ser carregados em um único 
 \textit{buffer}, o que torna esse cenário inviável, visto que a aplicação ficaria sem memória, ainda mais ao 
-imaginarmos cenários de aplicações  \textit{web} onde seria necessário realizar diversas leituras simultâneas.
-Além destas, o V8 (mecanismo presente no \textit{Node.JS} responsável pela execução de códigos \textit{JavaScript} \cite{NODEV8}) impõe 
+imaginarmos cenários de aplicações \textit{web} onde seria necessário realizar diversas leituras simultâneas.
+Ademais, o V8 (mecanismo presente no \textit{Node.JS} responsável pela execução de códigos \textit{JavaScript} \cite{NODEV8}) impõe 
 um limite máximo de, aproximadamente, 1 GB para \textit{buffers}, o que explica a impossibilidade técnica para problemas 
 desta natureza \cite[p. 122]{MARIO}.
 
@@ -213,70 +225,72 @@ simplificada, ao modo que esta operação se resume ao encadeamento de \textit{s
 
 \section{Metodologia}
 
-% ler um arquivo - definir tamanho, ex.: 50GB
-% comparação - leitura badaras x leitura com arquitetura baseada em eventos
-% métricas para comparação - uso de memória e tempo
-% seção sobre a base de dados utilizada (dados, tamanho, link download)
-
-
 Nesta seção será descrita a metodologia proposta para a pesquisa do tema, esta que tem caráter semi-experimental, qualitativo
 e escopo exploratório. Sendo o objetivo desta pesquisa analisar o desempenho de sistemas
 \textit{web} baseados em \textit{Node.JS} quando confrontados com uma demanda intensa de dados, 
 com tamanhos de arquivo na ordem de \textit{gigabytes}.
 
+O estudo será realizado em um ambiente controlado, onde serão desenvolvidos cenários de teste com diferentes 
+implementações de arquitetura para a resolução do problema de envio de dados, a fim de aferir métricas de desempenho do servidor, 
+sendo consumo de memória \textit{RAM} a principal. Uma das implementação será com uma arquitetura não escalável e não 
+pensada para o caso específico de transferência de um grande volume de dados, e outra aplicando técnicas focadas na 
+manipulação de maiores volumes de dados.
 
-\subsection{Planejamento experimental}
 
-A parte prática do estudo será realizada em um ambiente controlado, onde serão desenvolvidos cenários de teste com diferentes 
-implementações de arquitetura para a resolução do problema de envio de dados. Sendo um implementação convencional, com uma
-arquitetura não escalável e não pensada para o caso específico de transferência de um grande volume de dados, e outra aplicando
-técnicas focadas na manipulação de maiores volumes de dados.
+\subsection{Base de dados utilizada}
+
+A base de dados foi escolhida com base em seu tamanho em \textit{gigabytes}, com o objetivo de garatir resultados
+significativos para o estudo. Buscou-se uma base ampla e abrangente, a qual contivesse um número significativo de 
+registros para o processamento na plataforma.
+
+O arquivo final utilizado apresenta um tamanho de 1.65 GB, sendo do formato \textit{csv} (\textit{comma separated values}) 
+com 19 propriedades separadas em colunas. A extração foi realizada da base 
+\textit{CORD-19: COVID-19 Open Research Dataset} \cite{BASE}. Destaca-se que a escolha foi realizada a partir 
+de fontes confiáveis e respeitando os critérios éticos e legais. O tratamento das informações contidas será de 
+acordo com as técnicas e métodos descritos nas seções subsequentes deste trabalho.
 
 
 \subsection{Construção do ambiente de teste}
 
-Será configurado um ambiente de teste composto por uma aplicação servidor e uma aplicação cliente.
-O servidor de aplicação será baseado em \textit{Node.JS}, utilizando a versão xx.xx.xx. 
-A aplicação cliente terá uma interface básica para consumo de dados, construída apenas com HTML5.
+Será configurado um ambiente de teste composto por uma aplicação servidor, com o intuito de registrar o consumo
+de memória \textit{RAM} da aplicação nos dois cenários propostos. O servidor de aplicação será baseado em \textit{Node.JS}, 
+utilizando a versão 20.3.0. Além dessa, será construída uma aplicação cliente para o 
+consumo dos dados enviados pelo servidor. Esta aplicação terá uma interface básica para consumo de dados, construída 
+com HTML5 e JavaScript.
 
-\subsection{Base de dados utilizada}
-
-A base de dados a ser utilizada será a mesma para ambos os cenários, ...
 
 \subsection{Definição dos cenários de teste}
 
-Serão definidos dois cenários de teste para avaliar o desempenho das implementações quando confrontadas com uma transferência de
-um volume de dados de XX \textit{gigabytes}. Os cenários de teste serão nomeados da seguinte forma:
+Para a primeira etapa, serão definidos dois cenários de teste para avaliar o desempenho das implementações quando confrontadas
+com uma transferência de um volume de dados de 1.65 \textit{gigabytes}. Os cenários de teste serão nomeados da seguinte forma:
 
 \begin{enumerate}[a)]
-    \item Cenário 1: Implementação com arquitetura não específica para transferências volumosas.
-    \item Cenário 2: Implementação com arquitetura escalável para transferências volumosas.
+\item Cenário 1: Implementação com arquitetura não específica para transferências volumosas, ou seja, realização 
+da leitura de arquivos de forma síncrona.
+\item Cenário 2: Implementação com arquitetura escalável para transferências volumosas, utilizando métodos
+da arquitetura baseada em eventos para ler arquivos de forma assíncrona.
 \end{enumerate}
 
 \subsection{Coleta e análise de dados}
 
-Serão definidos dois indicadores de desempenho a serem coletados durante a execução dos cenários de teste. Sendo os indicadores
-consumo de memória \textit{RAM} da máquina em que o servidor será executado e o tempo de execução para o envio dos dados.
-
-Os dados coletados serão analisados para identificar padrões, tendências e relações entre o consumo de dados e a implementação.
-Serão realizadas comparações entre os cenários de teste para identificar diferenças significativas em termos de desempenho, 
-levando em consideração as métricas previamente definidas.
+O indicador de desempenho a ser coletado e analisado para cada uma das implementações será o consumo de memória
+\textit{RAM} por parte do servidor durante a transferência dos dados contidos na base previamente citada.
 
 
-% 1. Revisão bibliográfica de documentação e artigos referentes à
-% linguagem e frameworks escolhidos para o tratamento de alta
-% demanda de dados.
-% 2. Análise de casos e implementações feitas pela comunidade
-% desenvolvedora de software.
-% 3. Comparação de diferentes implementações feitas em sistemas web
-% para a manipulação e transferência de alto volume de dados.
-% 4. Desenvolvimento de aplicações cliente e servidor para transferência de
-% alto volume de dados.
+\section{Análises preliminares} 
 
-\section{Resultados e discussão}
+Tendo em vista o \textit{background} estabelecido e a construção e planejamento da parte experimental,
+é possível esperar que o estudo consiga elucidar as questões propostas sobre a preferência de uma implementação escalável
+e direcionada à leitura de arquivo de forma assíncrona, a fim de preservar recursos da máquina que hospeda um servidor
+\textit{web}.
 
 
-\section{Conclusão}
+\section{Considerações finais}
+
+Com esta pesquisa, mesclando teoria e parte experimental, espera-se apresentar e dar foco à uma implementação
+escalável e direcionada à transferência de volumes de dados na ordem de \textit{gigabytes} em aplicações \textit{web}
+desenvolvidas com \textit{Node.JS}, demonstrando como o uso de técnicas como as \textit{streams} deve ser encorajado 
+quando se fala em requisições de dados volumosos na \textit{web}.
 
 
 \bibliographystyle{sbc}
