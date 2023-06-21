@@ -24,7 +24,7 @@
 
 \title{Estudo relativo ao desempenho em função do consumo sobre alta demanda de dados em sistemas web desenvolvidos com \textit{Node.JS}}
 
-\author{Marcos Renan Krul\inst{1}, Renato Cristiano Ruppel\inst{1}, Prof. Dr. Adriano Ferrsa\inst{1}}
+\author{Marcos Renan Krul\inst{1}, Renato Cristiano Ruppel\inst{1}, Prof. Dr. Adriano Ferrasa\inst{1}}
 
 
 \address{Universidade Estadual de Ponta Grossa (UEPG)
@@ -67,10 +67,10 @@ sob outra perspectiva, apresentam-se questões críticas que devem ser analisada
 o desempenho em situações com alta demanda de dados.
 
 O uso de \textit{Node.JS}, tecnologia em crescente uso e relevância no
-desenvolvimento \textit{web}, justifica-se pelo fato de que este permite uma abordagem de alta
+desenvolvimento \textit{web}, justifica-se pelo fato de que esta permite uma abordagem de alta
 performance e apresenta recursos para otimização e escalabilidade. Esse \textit{framework} apresenta
 bons resultados em casos que necessitem da persistência de centenas ou milhares de conexões
-simultâneas, onde a comunicação é realizada com o envio de pequenos fragmentos do arquivo de destino
+simultâneas, onde a comunicação é realizada com o envio de pequenos fragmentos do arquivo ao destino
 \cite[p. 112]{EJSMONT}.
 
 Aplicações como colaboração de documentos e tarefas, jogos e \textit{streaming} de vídeo \cite{ZRHR} devem processar 
@@ -91,7 +91,7 @@ escolhidos.
 
 Padrões de projeto são soluções previamente definidas para problemas específicos que, geralmente,
 são comuns ao desenvolvimento do \textit{software} de diversas aplicações. Não são, necessariamente, 
-bibliotecas ou módulos prontos, apenas carregam o conceito de uma solução já comprovada e testada para um 
+bibliotecas ou módulos prontos, apenas apresentam o conceito de uma solução já comprovada e testada para um 
 determinado caso, sendo, dessa forma, necessária a implementação destes na 
 linguagem escolhida \cite[p. 13]{DIOGORESENDE}.
 
@@ -110,7 +110,8 @@ uma simples função somada à uma \textit{callback}, que irá consumir mais rec
 leitura onde é possível verificar os eventos de dados e de conclusão, ou até mesmo encaminhar o fluxo para 
 outra camada de processamento. Da mesma forma que ocorre com os arquivos, o controle dos eventos 
 de conexão, recebimento de dados e encerramento está presente em módulos principais como, por exemplo, 
-o \textit{http}. Em suma, eventos são recursos fundamentais do \textit{Node.JS} \cite[p. 15]{DIOGORESENDE}.
+o \textit{http}. Observa-se que a arquitetura do \textit{Node.JS} baseia-se em eventos, sendo estes,
+recursos fundamentais desta plataforma \cite[p. 15]{DIOGORESENDE}.
 
 
 \subsection{Arquitetura orientada a eventos}
@@ -123,10 +124,10 @@ mudanças nos dados recebidos \cite[p. 27]{DIOGORESENDE}.
 Operações envolvendo \textit{sockets}, \textit{streams} e arquivos são, em grande parte, 
 realizados de forma assíncrona em aplicações escritas na plataforma do \textit{Node.JS}, da forma que o processamento
 dos ouvintes é executado diante de algum disparo de evento. \cite{MFO} Ao adotar este tipo de arquitetura em um projeto, 
-a aplicação passa a ter o fluxo de informação controlado pelos disparos, o que, dependendo do caso, pode ser a melhor 
+a aplicação passa a ter o fluxo de informação controlado pelo envio de eventos, o que, dependendo do caso, pode ser a melhor 
 escolha de padrão. Contudo, ainda é preciso se atentar a alguns detalhes e desvantagens ao utilizar esta abordagem,
 visto que diversos erros de programação podem ser observados como, por exemplo, eventos não tratados e ouvintes
-registrados tarde demais \cite[p. 28]{DIOGORESENDE}.
+registrados fora do tempo de interação \cite[p. 28]{DIOGORESENDE}.
 
 Como o fluxo de dados da aplicação passa a ser dependente do acontecimento de certos eventos, é preciso ter cuidado 
 extra no código para não permitir brechas que podem levar a um \textit{deadlock},
@@ -156,17 +157,17 @@ como, por exemplo, operações de I/O para as quais sistemas operacionais não o
 Fonte: Adaptado de \cite{BUGS}.
 \end{figure}
 
-A \autoref{fig:nodejs_eda_model} apresenta o modelo utilizado na arquitetura orientada a eventos da plataforma do 
-\textit{Node.JS}. No fluxo de processamento de eventos, a primeira etapa realizada pela \textit{loop thread} é 
+Na arquitetura orientada a eventos da plataforma do \textit{Node.JS} (\autoref{fig:nodejs_eda_model}), 
+o fluxo de processamento de eventos é iniciado pela \textit{loop thread} com 
 a busca de um evento no \textit{event loop} e, caso sua \textit{callback} não possa ser executada na mesma, ocorre
 a transferência para a \textit{worker pool}, registrando uma nova \textit{callback} associada. 
-Na figura, é possível observar este comportamento nas etapas 1.1 e 1.2, onde as ações de criação e leitura de 
+Ainda, é possível observar este comportamento nas etapas 1.1 e 1.2, onde as ações de criação e leitura de 
 um arquivo são transferidas à \textit{worker pool}, visto que são operações custosas e bloqueantes. Dada 
 a transferência, a \textit{thread} principal permanece não-bloqueada e pode continuar seu processamento. 
 Dentro da \textit{worker pool}, novas \textit{threads} podem ser criadas para realizar a execução das operações
 assíncronas de I/O e, ao término, os eventos serão inseridos na fila específica para I/O (\textit{Node.JS} 
 possui sete filas de eventos para diferentes tipos, sendo eles: temporizador, I/O, pendente, ocioso, preparação, 
-verificação e fechamento \cite{NODEEVENTLOOP}). Na figura, as etapas 2.1 e 2.2 representam este comportamento.
+verificação e fechamento \cite{NODEEVENTLOOP}). As etapas 2.1 e 2.2 representam este comportamento.
 Por fim, a \textit{loop thread} busca estes novos eventos na fila e executa suas 
 \textit{callbacks} (etapas 3.1 e 3.2) \cite{BUGS}.
 
@@ -197,7 +198,7 @@ processamento chegou ao fim \cite[p. 28]{DIOGORESENDE}.
 O modelo da arquitetura baseada em eventos do \textit{Node.JS} aumenta o poder das \textit{streams}, visto que,
 em plataformas baseadas em eventos, a maneira mais eficiente para tratamento de I/O é com processamento em tempo real.
 Dessa forma, a aplicação irá consumir os dados de entrada a medida que estes estão disponíveis, e o envio dos dados
-de saída será de acordo com o rítimo de produção da aplicação \cite[p. 119]{MARIO}.
+de saída será de acordo com o ritmo de produção da aplicação \cite[p. 119]{MARIO}.
 
 As \textit{streams}, além das características apresentadas, são utilizadas em problemas que não apresentam soluções tecnicamente
 possíveis com outras interfaces presentes na plataforma do \textit{Node.JS}, como, por exemplo, a leitura de 
@@ -237,11 +238,10 @@ pensada para o caso específico de transferência de um grande volume de dados, 
 manipulação de maiores volumes de dados.
 
 
-\subsection{Base de dados utilizada}
+\subsection{Base de teste}
 
-A base de dados foi escolhida com base em seu tamanho em \textit{gigabytes}, com o objetivo de garatir resultados
-significativos para o estudo. Buscou-se uma base ampla e abrangente, a qual contivesse um número significativo de 
-registros para o processamento na plataforma.
+A base de dados utilizada para testes foi escolhida baseando-se em seu tamanho (ordem de \textit{gigabytes}) com
+o objetivo de garantir resultados significativos para o estudo.
 
 O arquivo final utilizado apresenta um tamanho de 1.65 GB, sendo do formato \textit{csv} (\textit{comma separated values}) 
 com 19 propriedades separadas em colunas. A extração foi realizada da base 
@@ -265,10 +265,10 @@ Para a primeira etapa, serão definidos dois cenários de teste para avaliar o d
 com uma transferência de um volume de dados de 1.65 \textit{gigabytes}. Os cenários de teste serão nomeados da seguinte forma:
 
 \begin{enumerate}[a)]
-\item Cenário 1: Implementação com arquitetura não específica para transferências volumosas, ou seja, realização 
-da leitura de arquivos de forma síncrona.
-\item Cenário 2: Implementação com arquitetura escalável para transferências volumosas, utilizando métodos
-da arquitetura baseada em eventos para ler arquivos de forma assíncrona.
+\item Cenário 1: Implementação com arquitetura não específica para transferências da ordem de \textit{gigabytes}, 
+ou seja, realização da leitura de arquivos de forma síncrona.
+\item Cenário 2: Implementação com arquitetura escalável para transferências da ordem de \textit{gigabytes}, 
+utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma assíncrona.
 \end{enumerate}
 
 \subsection{Coleta e análise de dados}
