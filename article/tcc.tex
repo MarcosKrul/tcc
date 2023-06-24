@@ -68,21 +68,21 @@ o desempenho em situações com alta demanda de dados.
 
 O uso de \textit{Node.JS}, tecnologia em crescente uso e relevância no
 desenvolvimento \textit{web}, justifica-se pelo fato de que esta permite uma abordagem de alta
-performance e apresenta recursos para otimização e escalabilidade. Esse \textit{framework} apresenta
+performance e apresenta recursos para otimização e escalabilidade. Essa plataforma apresenta
 bons resultados em casos que necessitem da persistência de centenas ou milhares de conexões
 simultâneas, onde a comunicação é realizada com o envio de pequenos fragmentos do arquivo ao destino
 \cite[p. 112]{EJSMONT}.
 
-Aplicações como colaboração de documentos e tarefas, jogos e \textit{streaming} de vídeo \cite{ZRHR} devem processar 
-arquivos de grande porte, de forma rápida e estável. Contudo, existem limitações inerentes ao uso da 
-plataforma \textit{web}, como o processamento de diversas requisições que exijam muitos dados, 
-tratamento do alto fluxo de dados pela máquina cliente e os limites impostos pelas tecnologias escolhidas.
+Aplicações como colaboração de documentos e tarefas, jogos e \textit{streaming} de vídeo, áudio e imagens
+\cite{ZRHR} devem processar arquivos com tamanhos na ordem de \textit{gigabytes}, de forma rápida e estável. 
+Contudo, existem limitações inerentes ao uso da plataforma \textit{web}, como o processamento de 
+diversas requisições que exijam esses arquivos, tratamento do alto fluxo de dados pela máquina 
+cliente e os limites impostos pelas tecnologias escolhidas.
 
 Para sobrepujar os problemas supracitados, existem técnicas desenvolvidas para a \textit{web} que buscam
 atenuar os problemas de alta demanda e torná-los irrisórios na experiência do usuário, como o processamento
 assíncrono (\textit{streams}) e \textit{caching}. Faz-se necessário, portanto, desenvolver um estudo das 
-técnicas escolhidas para aumentar o desempenho em alta demanda de dados utilizando os \textit{frameworks} 
-escolhidos.
+técnicas escolhidas para aumentar o desempenho em alta demanda de dados utilizando a plataforma do \textit{Node.JS}.
 
 
 \section{Revisão de bibliografia e trabalhos relacionados}
@@ -98,13 +98,13 @@ linguagem escolhida \cite[p. 13]{DIOGORESENDE}.
 Um único \textit{software} pode ser implementado com diferentes padrões de projeto e, até mesmo, com a união
 de dois ou mais. Os padrões apresentam diversos benefícios, como aumento da produtividade, manutenção e comunicação
 entre a equipe de desenvolvimento. Contudo, a definição das soluções arquiteturais adotadas deve ser 
-cuidadosa, visto que escolhas incorretas podem acarretar em novos empecilhos. Dentre outras, 
-alguns \textit{designs} adicionam camadas extras de processamento para obter maior flexibilidade, podendo, dessa forma, 
+cuidadosa, visto que escolhas incorretas podem acarretar em novos empecilhos como, por exemplo, a adição de
+camadas extras de processamento para obter maior flexibilidade, podendo, dessa forma, 
 afetar as métricas de desempenho do sistema final \cite[p. 13 - p. 14]{DIOGORESENDE}.
 
 Dentre a maioria dos padrões de projeto conhecidos, existem aqueles que são amplamente utilizados no 
 \textit{Node.JS}, devido à sua estrutura e ao seu modelo de interface. Dentre eles, evidenciam-se
-os padrões de fluxo de eventos e os orientados a eventos, já presentes e fundamentados na interface principal 
+os padrões orientados a eventos, já presentes e fundamentados na interface principal 
 da plataforma. É possível, por exemplo, substituir o modo de leitura de um arquivo de 
 uma simples função somada à uma \textit{callback}, que irá consumir mais recursos de máquina, para um fluxo de 
 leitura onde é possível verificar os eventos de dados e de conclusão, ou até mesmo encaminhar o fluxo para 
@@ -158,8 +158,8 @@ Fonte: Adaptado de \cite{BUGS}.
 \end{figure}
 
 Na arquitetura orientada a eventos da plataforma do \textit{Node.JS} (\autoref{fig:nodejs_eda_model}), 
-o fluxo de processamento de eventos é iniciado pela \textit{loop thread} com 
-a busca de um evento no \textit{event loop} e, caso sua \textit{callback} não possa ser executada na mesma, ocorre
+o fluxo de processamento de eventos da primeira etapa é realizada pelo \textit{loop thread}, 
+buscando um evento no \textit{event loop} e, caso sua \textit{callback} não possa ser executada na mesma, ocorre
 a transferência para a \textit{worker pool}, registrando uma nova \textit{callback} associada. 
 Ainda, é possível observar este comportamento nas etapas 1.1 e 1.2, onde as ações de criação e leitura de 
 um arquivo são transferidas à \textit{worker pool}, visto que são operações custosas e bloqueantes. Dada 
@@ -182,7 +182,7 @@ recebida pelo servidor é atribuida à uma nova \textit{thread} para processamen
 problemas relacionados à interferências. Contudo, cada requisição recebida resulta em sobrecarga no uso de
 recursos de máquina e em trocas de contexto \cite{JGD}. Dessa forma, os custos computacionais aumentam
 à medida que novos clientes realizam suas requisições, fazendo com que os sitemas limitem o número máximo de
-\textit{threads} e, consequentemente, travem a escalabilidade do servidor \cite{ZRHR}.
+\textit{threads} e, consequentemente, bloqueiem a escalabilidade do servidor \cite{ZRHR}.
 
 
 \subsection{\textit{Stream}}
@@ -190,12 +190,12 @@ recursos de máquina e em trocas de contexto \cite{JGD}. Dessa forma, os custos 
 As \textit{streams} representam uma das mais importantes estruturas na plataforma do \textit{Node.JS}, por motivos
 como aumento em desempenho e eficiência, possibilidade de criação de códigos elegantes e pela sua compatibilidade
 no modelo da arquitetura orientada a eventos do \textit{Node.JS} \cite[p. 119]{MARIO}. Oferecem uma interface facilitada 
-e rápida para leitura, gravação e transformação, de forma que é possível encadear dados entre estas operações 
-para processá-los e, se necessário, transformá-los. Além dessas, essa estrutura está relacionada com os eventos, visto que
-utilizam destes para enviar notificações aos consumidores quando os dados estão prontos para consumo ou quando o
-processamento chegou ao fim \cite[p. 28]{DIOGORESENDE}.
+e rápida para leitura, gravação e transformação de dados, de forma que é possível realizar encadeamento 
+entre estas operações para processá-los e, se necessário, transformá-los. Além dessas, essa estrutura está 
+relacionada com os eventos, visto que utilizam destes para enviar notificações aos consumidores 
+quando os dados estão prontos para consumo ou quando o processamento chegou ao fim \cite[p. 28]{DIOGORESENDE}.
 
-O modelo da arquitetura baseada em eventos do \textit{Node.JS} aumenta o poder das \textit{streams}, visto que,
+O modelo da arquitetura baseada em eventos do \textit{Node.JS} aumenta o poder de uso das \textit{streams}, visto que,
 em plataformas baseadas em eventos, a maneira mais eficiente para tratamento de I/O é com processamento em tempo real.
 Dessa forma, a aplicação irá consumir os dados de entrada a medida que estes estão disponíveis, e o envio dos dados
 de saída será de acordo com o ritmo de produção da aplicação \cite[p. 119]{MARIO}.
@@ -226,14 +226,14 @@ simplificada, ao modo que esta operação se resume ao encadeamento de \textit{s
 
 \section{Metodologia}
 
-Nesta seção será descrita a metodologia proposta para a pesquisa do tema, esta que tem caráter semi-experimental, qualitativo
-e escopo exploratório. Sendo o objetivo desta pesquisa analisar o desempenho de sistemas
-\textit{web} baseados em \textit{Node.JS} quando confrontados com uma demanda intensa de dados, 
+A metodologia aplicada apresenta caráter semi-experimental, qualitativo
+e escopo exploratório, para análise do desempenho de sistemas \textit{web} baseados em \textit{Node.JS} 
+quando será gerada uma condição de tráfego de fluxo intenso de dados,
 com tamanhos de arquivo na ordem de \textit{gigabytes}.
 
 O estudo será realizado em um ambiente controlado, onde serão desenvolvidos cenários de teste com diferentes 
 implementações de arquitetura para a resolução do problema de envio de dados, a fim de aferir métricas de desempenho do servidor, 
-sendo consumo de memória \textit{RAM} a principal. Uma das implementação será com uma arquitetura não escalável e não 
+como o consumo de memória \textit{RAM}. A implementação utilizará uma arquitetura não escalável e não 
 pensada para o caso específico de transferência de um grande volume de dados, e outra aplicando técnicas focadas na 
 manipulação de maiores volumes de dados.
 
@@ -289,8 +289,8 @@ e direcionada à leitura de arquivo de forma assíncrona, a fim de preservar rec
 
 Com esta pesquisa, mesclando teoria e parte experimental, espera-se apresentar e dar foco à uma implementação
 escalável e direcionada à transferência de volumes de dados na ordem de \textit{gigabytes} em aplicações \textit{web}
-desenvolvidas com \textit{Node.JS}, demonstrando como o uso de técnicas como as \textit{streams} deve ser encorajado 
-quando se fala em requisições de dados volumosos na \textit{web}.
+desenvolvidas com \textit{Node.JS}. Espera-se ainda demonstrar como o uso de técnicas como as \textit{streams} deve ser 
+utilizado e também encorajado quando se fala em requisições de dados na ordem de \textit{gigabytes} ou superiores na \textit{web}.
 
 
 \bibliographystyle{sbc}
