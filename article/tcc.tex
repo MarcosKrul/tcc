@@ -60,8 +60,8 @@ the event-driven architecture provides the best solution for developing data-int
 
 \section{Introdução}
 
-O desenvolvimento de novas aplicações e a migração das já existentes para a plataforma \textit{web} 
-vêm crescendo e se tornando uma tendência \cite{SOUZAB}. Existem benefícios que justificam esse comportamento,
+O desenvolvimento de aplicações web bem como a migração de aplicações existentes para este ambiente,
+é a realidade atual encontrada no mercado de software. Existem benefícios que justificam esse comportamento,
 como facilidades em instalações e atualizações, alcance global instantâneo e alta portabilidade. Porém,
 sob outra perspectiva, apresentam-se questões críticas que devem ser analisadas antes de aderir à plataforma, como
 o desempenho em situações com alta demanda de dados.
@@ -74,9 +74,9 @@ simultâneas, onde a comunicação é realizada com o envio de pequenos fragment
 \cite[p. 112]{EJSMONT}.
 
 Aplicações como colaboração de documentos e tarefas, jogos e \textit{streaming} de vídeo, áudio e imagens
-\cite{ZRHR} devem processar arquivos com tamanhos na ordem de \textit{gigabytes}, de forma rápida e estável. 
+\cite{ZRHR} devem processar arquivos com tamanhos na ordem de \textit{gigabytes}. 
 Contudo, existem limitações inerentes ao uso da plataforma \textit{web}, como o processamento de 
-diversas requisições que exijam esses arquivos, tratamento do alto fluxo de dados pela máquina 
+diversas requisições que exijam esses arquivos, tratamento de dados pela máquina 
 cliente e os limites impostos pelas tecnologias escolhidas.
 
 Para sobrepujar os problemas supracitados, existem técnicas desenvolvidas para a \textit{web} que buscam
@@ -100,7 +100,7 @@ de dois ou mais. Os padrões apresentam diversos benefícios, como aumento da pr
 entre a equipe de desenvolvimento. Contudo, a definição das soluções arquiteturais adotadas deve ser 
 cuidadosa, visto que escolhas incorretas podem acarretar em novos empecilhos como, por exemplo, a adição de
 camadas extras de processamento para obter maior flexibilidade, podendo, dessa forma, 
-afetar as métricas de desempenho do sistema final \cite[p. 13 - p. 14]{DIOGORESENDE}.
+afetar as métricas de desempenho do sistema final, como o tempo de execução \cite[p. 13 - p. 14]{DIOGORESENDE}.
 
 Dentre a maioria dos padrões de projeto conhecidos, existem aqueles que são amplamente utilizados no 
 \textit{Node.JS}, devido à sua estrutura e ao seu modelo de interface. Dentre eles, evidenciam-se
@@ -190,12 +190,12 @@ recursos de máquina e em trocas de contexto \cite{JGD}. Dessa forma, os custos 
 As \textit{streams} representam uma das mais importantes estruturas na plataforma do \textit{Node.JS}, por motivos
 como aumento em desempenho e eficiência, possibilidade de criação de códigos elegantes e pela sua compatibilidade
 no modelo da arquitetura orientada a eventos do \textit{Node.JS} \cite[p. 119]{MARIO}. Oferecem uma interface facilitada 
-e rápida para leitura, gravação e transformação de dados, de forma que é possível realizar encadeamento 
+para leitura, gravação e transformação de dados, de forma que é possível realizar encadeamento 
 entre estas operações para processá-los e, se necessário, transformá-los. Além dessas, essa estrutura está 
 relacionada com os eventos, visto que utilizam destes para enviar notificações aos consumidores 
 quando os dados estão prontos para consumo ou quando o processamento chegou ao fim \cite[p. 28]{DIOGORESENDE}.
 
-O modelo da arquitetura baseada em eventos do \textit{Node.JS} aumenta o poder de uso das \textit{streams}, visto que,
+O modelo da arquitetura baseada em eventos do \textit{Node.JS} aumenta a eficácia no uso das \textit{streams}, visto que,
 em plataformas baseadas em eventos, a maneira mais eficiente para tratamento de I/O é com processamento em tempo real.
 Dessa forma, a aplicação irá consumir os dados de entrada a medida que estes estão disponíveis, e o envio dos dados
 de saída será de acordo com o ritmo de produção da aplicação \cite[p. 119]{MARIO}.
@@ -216,8 +216,8 @@ Os \textit{buffers}, no \textit{Node.JS}, são objetos especiais utilizados para
 de dados binários, o que não seria possível operando com tipos primitivos do \textit{JavaScript} como, por exemplo,
 \textit{strings}, visto que estas são codificadas em \textit{Unicode} \cite[p. 29]{DIOGORESENDE}.
 
-Além da possibilidade de manipulação de dados binários e da facilidade em leituras e escritas de números de diferentes 
-tamanhos, os \textit{buffers} são uma importante estrutura na plataforma do \textit{Node.JS} em relação à arquitetura
+Além da possibilidade de manipulação de dados binários e da facilidade em leituras e escritas de números representados
+com estruturas de tamanhos e formatos (\textit{big-endian} e \textit{little-endian}) diferentes, os \textit{buffers} são uma importante estrutura na plataforma do \textit{Node.JS} em relação à arquitetura
 orientada a eventos, dada a compatibilidade binária existente entre os principais módulos da plataforma que 
 utilizam estes nos eventos de dados. Dessa forma, é possível que arquivos sejam transmitidos ao cliente de maneira 
 simplificada, ao modo que esta operação se resume ao encadeamento de \textit{streams} com a troca de 
