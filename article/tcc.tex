@@ -176,7 +176,7 @@ Por fim, a \textit{loop thread} busca estes novos eventos na fila e executa suas
 \textit{callbacks} (etapas 3.1 e 3.2) \cite{BUGS}.
 
 
-\subsection{EDA \textit{vs.} OPTC}
+\subsection{EDA \textit{vs.} OTPC}
 
 A abordagem EDA, descrita na seção anterior, realiza multiplexação de uma única \textit{thread} para processar 
 as requisições dos clientes, reduzindo, dessa forma, o consumo de recursos de máquina. 
@@ -185,7 +185,7 @@ no conceito de uma \textit{thread} por cliente (\textit{One Thread Per Client}, 
 recebida pelo servidor é atribuida à uma nova \textit{thread} para processamento isolado dos clientes, reduzindo
 problemas relacionados à interferências. Contudo, cada requisição recebida resulta em sobrecarga no uso de
 recursos de máquina e em trocas de contexto \cite{JGD}. Dessa forma, os custos computacionais aumentam
-à medida que novos clientes realizam suas requisições, fazendo com que os sitemas limitem o número máximo de
+à medida que novos clientes realizam suas requisições, fazendo com que os sistemas limitem o número máximo de
 \textit{threads} e, consequentemente, bloqueiem a escalabilidade do servidor \cite{ZRHR}.
 
 
@@ -237,8 +237,8 @@ com tamanhos de arquivo na ordem de \textit{gigabytes}.
 
 O estudo será realizado em um ambiente controlado, onde serão desenvolvidos cenários de teste com diferentes 
 implementações de arquitetura para a resolução do problema de envio de dados, a fim de aferir métricas de desempenho do servidor, 
-como o consumo de memória \textit{RAM}. A implementação utilizará uma arquitetura não escalável e não 
-pensada para o caso específico de transferência de um grande volume de dados, e outra aplicando técnicas focadas na 
+como o consumo de memória \textit{RAM}. Uma implementação utilizará uma arquitetura não escalável e não 
+pensada para o caso específico de transferência de um grande volume de dados, e outra aplicará técnicas focadas na 
 manipulação de maiores volumes de dados.
 
 
@@ -259,7 +259,7 @@ acordo com as técnicas e métodos descritos nas seções subsequentes deste tra
 Será configurado um ambiente de teste composto por uma aplicação servidor, com o intuito de registrar o consumo
 de memória \textit{RAM} da aplicação nos dois cenários propostos. O servidor de aplicação será baseado em \textit{Node.JS}, 
 utilizando a versão 20.3.0. Além dessa, será construída uma aplicação cliente para o 
-consumo dos dados enviados pelo servidor. Esta aplicação terá uma interface básica para consumo de dados, construída 
+consumo dos dados enviados pelo servidor. Esta aplicação terá uma interface básica, construída 
 com HTML5 e JavaScript.
 
 
