@@ -91,6 +91,17 @@ técnicas escolhidas para aumentar o desempenho em alta demanda de dados utiliza
 
 \section{Revisão de bibliografia e trabalhos relacionados}
 
+\subsection{Escalabilidade}
+
+O termo escalabilidade pode ser definido como a maneira de ajustar a
+capacidade de um sistema para atender demandas, de forma que o custo desta
+operação não seja tão elevado. \cite[p. 3]{EJSMONT}. O \textit{Node.js}, devido à sua natureza
+assíncrona, entrada e saída não bloqueantes e orientadas a eventos, caracteriza-se como
+uma plataforma escalável. \cite[p. 2]{SCALABILITY}. A incorporação de escalabilidade
+em um sistema pode compreender a capacidade de lidar com um crescimento de usuários, solicitações
+e transações, para este projeto, seu uso será voltado para a requisição e transferência de grandes volumes de dados.
+
+
 \subsection{Padrões de projeto no \textit{Node.JS}}
 
 Padrões de projeto são soluções previamente definidas para problemas específicos que, geralmente,
@@ -110,9 +121,10 @@ Dentre a maioria dos padrões de projeto conhecidos, existem aqueles que são am
 \textit{Node.JS}, devido à sua estrutura e ao seu modelo de interface. Dentre eles, evidenciam-se
 os padrões orientados a eventos, já presentes e fundamentados na interface principal 
 da plataforma. É possível, por exemplo, substituir o modo de leitura de um arquivo de 
-uma simples função somada à uma \textit{callback}, que irá consumir mais recursos de máquina, para um fluxo de 
-leitura onde é possível verificar os eventos de dados e de conclusão, ou até mesmo encaminhar o fluxo para 
-outra camada de processamento. Da mesma forma que ocorre com os arquivos, o controle dos eventos 
+uma simples função somada à uma \textit{callback}, que irá consumir mais recursos de máquina, como memória RAM, 
+para um fluxo de leitura onde é possível verificar os eventos de dados e de conclusão, 
+ou até mesmo encaminhar o fluxo para outra camada de processamento. Da mesma forma que ocorre com os 
+arquivos, o controle dos eventos 
 de conexão, recebimento de dados e encerramento está presente em módulos principais como, por exemplo, 
 o \textit{http}. Observa-se que a arquitetura do \textit{Node.JS} baseia-se em eventos, sendo estes,
 recursos fundamentais desta plataforma \cite[p. 15]{DIOGORESENDE}.
