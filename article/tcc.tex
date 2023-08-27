@@ -89,7 +89,7 @@ assíncrono (\textit{streams}) e \textit{caching}. Faz-se necessário, portanto,
 técnicas escolhidas para aumentar o desempenho em alta demanda de dados utilizando a plataforma do \textit{Node.JS}.
 
 
-\section{Revisão de bibliografia e trabalhos relacionados}
+\section{Revisão de bibliografia}
 
 \subsection{Escalabilidade}
 
@@ -238,6 +238,46 @@ orientada a eventos, dada a compatibilidade binária existente entre os principa
 utilizam estes nos eventos de dados. Dessa forma, é possível que arquivos sejam transmitidos ao cliente de maneira 
 simplificada, ao modo que esta operação se resume ao encadeamento de \textit{streams} com a troca de 
 \textit{buffers} entre cliente e servidor \cite[p. 29]{DIOGORESENDE}.
+
+
+\section{Trabalhos relacionados}
+
+Nesta seção, serão discutidos trabalhos relacionados que abordaram o desempenho e o consumo de recursos 
+em sistemas \textit{web}, particularmente aqueles desenvolvidos com \textit{Node.js}. Esses estudos ajudam a contextualizar 
+o presente trabalho e fornecem insights valiosos sobre otimizações e estratégias para lidar com demandas 
+intensas de dados.
+
+Um estudo anterior \cite{CLUSTERTCC} se concentrou na melhoria do desempenho em sistemas \textit{web} por meio de atualizações 
+de código e da implementação do módulo de \textit{cluster} no ambiente \textit{Node.js}. Os resultados indicaram melhorias 
+significativas, demonstrando a eficácia de distribuir a carga de trabalho entre processos paralelos usando a 
+técnica de \textit{clustering}. Essa abordagem se alinha diretamente com o nosso objetivo de entender como o consumo 
+de recursos afeta o desempenho em sistemas \textit{web} com \textit{Node.js}, especialmente sob alta demanda de dados.
+Da mesma forma, \cite{CLUSTERTCC} explorou otimizações em funções de cálculo de custos em sistemas 
+semelhantes. Observou-se que melhorias substanciais foram alcançadas ao aprimorar a eficiência na 
+iteração de matrizes e no gerenciamento de memória. Esses resultados ressaltam a importância de abordar o 
+processamento intensivo de dados para melhorar o desempenho geral do sistema, uma consideração crucial em 
+nossa investigação sobre sistemas \textit{web} de alta demanda.
+
+Além das melhorias já exploradas, o trabalho também apontou oportunidades não 
+investigadas, como a compilação AOT (\textit{Ahead of Time}) e a implementação de processos dedicados em segundo 
+plano. Essas estratégias oferecem caminhos adicionais para otimização e merecem consideração em futuras 
+iterações do projeto. Além disso, a implantação segura de técnicas como o clustering foi destacada como uma 
+consideração crítica, enfatizando a necessidade de garantir a estabilidade e a segurança do sistema em produção.
+
+Outro estudo anterior por \cite{NODEJVERSUSIIS} realizou uma comparação e avaliação do desempenho entre \textit{Node.js}, a mais recente 
+tecnologia, e o servidor \textit{IIS}, por meio de testes objetivos e sistemáticos. Os resultados 
+destacaram que o \textit{Node.js} apresenta um bom desempenho em relação ao servidor tradicional \textit{IIS} na 
+execução de tarefas intensivas de I/O. Além disso, o estudo sugeriu que o \textit{Node.js} é preferencialmente utilizado 
+em situações de I/O intensivo, em vez de serviços intensivos em CPU. Ao observar os resultados de desempenho em 
+termos de \textit{throughput}, o \textit{Node.js} emergiu como uma tecnologia amplamente adotada por muitas organizações, 
+especialmente devido às suas vantagens em cenários de I/O intensivo.
+
+Esses estudos não apenas contribuem para o entendimento do contexto em que nosso trabalho se insere, 
+mas também fornecem um ponto de partida sólido para nosso próprio estudo sobre o desempenho em função 
+do consumo de recursos em sistemas \textit{web} desenvolvidos com \textit{Node.js}. Ao avaliar suas metodologias e 
+resultados à luz de nossos objetivos, podemos identificar lacunas e direções promissoras para nossa 
+pesquisa, ampliando assim o conhecimento sobre estratégias de otimização e gerenciamento de recursos 
+em ambientes de alta demanda.
 
 
 \section{Metodologia}
