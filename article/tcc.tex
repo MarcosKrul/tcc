@@ -8,6 +8,10 @@
 \usepackage{caption}
 \usepackage{enumerate}
 \usepackage{subcaption}
+\documentclass{article}
+\usepackage{listings}
+\renewcommand\lstlistingname{Código}
+\def\lstlistingautorefname{Código}
 
 \newcommand\slsh{\char`\\}
 
@@ -29,6 +33,27 @@
 
 \address{Universidade Estadual de Ponta Grossa (UEPG)
     \email{19022626@uepg.br, 19010426@uepg.br, ferrasa@uepg.br}
+}
+
+\lstset{
+	language=JavaScript, 
+	basicstyle=\small\ttfamily, 
+	breaklines=true, 
+	numbers=left, 
+	numberstyle=\tiny\color{gray}, 
+	stepnumber=1, 
+	numbersep=8pt, 
+	frame=single, 
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	captionpos=b, 
+	xleftmargin=15pt, 
+	xrightmargin=0pt, 
+	tabsize=2, 
+	commentstyle=\color{green!40!black}, 
+	keywordstyle=\color{blue}, 
+	stringstyle=\color{red}
 }
 
 
@@ -59,6 +84,12 @@ the event-driven architecture provides the best solution for developing data-int
 
 
 \section{Introdução}
+
+% \begin{lstlisting}[caption={Exemplo de código em JavaScript}, label=lst:exemplo]
+% 	console.log({
+%         name: 'joao'
+%     })
+% \end{lstlisting}
 
 O desenvolvimento de aplicações \textit{web} bem como a migração de aplicações existentes para este ambiente,
 é a realidade atual encontrada no mercado de \textit{software}. É considerado o meio mais utilizado
@@ -121,7 +152,7 @@ Dentre a maioria dos padrões de projeto conhecidos, existem aqueles que são am
 \textit{Node.JS}, devido à sua estrutura e ao seu modelo de interface. Dentre eles, evidenciam-se
 os padrões orientados a eventos, já presentes e fundamentados na interface principal 
 da plataforma. É possível, por exemplo, substituir o modo de leitura de um arquivo de 
-uma simples função somada à uma \textit{callback}, que irá consumir mais recursos de máquina, como memória RAM, 
+uma simples função somada à uma \textit{callback}, que irá consumir mais recursos de máquina, como memória \textit{RAM}, 
 para um fluxo de leitura onde é possível verificar os eventos de dados e de conclusão, 
 ou até mesmo encaminhar o fluxo para outra camada de processamento. Da mesma forma que ocorre com os 
 arquivos, o controle dos eventos 
@@ -136,6 +167,13 @@ A arquitetura orientada a eventos (\textit{Event-Driven Architecture}, EDA) base
 de eventos, sendo que o consumo pode ser feito por um ou mais ouvintes ao mesmo tempo. A implementação da parte consumidora 
 deve garantir que haja uma reação ao acontecimento de eventos, ao invés de simplesmente tentar detectar 
 mudanças nos dados recebidos \cite[p. 27]{DIOGORESENDE}.
+
+Os sistemas operacionais oferecem operações bloqueantes para leitura e gravação em arquivos, fazendo com que ocorra
+um bloqueio na execução do programa principal até que haja uma resposta das solicitações. Nesse contexto, até pequenos
+bloqueio podem resultar no travamento de aplicações baseadas no modelo cliente/servidor e, dessa forma, novas requisições
+deverão esperar. Para tal problema, operações de I/O não bloqueantes - também conhecidos como I/O assíncrono - oferecem
+uma solução elegante, com o uso de \textit{callbacks} que serão invocadas ao fim das solicitações 
+de leitura e escrita em arquivos \cite{UDESC}.
 
 Operações envolvendo \textit{sockets}, \textit{streams} e arquivos são, em grande parte, 
 realizados de forma assíncrona em aplicações escritas na plataforma do \textit{Node.JS}, da forma que o processamento
@@ -272,7 +310,7 @@ em situações de I/O intensivo, em vez de serviços intensivos em CPU. Ao obser
 termos de \textit{throughput}, o \textit{Node.js} emergiu como uma tecnologia amplamente adotada por muitas organizações, 
 especialmente devido às suas vantagens em cenários de I/O intensivo.
 
-Esses estudos não apenas contribuem para o entendimento do contexto em que nosso trabalho se insere, 
+Esses estudos não apenas contribuem para o entendimento do contexto em que o presente trabalho se insere, 
 mas também fornecem um ponto de partida sólido para nosso próprio estudo sobre o desempenho em função 
 do consumo de recursos em sistemas \textit{web} desenvolvidos com \textit{Node.js}. Ao avaliar suas metodologias e 
 resultados à luz de nossos objetivos, podemos identificar lacunas e direções promissoras para nossa 
@@ -282,6 +320,15 @@ em ambientes de alta demanda.
 
 \section{Metodologia}
 
+
+% MÉTRICAS A SEREM ANALISADAS: 
+%     - Consumo de memóra RAM
+%     - Uso de CPU?
+%   - Throughput??
+%   - Latência do event loop
+%   - Estatísticas de memória do Garbage Collector
+
+
 A metodologia aplicada apresenta caráter semi-experimental, qualitativo
 e escopo exploratório, para análise do desempenho de sistemas \textit{web} baseados em \textit{Node.JS} 
 quando será gerada uma condição de tráfego de fluxo intenso de dados,
@@ -289,7 +336,7 @@ com tamanhos de arquivo na ordem de \textit{gigabytes}.
 
 O estudo será realizado em um ambiente controlado, onde serão desenvolvidos cenários de teste com diferentes 
 implementações de arquitetura para a resolução do problema de envio de dados, a fim de aferir métricas de desempenho do servidor, 
-como o consumo de memória \textit{RAM}. Uma implementação utilizará uma arquitetura não escalável e não 
+como o consumo de memória \textit{RAM}, [INSERIR OUTRAS MÉTRICAS AQUI] . Uma implementação utilizará uma arquitetura não escalável e não 
 pensada para o caso específico de transferência de um grande volume de dados, e outra aplicará técnicas focadas na 
 manipulação de maiores volumes de dados.
 
@@ -297,7 +344,10 @@ manipulação de maiores volumes de dados.
 \subsection{Base de teste}
 
 A base de dados utilizada para testes foi escolhida baseando-se em seu tamanho (ordem de \textit{gigabytes}) com
-o objetivo de garantir resultados significativos para o estudo.
+o objetivo de garantir resultados significativos para o estudo. Escolheu-se uma base com dados estruturados com o 
+objetivo de exemplificar a aplicação prática do processamento intermediário no processo de transferência. 
+Ao optar por essa abordagem, busca-se enfatizar a necessidade de ir além da mera transferência direta, 
+incorporando etapas de processamento que permitam aprimorar a integridade e utilidade dos dados no contexto de destino.
 
 O arquivo final utilizado apresenta um tamanho de 1.65 GB, sendo do formato \textit{csv} (\textit{comma separated values}) 
 com 19 propriedades separadas em colunas. A extração foi realizada da base 
@@ -309,10 +359,15 @@ acordo com as técnicas e métodos descritos nas seções subsequentes deste tra
 \subsection{Construção do ambiente de teste}
 
 Será configurado um ambiente de teste composto por uma aplicação servidor, com o intuito de registrar o consumo
-de memória \textit{RAM} da aplicação nos dois cenários propostos. O servidor de aplicação será baseado em \textit{Node.JS}, 
-utilizando a versão 20.3.0. Além dessa, será construída uma aplicação cliente para o 
-consumo dos dados enviados pelo servidor. Esta aplicação terá uma interface básica, construída 
-com HTML5 e JavaScript.
+de memória \textit{RAM} e [INSERIR OUTRAS MÉTRICAS AQUI] da aplicação nos dois cenários propostos. O servidor de aplicação será baseado em \textit{Node.JS}, 
+utilizando a versão 20.3.0. 
+
+% SERÁ PRECISO? **Além dessa, será construída uma aplicação cliente para o 
+% consumo dos dados enviados pelo servidor. Esta aplicação terá uma interface básica, construída 
+% com HTML5 e JavaScript.**
+
+% Descrever como vai ser a coleta de dados, monitoramento via software com interface gráfica
+% ou biblioteca e outputs via command line
 
 
 \subsection{Definição dos cenários de teste}
@@ -330,10 +385,10 @@ utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma
 \subsection{Coleta e análise de dados}
 
 O indicador de desempenho a ser coletado e analisado para cada uma das implementações será o consumo de memória
-\textit{RAM} por parte do servidor durante a transferência dos dados contidos na base previamente citada.
+\textit{RAM} e [INSERIR OUTRAS MÉTRICAS AQUI] por parte do servidor durante a transferência dos dados contidos na base previamente citada.
 
 
-\section{Análises preliminares} 
+\section{Resultados e discussão} 
 
 Tendo em vista o \textit{background} estabelecido e a construção e planejamento da parte experimental,
 é possível esperar que o estudo consiga elucidar as questões propostas sobre a preferência de uma implementação escalável

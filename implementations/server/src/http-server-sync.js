@@ -3,7 +3,7 @@ import fs from "node:fs";
 import { stat } from "node:fs/promises";
 import { createServer } from "node:http";
 
-import { PORT, filename, headers } from "./constants.js";
+import { PORT_SYNC, filename, headers } from "./constants.js";
 
 createServer(async (request, response) => {
   if (request.method === "OPTIONS") {
@@ -18,7 +18,7 @@ createServer(async (request, response) => {
 
     response.writeHead(200, headers);
 
-    const data = await fs.promises.readFile(filename, "utf8");
+    const data = fs.readFileSync(filename);
     response.end(data);
   } catch (error) {
     console.error(`Error at server: ${error.message}`);
@@ -26,5 +26,5 @@ createServer(async (request, response) => {
     response.end("Internal Server Error");
   }
 })
-  .listen(PORT)
-  .on("listening", () => console.log(`server is running at ${PORT}`));
+  .listen(PORT_SYNC)
+  .on("listening", () => console.log(`server is running at ${PORT_SYNC}`));

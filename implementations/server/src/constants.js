@@ -1,4 +1,5 @@
-const PORT = 3000;
+const PORT_SYNC = 3001;
+const PORT_ASYNC = 3000;
 
 const filename = "./database/metadata.csv";
 
@@ -9,4 +10,4 @@ const headers = {
   "Access-Control-Allow-Methods": "*",
 };
 
-export { PORT, filename, headers, abortController };
+export { PORT_ASYNC, PORT_SYNC, filename, headers, abortController };

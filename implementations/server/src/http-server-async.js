@@ -8,7 +8,7 @@ import os from "node:os";
 import { Readable, Transform, Writable } from "node:stream";
 import { TransformStream } from "node:stream/web";
 
-import { abortController, PORT, filename, headers } from "./constants.js";
+import { abortController, PORT_ASYNC, filename, headers } from "./constants.js";
 
 let itemsProcessed = 0;
 let maxMemoryUsage = process.memoryUsage().rss;
@@ -83,9 +83,13 @@ if (cluster.isPrimary) {
         )
         .pipeTo(Writable.toWeb(response), { signal: abortController.signal });
     } catch (error) {
-      console.log(`Error at server: ${error.message}`);
+      console.error(`Error at server: ${error.message}`);
+      response.statusCode = 500;
+      response.end("Internal Server Error");
     }
-  }).listen(PORT);
+  })
+    .listen(PORT_ASYNC)
+    .on("listening", () => console.log(`server is running at ${PORT_ASYNC}`));
 
   console.log(`Worker ${process.pid} is running`);
 }
