@@ -13,7 +13,9 @@
     "exec:sync": "scripts/exec.sh 3001",
     "exec:async": "scripts/exec.sh 3000",
     "lint": "eslint . --ext js,ts",
-    "restart": "./scripts/restart.sh"
+    "restart": "./scripts/restart.sh",
+    "start": "./scripts/start.sh",
+    "split": "node src/split-file.js"
   },
   "keywords": [],
   "author": "Marcos Renan Krul <marcoskrul2k@gmail.com> & Renato Cristiano Ruppel <heruppel2@gmail.com>",

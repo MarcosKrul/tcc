@@ -1,35 +1,42 @@
-import { createReadStream, writeFile } from "node:fs";
+import { createReadStream, existsSync, mkdirSync, writeFile } from "node:fs";
 import readline from "readline";
 
 import { splitFactor } from "./constants.js";
 
+const createDir = (filePath) => {
+  if (existsSync(filePath)) return;
+  mkdirSync(filePath);
+};
+
 const splitFile = async () => {
-  const vetorAiFora = [];
+  const data = [];
   let linesRead = 0;
   let fileCreated = 1;
 
-  const readStream = createReadStream("../database/metadata.csv");
+  createDir(`database/part_${splitFactor}`);
+
+  const readStream = createReadStream("database/metadata.csv");
   const rl = readline.createInterface({
     input: readStream,
-    crlfDelay: Infinity, // Para tratar diferentes formatos de quebra de linha
+    crlfDelay: Infinity,
   });
 
   rl.on("line", (line) => {
     linesRead += 1;
-    vetorAiFora.push(line);
+    data.push(line);
 
     if (linesRead * splitFactor >= 1000000) {
       linesRead = 0;
       writeFile(
-        `../database/${fileCreated}-metadata-part.csv`,
-        vetorAiFora.join("\n"),
+        `database/part_${splitFactor}/metadata-${fileCreated}.csv`,
+        data.join("\n"),
         "utf-8",
         (err) => {
-          console.log("ERR", err);
+          if (err) console.log("ERR", err);
         }
       );
       fileCreated += 1;
-      vetorAiFora.length = 0;
+      data.length = 0;
     }
   });
 
