@@ -10,4 +10,13 @@ const headers = {
   "Access-Control-Allow-Methods": "*",
 };
 
-export { PORT_ASYNC, PORT_SYNC, filename, headers, abortController };
+const splitFactor = 10;
+
+export {
+  PORT_ASYNC,
+  PORT_SYNC,
+  filename,
+  headers,
+  abortController,
+  splitFactor,
+};
