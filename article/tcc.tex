@@ -484,8 +484,18 @@ Será configurado um ambiente de teste composto por uma aplicação servidor, co
 de memória \textit{RAM} e [INSERIR OUTRAS MÉTRICAS AQUI] da aplicação nos dois cenários propostos. O servidor de 
 aplicação será baseado em \textit{Node.JS}, utilizando a versão 20.3.0. 
 
+Para monitoramento e \textit{benchmarking} das aplicações será utilizado o \textit{software} \textit{Apache JMeter},
+versão 5.6.2 \cite{JMETER}. Por meio de sua interface gráfica, esta ferramenta permite a criação de casos de teste,
+com configurações de quantidade de clientes, repetições de uma mesma requisição e a adição de variáveis a serem 
+observadas em cada requisição completa. %EXPLICAR VARIAVEIS DO JMETER
+
+
 % Descrever como vai ser a coleta de dados, monitoramento via software com interface gráfica
 % ou biblioteca e outputs via command line
+% VAZAO
+% TAXA DE TRANSFERENCIA KB/S
+% LATÊNCIA
+% CONNECT TIME
 
 
 \subsection{Definição dos cenários de teste}
@@ -506,6 +516,8 @@ utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma
 O indicador de desempenho a ser coletado e analisado para cada uma das implementações será o consumo de memória
 \textit{RAM} e [INSERIR OUTRAS MÉTRICAS AQUI] por parte do servidor durante a transferência dos dados contidos na base previamente citada.
 
+% EXPLICAR COMO AS VARIAVEIS DO JMETER SERAO CAPTURADAS (ESCRITAS EM ARQUIVO TXT, CSV...)
+% FALAR QUAIS FORMAS SERAO UTILIZADAS, TABELAS, SO TEXTO, GRAFICOS
 
 \section{Resultados e discussão} 
 
