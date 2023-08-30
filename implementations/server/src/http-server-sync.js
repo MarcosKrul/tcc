@@ -3,7 +3,7 @@ import fs from "node:fs";
 import { stat } from "node:fs/promises";
 import { createServer } from "node:http";
 
-import { PORT_SYNC, filename, headers } from "./constants.js";
+import { PORT_SYNC, abortController, filename, headers } from "./constants.js";
 
 createServer(async (request, response) => {
   if (request.method === "OPTIONS") {
@@ -12,11 +12,16 @@ createServer(async (request, response) => {
     return;
   }
 
+  request.once("close", () => {
+    console.log(`Connection was closed`);
+    abortController.abort();
+  });
+
+  response.writeHead(200, headers);
+
   try {
     const { size } = await stat(filename);
     console.log("processing:", byteSize(size));
-
-    response.writeHead(200, headers);
 
     const data = fs.readFileSync(filename);
     response.end(data);

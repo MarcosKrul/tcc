@@ -8,8 +8,8 @@
 \usepackage{caption}
 \usepackage{enumerate}
 \usepackage{subcaption}
-\documentclass{article}
 \usepackage{listings}
+\usepackage{color}
 \renewcommand\lstlistingname{Código}
 \def\lstlistingautorefname{Código}
 
@@ -35,12 +35,31 @@
     \email{19022626@uepg.br, 19010426@uepg.br, ferrasa@uepg.br}
 }
 
+\definecolor{lightgray}{rgb}{.9,.9,.9}
+\definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+
+\lstdefinelanguage{JavaScript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+
 \lstset{
 	language=JavaScript, 
 	basicstyle=\small\ttfamily, 
 	breaklines=true, 
 	numbers=left, 
-	numberstyle=\tiny\color{gray}, 
+	numberstyle=\tiny\color{lightgray}, 
 	stepnumber=1, 
 	numbersep=8pt, 
 	frame=single, 
@@ -84,12 +103,6 @@ the event-driven architecture provides the best solution for developing data-int
 
 
 \section{Introdução}
-
-% \begin{lstlisting}[caption={Exemplo de código em JavaScript}, label=lst:exemplo]
-% 	console.log({
-%         name: 'joao'
-%     })
-% \end{lstlisting}
 
 O desenvolvimento de aplicações \textit{web} bem como a migração de aplicações existentes para este ambiente,
 é a realidade atual encontrada no mercado de \textit{software}. É considerado o meio mais utilizado
@@ -341,6 +354,115 @@ pensada para o caso específico de transferência de um grande volume de dados, 
 manipulação de maiores volumes de dados.
 
 
+\subsection{Implementações}
+
+Serão abordadas, nesta seção, as implementações cruciais que foram desenvolvidas e 
+otimizadas para avaliar e aprimorar o desempenho no ambiente \textit{Node.js}. Compreendendo a 
+importância de alcançar um desempenho eficiente em aplicações \textit{web} com consumo de dados na ordem
+de \textit{gigabytes}, foram adotadas estratégias e técnicas para maximizar a capacidade de 
+processamento, minimizar os gargalos de execução e otimizar o consumo de recursos. 
+
+\begin{lstlisting}[caption={Código base para um servidor \textit{Node.JS}}, label=cod:base]
+	createServer(async (request, response) => {
+		if (request.method === "OPTIONS") {
+			response.writeHead(204, headers);
+			response.end();
+			return;
+		}
+
+		request.once("close", () => {
+			console.log(`Connection was closed`);
+			abortController.abort();
+		});
+
+		response.writeHead(200, headers);
+
+		try {
+			const { size } = await stat(filename);
+			console.log("processing:", byteSize(size));
+
+			// code here
+		} catch (error) {
+			console.error(`Error at server: ${error.message}`);
+			response.statusCode = 500;
+			response.end("Internal Server Error");
+		}
+	})
+  .listen(PORT)
+  .on("listening", () => console.log(`server is running at ${PORT}`));
+\end{lstlisting}
+
+O Código~\ref{cod:base} apresenta a estrutura base para criação de servidores simples usando a 
+plataforma do \textit{Node.JS}. Para tal, é utilizada a função \textit{createServer} do módulo nativo \textit{http}.
+A sua \textit{callback} recebe os objetos de requisição e resposta para tratamentos como definição de cabeçalhos, leitura
+de valores de entrada e escrita de valores de saída. Dessa forma, o servidor para este estudo irá responder à chamadas
+realizadas no caminho raíz da aplicação, em determinada porta arbitrária.
+
+A primeira implementação realizada, ilustrada no Código~\ref{cod:sync}, realiza a leitura do arquivo de 1.65 GB
+de forma síncrona utilizando chamadas do módulo \textit{fs} (\textit{file system}), ou seja, todo o conteúdo será
+inserido dentro de um único \textit{buffer} e retornado assim que a operação esteja concluída. Este trecho de código
+deve ser inserido dentro do servidor previamente implementado no Código~\ref{cod:base}.
+
+\begin{lstlisting}[caption={Implementação da leitura do arquivo de forma síncrona}, label=cod:sync]
+	const data = fs.readFileSync(filename);
+	response.end(data);
+\end{lstlisting}
+
+O Código~\ref{cod:async} apresenta a implementação inicial para a leitura do arquivo de 1.65 GB de forma assíncrona,
+onde o conteúdo será processado sob demanada em pequenas porções - denominadas \textit{chunks}. Para tal, é utilizada
+a função \textit{createReadStream} presente no módulo \textit{fs} (nativo da plataforma do \textit{Node.JS}) para
+criar um \textit{stream} de leitura. Este trecho de código deve ser inserido dentro do servidor previamente 
+implementado no Código~\ref{cod:base}.
+
+O código apresenta uma sequência de operações que visam processar dados de um arquivo \textit{CSV} e 
+transformá-los em formato \textit{JSON} (\textit{JavaScript object notation}). Através de uma abordagem baseada 
+em fluxos de dados, o código executa alguma etapas de processamento. Após a criação da \textit{stream}, 
+os dados do arquivo são canalizados em um processo de 
+transformação usando o método \textit{pipeThrough} duas vezes. A primeira envolve a 
+conversão dos dados \textit{CSV} em \textit{JSON}, através de uma biblioteca da comunidade (\textit{csvtojson}), 
+selecionando apenas três propriedades escolhidas arbitrariamente. A conversão foi realizada a fim de facilitar
+a manipulação dos dados no formato nativo da linguagem \textit{JavaScript}. O segundo processamento cria uma 
+transformação personalizada, onde os dados \textit{JSON} são processados um a um. 
+Para cada \textit{chunk} do arquivo, os campos são extraídos e usados para criar um novo objeto 
+\textit{JSON} com os campos renomeados. Este processamento foi realizado apenas para demonstrar que, além de uma simples
+transferência de dados, é possível realizar processos intermediários dentro do fluxo criado.
+
+Para finalizar o processamento, a saída da transformação é canalizada para uma saída de uma resposta à requisição
+\textit{HTTP}, realizada através do método \textit{pipeTo}. A opção \textit{signal} cria a possibilidade de 
+cancelar a operação, o que é especialmente útil em cenários em que a mesma precisa ser interrompida. Todos os utilitários
+usados para leitura (\textit{Readable}), escrita (\textit{Writable}) e transformação (\textit{Transform}) são ofertados
+pelo módulo nativo \textit{stream} da plataforma do \textit{Node.JS}.
+
+\begin{lstlisting}[caption={Implementação da leitura do arquivo de forma assíncrona}, label=cod:async]
+	await Readable.toWeb(createReadStream(filename))
+		.pipeThrough(
+			Transform.toWeb(
+				csvtojson({ headers: ["cord_uid", "sha", "publish_time"] })
+			)
+		)
+		.pipeThrough(
+			new TransformStream({
+				async transform(chunk, controller) {
+					const {
+						cord_uid: cordUid,
+						sha,
+						publish_time: publishTime,
+					} = JSON.parse(Buffer.from(chunk));
+
+					const mappedData = {
+						cordUid,
+						sha,
+						publishTime,
+					};
+
+					controller.enqueue(JSON.stringify(mappedData).concat("\n"));
+				},
+			})
+		)
+		.pipeTo(Writable.toWeb(response), { signal: abortController.signal });
+\end{lstlisting}
+
+
 \subsection{Base de teste}
 
 A base de dados utilizada para testes foi escolhida baseando-se em seu tamanho (ordem de \textit{gigabytes}) com
@@ -349,7 +471,7 @@ objetivo de exemplificar a aplicação prática do processamento intermediário 
 Ao optar por essa abordagem, busca-se enfatizar a necessidade de ir além da mera transferência direta, 
 incorporando etapas de processamento que permitam aprimorar a integridade e utilidade dos dados no contexto de destino.
 
-O arquivo final utilizado apresenta um tamanho de 1.65 GB, sendo do formato \textit{csv} (\textit{comma separated values}) 
+O arquivo final utilizado apresenta um tamanho de 1.65 GB, sendo do formato \textit{CSV} (\textit{comma separated values}) 
 com 19 propriedades separadas em colunas. A extração foi realizada da base 
 \textit{CORD-19: COVID-19 Open Research Dataset} \cite{BASE}. Destaca-se que a escolha foi realizada a partir 
 de fontes confiáveis e respeitando os critérios éticos e legais. O tratamento das informações contidas será de 
@@ -359,12 +481,8 @@ acordo com as técnicas e métodos descritos nas seções subsequentes deste tra
 \subsection{Construção do ambiente de teste}
 
 Será configurado um ambiente de teste composto por uma aplicação servidor, com o intuito de registrar o consumo
-de memória \textit{RAM} e [INSERIR OUTRAS MÉTRICAS AQUI] da aplicação nos dois cenários propostos. O servidor de aplicação será baseado em \textit{Node.JS}, 
-utilizando a versão 20.3.0. 
-
-% SERÁ PRECISO? **Além dessa, será construída uma aplicação cliente para o 
-% consumo dos dados enviados pelo servidor. Esta aplicação terá uma interface básica, construída 
-% com HTML5 e JavaScript.**
+de memória \textit{RAM} e [INSERIR OUTRAS MÉTRICAS AQUI] da aplicação nos dois cenários propostos. O servidor de 
+aplicação será baseado em \textit{Node.JS}, utilizando a versão 20.3.0. 
 
 % Descrever como vai ser a coleta de dados, monitoramento via software com interface gráfica
 % ou biblioteca e outputs via command line
@@ -372,14 +490,15 @@ utilizando a versão 20.3.0.
 
 \subsection{Definição dos cenários de teste}
 
-Para a primeira etapa, serão definidos dois cenários de teste para avaliar o desempenho das implementações quando confrontadas
-com uma transferência de um volume de dados de 1.65 \textit{gigabytes}. Os cenários de teste serão nomeados da seguinte forma:
+Serão definidos dois cenários de teste para avaliar o desempenho das implementações quando confrontadas
+com uma transferência de um volume de dados de 1.65 \textit{gigabytes}. Os cenários de teste serão 
+nomeados da seguinte forma:
 
 \begin{enumerate}[a)]
 \item Cenário 1: Implementação com arquitetura não específica para transferências da ordem de \textit{gigabytes}, 
-ou seja, realização da leitura de arquivos de forma síncrona.
+ou seja, realização da leitura de arquivos de forma síncrona (Código~\ref{cod:sync}).
 \item Cenário 2: Implementação com arquitetura escalável para transferências da ordem de \textit{gigabytes}, 
-utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma assíncrona.
+utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma assíncrona (Código~\ref{cod:async}).
 \end{enumerate}
 
 \subsection{Coleta e análise de dados}
@@ -390,18 +509,11 @@ O indicador de desempenho a ser coletado e analisado para cada uma das implement
 
 \section{Resultados e discussão} 
 
-Tendo em vista o \textit{background} estabelecido e a construção e planejamento da parte experimental,
-é possível esperar que o estudo consiga elucidar as questões propostas sobre a preferência de uma implementação escalável
-e direcionada à leitura de arquivo de forma assíncrona, a fim de preservar recursos da máquina que hospeda um servidor
-\textit{web}.
+
 
 
 \section{Considerações finais}
 
-Com esta pesquisa, mesclando teoria e parte experimental, espera-se apresentar e dar foco à uma implementação
-escalável e direcionada à transferência de volumes de dados na ordem de \textit{gigabytes} em aplicações \textit{web}
-desenvolvidas com \textit{Node.JS}. Espera-se ainda demonstrar como o uso de técnicas como as \textit{streams} deve ser 
-utilizado e também encorajado quando se fala em requisições de dados na ordem de \textit{gigabytes} ou superiores na \textit{web}.
 
 
 \bibliographystyle{sbc}
