@@ -2,6 +2,3 @@
 
 database/*
 !database/.gitkeep
-
-tmp/*.csv
-!tmp/.gitkeep

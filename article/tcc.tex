@@ -291,6 +291,16 @@ simplificada, ao modo que esta operação se resume ao encadeamento de \textit{s
 \textit{buffers} entre cliente e servidor \cite[p. 29]{DIOGORESENDE}.
 
 
+\section{\textit{Cluster}}
+
+A técnica de clusterização pode ser utilizada para escalar horizontalmente um servidor em uma única máquina,
+criando processos filhos, chamados de \textit{workers}, que executam de forma concorrente e compartilham uma mesma porta.
+O \textit{Node.js} fornece o módulo de \texit{cluster} para permitir a execução de várias instâncias de aplicações na
+mesma máquina. Esse módulo é semelhante ao módulo \textit{child_process}, também nativo do \textit{Node.js},
+que fornece o método \texit{fork} para criar subprocessos, sendo a principal diferença entre os dois módulos
+um mecanismo adicional que permite o roteamento de solicitações recebidas, distribuindo-as entre as instâncias
+criadas. \cite[p. 76]{DISTRIBUTEDNODE}
+
 \section{Trabalhos relacionados}
 
 Nesta seção, serão discutidos trabalhos relacionados que abordaram o desempenho e o consumo de recursos 
@@ -349,7 +359,8 @@ com tamanhos de arquivo na ordem de \textit{gigabytes}.
 
 O estudo será realizado em um ambiente controlado, onde serão desenvolvidos cenários de teste com diferentes 
 implementações de arquitetura para a resolução do problema de envio de dados, a fim de aferir métricas de desempenho do servidor, 
-como o consumo de memória \textit{RAM}, [INSERIR OUTRAS MÉTRICAS AQUI] . Uma implementação utilizará uma arquitetura não escalável e não 
+como o consumo de memória \textit{RAM}, \textit{throughput} (quantidade de requisições processadas por unidade 
+de tempo - vazão). Uma implementação utilizará uma arquitetura não escalável e não 
 pensada para o caso específico de transferência de um grande volume de dados, e outra aplicará técnicas focadas na 
 manipulação de maiores volumes de dados.
 
@@ -488,6 +499,10 @@ Para monitoramento e \textit{benchmarking} das aplicações será utilizado o \t
 versão 5.6.2 \cite{JMETER}. Por meio de sua interface gráfica, esta ferramenta permite a criação de casos de teste,
 com configurações de quantidade de clientes, repetições de uma mesma requisição e a adição de variáveis a serem 
 observadas em cada requisição completa. %EXPLICAR VARIAVEIS DO JMETER
+
+A ferramenta \textit{PM2} \cite{PM2} será utilizada para a captura do uso de memória \textit{RAM} e latência do 
+\textit{event loop} do \textit{Node.js}, tanto no cenário síncrono como no cenário assíncrono, para fins de comparação
+entre as implementações.
 
 
 % Descrever como vai ser a coleta de dados, monitoramento via software com interface gráfica
