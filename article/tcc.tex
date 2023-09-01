@@ -85,20 +85,20 @@
 O trabalho realiza um estudo sobre técnicas presentes na plataforma do \textit{Node.JS} para desenvolvimento de servidores \textit{web} 
 que exijam processamento de grandes volumes de dados. Dentre os principais padrões de projeto, destaca-se a arquitetura orientada a eventos,
 fortemente enraizada nos principais núcleos da plataforma, que, juntamente com as \textit{streams}, possibilita a leitura de arquivos 
-com tamanho na ordem de \textit{gigabytes}. Serão desenvolvidas aplicações cliente e servidor para validar a possibilidade de consumo em alta
-demanda em aplicações \textit{web}, além de aferir o consumo de recursos de máquina no lado servidor diante da leitura e processamento
-de um arquivo com 1.65 GB. Espera-se concluir que a arquitetura orientada a eventos provê a melhor solução para desenvolvimento de aplicações
-\textit{web} com alta demanda de dados na plataforma do \textit{Node.JS}.
+com tamanho na ordem de \textit{gigabytes}. Serão criadas aplicações servidoras com o objetivo de testar a capacidade de lidar com altas 
+demandas em aplicações web. Além disso, será avaliado como os recursos do servidor são utilizados ao lidar com a leitura e processamento 
+de um arquivo de 1,65 GB. O resultado esperado é demonstrar que a arquitetura orientada a eventos é a solução mais eficaz para o 
+desenvolvimento de aplicações web que lidam com grandes volumes de dados na plataforma Node.JS.
 \end{resumo}
 
 
 \begin{abstract} 
-The work carries out a study on techniques present in the Node.js platform for developing web servers that require 
-processing large volumes of data. Among the main design patterns, the event-driven architecture stands out, deeply 
-rooted in the platform's core, which, together with streams, enables reading files with gigabyte-sized dimensions. Client and 
-server applications will be developed to validate the possibility of high-demand consumption in web applications, as well as to 
-assess the server-side resource consumption when reading and processing a 1.65 GB file. It is expected to conclude that 
-the event-driven architecture provides the best solution for developing data-intensive web applications on the Node.js platform.
+The work carries out a study of techniques present in the Node.JS platform for developing web servers that require processing large
+volumes of data. Among the main design patterns, the event-driven architecture stands out, deeply rooted in the core of the platform, 
+which, along with streams, enables the reading of files with sizes in the gigabytes range. Server applications will be created with the 
+goal of testing the ability to handle high demands in web applications. Additionally, an evaluation will be conducted on how server 
+resources are utilized when dealing with the reading and processing of a 1.65 GB file. The expected outcome is to demonstrate that the 
+event-driven architecture is the most effective solution for developing web applications that deal with large volumes of data on the Node.JS platform.
 \end{abstract}
 
 
@@ -291,15 +291,15 @@ simplificada, ao modo que esta operação se resume ao encadeamento de \textit{s
 \textit{buffers} entre cliente e servidor \cite[p. 29]{DIOGORESENDE}.
 
 
-\section{\textit{Cluster}}
+\subsection{\textit{Cluster}}
 
 A técnica de clusterização pode ser utilizada para escalar horizontalmente um servidor em uma única máquina,
 criando processos filhos, chamados de \textit{workers}, que executam de forma concorrente e compartilham uma mesma porta.
-O \textit{Node.js} fornece o módulo de \texit{cluster} para permitir a execução de várias instâncias de aplicações na
-mesma máquina. Esse módulo é semelhante ao módulo \textit{child_process}, também nativo do \textit{Node.js},
-que fornece o método \texit{fork} para criar subprocessos, sendo a principal diferença entre os dois módulos
+O \textit{Node.js} fornece o módulo de \textit{cluster} para permitir a execução de várias instâncias de aplicações na
+mesma máquina. Esse módulo é semelhante ao módulo \textit{child\textunderscore process}, também nativo do \textit{Node.js},
+que fornece o método \textit{fork} para criar subprocessos, sendo a principal diferença entre os dois módulos
 um mecanismo adicional que permite o roteamento de solicitações recebidas, distribuindo-as entre as instâncias
-criadas. \cite[p. 76]{DISTRIBUTEDNODE}
+criadas \cite[p. 76]{DISTRIBUTEDNODE}.
 
 \section{Trabalhos relacionados}
 
@@ -392,7 +392,7 @@ processamento, minimizar os gargalos de execução e otimizar o consumo de recur
 			const { size } = await stat(filename);
 			console.log("processing:", byteSize(size));
 
-			// code here
+			{ ... }
 		} catch (error) {
 			console.error(`Error at server: ${error.message}`);
 			response.statusCode = 500;
@@ -473,6 +473,32 @@ pelo módulo nativo \textit{stream} da plataforma do \textit{Node.JS}.
 		.pipeTo(Writable.toWeb(response), { signal: abortController.signal });
 \end{lstlisting}
 
+O Código~\ref{cod:async-cluster}, ainda, foi utilizado para a terceira versão do servidor, somando à técninca de leitura
+assíncrona de arquivos com a clusterização, implementada a partir de módulo \textit{cluster}, nativo da plataforma
+\textit{Node.JS}. É possível observar que o processo principal será responsável pela criação de processos filhos a partir
+do comando \textit{fork}, criando uma quantidade de processos referente ao número de núcleos de processamento presentes
+no processador da máquina. Os processos filhos, por sua vez, serão responsáveis pela instanciação de um servidor com 
+a implementação de leitura assíncrona, igualmente como apresentada no Código~\ref{cod:async}.
+
+\begin{lstlisting}[caption={Implementação da técnica de clusterização}, label=cod:async-cluster]
+	if (cluster.isPrimary) {
+		const numCPUs = os.cpus().length;
+
+		for (let i = 0; i < numCPUs; i += 1) {
+			cluster.fork();
+		}
+
+		console.log(`Number of workers: ${Object.keys(cluster.workers).length}`);
+
+		cluster.on("exit", (worker) => {
+			console.log(`Worker ${worker.process.pid} died`);
+			cluster.fork();
+		});
+	} else {
+		{ ... }
+	}
+\end{lstlisting}
+
 
 \subsection{Base de teste}
 
@@ -491,26 +517,36 @@ acordo com as técnicas e métodos descritos nas seções subsequentes deste tra
 
 \subsection{Construção do ambiente de teste}
 
-Será configurado um ambiente de teste composto por uma aplicação servidor, com o intuito de registrar o consumo
-de memória \textit{RAM} e [INSERIR OUTRAS MÉTRICAS AQUI] da aplicação nos dois cenários propostos. O servidor de 
-aplicação será baseado em \textit{Node.JS}, utilizando a versão 20.3.0. 
+Será configurado um ambiente de teste composto por uma aplicação servidor, com o intuito de registrar e avaliar as métricas como consumo
+de memória \textit{RAM} e \textit{CPU}, \textit{thoughput} (vazão de requisições 
+por unidade de tempo) e latência do \textit{event loop} da aplicação nos três cenários propostos. 
+O servidor de aplicação será baseado em \textit{Node.JS}, utilizando a versão 20.3.0. 
 
-Para monitoramento e \textit{benchmarking} das aplicações será utilizado o \textit{software} \textit{Apache JMeter},
+Para uma parte do monitoramento das aplicações será utilizado o \textit{software} \textit{Apache JMeter}, na
 versão 5.6.2 \cite{JMETER}. Por meio de sua interface gráfica, esta ferramenta permite a criação de casos de teste,
 com configurações de quantidade de clientes, repetições de uma mesma requisição e a adição de variáveis a serem 
-observadas em cada requisição completa. %EXPLICAR VARIAVEIS DO JMETER
+observadas em cada requisição completada. A métrica a ser capturada utilizando esta ferramenta será a vazão (\textit{thoughput}),
+que se refere à quantidade de requisições feitas à aplicação por unidade de tempo.
 
-A ferramenta \textit{PM2} \cite{PM2} será utilizada para a captura do uso de memória \textit{RAM} e latência do 
-\textit{event loop} do \textit{Node.js}, tanto no cenário síncrono como no cenário assíncrono, para fins de comparação
-entre as implementações.
+A ferramenta \textit{PM2} na versão 5.3.0 \cite{PM2}, oferece um \textit{dashboard} de monitoramento em tempo real da aplicação,
+permitindo a captura do uso de memória \textit{RAM}, uso de \textit{CPU} e latência do \textit{event loop} do \textit{Node.js}, 
+que se refere ao intervalo entre o registro de uma \textit{callback} e a execução da mesma.
+No âmbito deste trabalho, o PM2 será empregado como uma ferramenta integral para a execução e 
+monitoramento dos servidores. Com suas características abrangentes de gerenciamento de processos, o 
+PM2 oferece a capacidade de iniciar, parar e reiniciar aplicativos de forma eficiente, facilitando a 
+gestão contínua dos serviços. Além disso, sua habilidade em monitorar a saúde dos processos em execução, 
+proporcionando informações detalhadas sobre a utilização de recursos como CPU e memória, permitirá uma 
+visão abrangente do desempenho dos servidores.
 
 
 % Descrever como vai ser a coleta de dados, monitoramento via software com interface gráfica
 % ou biblioteca e outputs via command line
-% VAZAO
-% TAXA DE TRANSFERENCIA KB/S
-% LATÊNCIA
-% CONNECT TIME
+
+
+% MEMÓRIA
+% THROUGHPUT VAZAO -  quantidade de requisições por tempo, sendo o tempo desde o começo da primeira amostra até o final da última amostra,
+% LATÊNCIA DO EVENT LOOP (PM2) - se refere ao atraso entre a solicitação de uma operação assíncrona e a conclusão efetiva dessa operação
+% CPU 
 
 
 \subsection{Definição dos cenários de teste}
@@ -524,19 +560,42 @@ nomeados da seguinte forma:
 ou seja, realização da leitura de arquivos de forma síncrona (Código~\ref{cod:sync}).
 \item Cenário 2: Implementação com arquitetura escalável para transferências da ordem de \textit{gigabytes}, 
 utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma assíncrona (Código~\ref{cod:async}).
+\item Cenário 3: Implementação com arquitetura escalável para transferências da ordem de \textit{gigabytes}, 
+utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma assíncrona somada à utilização de
+\textit{cluster} (Código~\ref{cod:async-cluster}).
 \end{enumerate}
 
 \subsection{Coleta e análise de dados}
 
-O indicador de desempenho a ser coletado e analisado para cada uma das implementações será o consumo de memória
-\textit{RAM} e [INSERIR OUTRAS MÉTRICAS AQUI] por parte do servidor durante a transferência dos dados contidos na base previamente citada.
+Os indicadores de desempenho a serem coletados e analisados para cada uma das implementações, durante a transferência
+dos dados contidos na base previamente citada serão: Uso de memória \textit{RAM}, uso de \textit{CPU}, \textit{throughput}
+e latência do \textit{event loop}.
 
-% EXPLICAR COMO AS VARIAVEIS DO JMETER SERAO CAPTURADAS (ESCRITAS EM ARQUIVO TXT, CSV...)
-% FALAR QUAIS FORMAS SERAO UTILIZADAS, TABELAS, SO TEXTO, GRAFICOS
+No \textit{software} \textit{Apache JMeter}, serão desenvolvidos 3 cenários de teste correspondentes às 3 diferentes implementações.
+Para avaliar o \textit{throughput} de cada caso de teste, serão usados X clientes, os quais enviarão solicitações à aplicação
+de destino. As requisições dos clientes não serão feitas ao mesmo tempo, mas sim de forma escalonada, com cada
+cliente disparando uma nova requisição a cada segundo. Isso resultará em um total de X requisições ao longo do teste.
+Os valores de \textit{throughput} para cada cenário serão capturados ao fim da bateria de testes e agrupados para comparação.
+
+Já as métricas capturadas pela plataforma \textit{PM2} são registradas em tempo real em forma de gráficos, que possibilitam uma 
+análise, nesse caso, do uso de memória \textit{RAM}, uso de \textit{CPU} e latência do \textit{event loop}, durante o tempo em
+que ocorre a requisição e transferência de dados.
+
 
 \section{Resultados e discussão} 
 
-
+\begin{table}[!h]
+\centering
+\caption{Throughput para os 3 cenários propostos}
+\label{tab:exemplo}
+\begin{tabular}{|p{4cm}|p{4cm}|p{4cm}|}
+\hline
+\textbf{Coluna 1} & \textbf{Coluna 2} & \textbf{Coluna 3} \\
+\hline
+Valor 1 & Valor 2 & Valor 3\\
+\hline
+\end{tabular}
+\end{table}
 
 
 \section{Considerações finais}
