@@ -3,9 +3,17 @@ import fs from "node:fs";
 import { stat } from "node:fs/promises";
 import { createServer } from "node:http";
 
-import { PORT_SYNC, abortController, filename, headers } from "./constants.js";
+import {
+  PORT_SYNC,
+  abortController,
+  filename,
+  headers,
+  throughputMetric,
+} from "./constants.js";
 
 createServer(async (request, response) => {
+  throughputMetric.mark();
+
   if (request.method === "OPTIONS") {
     response.writeHead(204, headers);
     response.end();

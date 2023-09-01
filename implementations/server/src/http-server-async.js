@@ -6,7 +6,13 @@ import { createServer } from "node:http";
 import { Readable, Transform, Writable } from "node:stream";
 import { TransformStream } from "node:stream/web";
 
-import { abortController, PORT_ASYNC, filename, headers } from "./constants.js";
+import {
+  abortController,
+  PORT_ASYNC,
+  filename,
+  headers,
+  throughputMetric,
+} from "./constants.js";
 
 let itemsProcessed = 0;
 let maxMemoryUsage = process.memoryUsage().rss;
@@ -17,6 +23,8 @@ const measureMemoryUsage = () => {
 };
 
 createServer(async (request, response) => {
+  throughputMetric.mark();
+
   if (request.method === "OPTIONS") {
     response.writeHead(204, headers);
     response.end();

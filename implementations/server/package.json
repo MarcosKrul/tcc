@@ -11,6 +11,9 @@
     "dev:sync": "node --watch src/http-server-sync.js",
     "dev:async": "node --watch src/http-server-async.js",
     "dev:async:cluster": "node --watch src/http-server-async-cluster.js",
+    "start:sync": "pm2 start --name sync src/http-server-sync.js",
+    "start:async": "pm2 start --name async src/http-server-async.js",
+    "start:async:cluster": "pm2 start --name async-c src/http-server-async-cluster.js",
     "exec:sync": "scripts/exec.sh 3001",
     "exec:async": "scripts/exec.sh 3000",
     "lint": "eslint . --ext js,ts",
@@ -33,6 +36,7 @@
   },
   "dependencies": {
     "byte-size": "^8.1.1",
-    "csvtojson": "^2.0.10"
+    "csvtojson": "^2.0.10",
+    "tx2": "^1.0.5"
   }
 }

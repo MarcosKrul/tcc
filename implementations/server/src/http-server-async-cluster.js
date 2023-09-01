@@ -13,6 +13,7 @@ import {
   PORT_ASYNC_CLUSTER,
   filename,
   headers,
+  throughputMetric,
 } from "./constants.js";
 
 let itemsProcessed = 0;
@@ -38,6 +39,8 @@ if (cluster.isPrimary) {
   });
 } else {
   createServer(async (request, response) => {
+    throughputMetric.mark();
+
     if (request.method === "OPTIONS") {
       response.writeHead(204, headers);
       response.end();
