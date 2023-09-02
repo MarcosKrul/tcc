@@ -11,8 +11,8 @@ import { performance } from "node:perf_hooks";
 import { Readable, Transform, Writable } from "node:stream";
 import { TransformStream } from "node:stream/web";
 
+import { saveRequestMetrics } from "./analytics.js";
 import { PORT_ASYNC_CLUSTER, filename, headers } from "./constants.js";
-import { getRuntimeFormatted } from "./runtimeControl.js";
 
 let itemsProcessed = 0;
 let maxMemoryUsage = process.memoryUsage().rss;
@@ -36,10 +36,10 @@ if (cluster.isPrimary) {
     cluster.fork();
   });
 } else {
-  let startTime = -1;
-  const requestId = randomUUID();
-
   createServer(async (request, response) => {
+    let startTime = -1;
+    const requestId = randomUUID();
+
     if (request.method === "OPTIONS") {
       response.writeHead(204, headers);
       response.end();
@@ -47,20 +47,14 @@ if (cluster.isPrimary) {
     }
 
     request.once("close", () => {
-      console.log(
-        `${format(
-          new Date(),
-          "dd/MM/yyyy HH:mm:ss"
-        )} Connection ${requestId} was closed with ${getRuntimeFormatted(
-          startTime,
-          performance.now()
-        )}s`
-      );
-      console.log(
-        `${itemsProcessed} items processed with Max memory usage: ${byteSize(
-          maxMemoryUsage
-        )}`
-      );
+      saveRequestMetrics({
+        requestId,
+        server: "async-cluster",
+        startTime,
+        endTime: performance.now(),
+        itemsProcessed,
+        maxMemoryUsage,
+      });
     });
 
     response.writeHead(200, headers);

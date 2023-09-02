@@ -343,15 +343,6 @@ em ambientes de alta demanda.
 
 \section{Metodologia}
 
-
-% MÉTRICAS A SEREM ANALISADAS: 
-%     - Consumo de memóra RAM
-%     - Uso de CPU?
-%   - Throughput??
-%   - Latência do event loop
-%   - Estatísticas de memória do Garbage Collector
-
-
 A metodologia aplicada apresenta caráter semi-experimental, qualitativo
 e escopo exploratório, para análise do desempenho de sistemas \textit{web} baseados em \textit{Node.JS} 
 quando será gerada uma condição de tráfego de fluxo intenso de dados,
@@ -375,6 +366,9 @@ processamento, minimizar os gargalos de execução e otimizar o consumo de recur
 
 \begin{lstlisting}[caption={Código base para um servidor \textit{Node.JS}}, label=cod:base]
 	createServer(async (request, response) => {
+		let startTime = -1;
+  	const requestId = randomUUID();
+
 		if (request.method === "OPTIONS") {
 			response.writeHead(204, headers);
 			response.end();
@@ -382,15 +376,23 @@ processamento, minimizar os gargalos de execução e otimizar o consumo de recur
 		}
 
 		request.once("close", () => {
-			console.log(`Connection was closed`);
-			abortController.abort();
+			saveRequestMetrics({
+				requestId,
+				server: "sync",
+				startTime,
+				endTime: performance.now(),
+			});
 		});
 
 		response.writeHead(200, headers);
 
 		try {
+			startTime = performance.now();
 			const { size } = await stat(filename);
-			console.log("processing:", byteSize(size));
+			console.log(
+				`${format(new Date(), "dd/MM/yyyy HH:mm:ss")} ${requestId} Processing: `,
+				`${byteSize(size)}`
+			);
 
 			{ ... }
 		} catch (error) {
@@ -470,7 +472,7 @@ pelo módulo nativo \textit{stream} da plataforma do \textit{Node.JS}.
 				},
 			})
 		)
-		.pipeTo(Writable.toWeb(response), { signal: abortController.signal });
+		.pipeTo(Writable.toWeb(response));
 \end{lstlisting}
 
 O Código~\ref{cod:async-cluster}, ainda, foi utilizado para a terceira versão do servidor, somando à técninca de leitura
@@ -515,66 +517,6 @@ de fontes confiáveis e respeitando os critérios éticos e legais. O tratamento
 acordo com as técnicas e métodos descritos nas seções subsequentes deste trabalho.
 
 
-\subsection{Construção do ambiente de teste}
-
-Será configurado um ambiente de teste composto por uma aplicação servidor, com o intuito de registrar e avaliar as métricas como consumo
-de memória \textit{RAM} e \textit{CPU}, \textit{thoughput} e latência do \textit{event loop} da aplicação nos três cenários propostos. 
-O servidor de aplicação será baseado em \textit{Node.JS}, utilizando a versão 20.3.0. A aplicação será executada em uma máquina
-com o sistema operacional \textit{Windows} 10 64 \textit{bits}, possuindo 24 \textit{gigabytes} de memória \textit{RAM} e um 
-processador com 4 núcleos e 4 \textit{threads}.
-
-Para uma parte do monitoramento das aplicações será utilizado o \textit{software} \textit{Apache JMeter}, na
-versão 5.6.2 \cite{JMETER}. Por meio de sua interface gráfica, esta ferramenta permite a criação de casos de teste,
-com configurações de quantidade de clientes, repetições de uma mesma requisição e a adição de variáveis a serem 
-observadas em cada requisição completada. A métrica a ser capturada utilizando esta ferramenta será o \textit{thoughput},
-que se refere à quantidade de requisições feitas à aplicação por unidade de tempo.
-
-Para uma parte do monitoramento das aplicações será utilizada biblioteca para \textit{Node.js} \textit{Autocannon}, na
-versão 7.12.0 \cite{AUTOCANNON}. A biblioteca oferece opções de configuração para efetuar o disparo de requisições e coletar
-dados relevantes destas. É possível, por meio de um \textit{script} feito em \textit{JavaScript}, definir a quantidade de clientes,
-a quantidade de requisições que estes irão fazer, e se estas ocorreram simultaneamente. A métrica a ser capturada utilizando
-esta ferramenta será o \textit{thoughput}, que se refere à quantidade de requisições feitas à aplicação por unidade de tempo.
-O Código~\ref{cod:autocannon} apresenta a configuração utilizada, destacando as propriedades críticas para o teste.
-A primeira delas é \textit{connections}, que define o número de conexões simultâneas, ou seja, quantos clientes estarão realizando requisições concorrentes.
-Em seguida, a propriedade \textit{amount}, que representa o total de requisições a serem executadas pelos clientes durante o teste.
-Por fim, a propriedade \textit{connectionRate} determina o limite máximo de requisições que um único cliente pode realizar a cada segundo.
-Como propriedades auxiliares, para o acesso ao servidor, mas que não afetarão as métricas, temos a passagem da \textit{URL} do servidor,
-o método \textit{GET} e o tipo de conexão no cabeçalho, \textit{keep-alive}, que deixa explícito que a conexão deve manter-se aberta
-para o recebimento dos dados na resposta.
-
-\begin{lstlisting}[caption={Implementação de uma instância do \textit{autocannon} para testes}, label=cod:autocannon]
-	const instance = autocannon({
-		url: `http://localhost:${PORT}`,
-		connections: 10,
-		amount: 100,
-		connectionRate: 2,
-		timeout: 999999,
-		method: "GET",
-		headers: { connection: "keep-alive" },
-	});
-\end{lstlisting}
-
-A ferramenta \textit{PM2} na versão 5.3.0 \cite{PM2}, oferece um \textit{dashboard} de monitoramento em tempo real da aplicação,
-permitindo a captura do uso de memória \textit{RAM}, uso de \textit{CPU} e latência do \textit{event loop} do \textit{Node.js}, 
-que se refere ao intervalo entre o registro de uma \textit{callback} e a execução da mesma.
-No âmbito deste trabalho, o PM2 será empregado como uma ferramenta integral para a execução e 
-monitoramento dos servidores. Com suas características abrangentes de gerenciamento de processos, o 
-PM2 oferece a capacidade de iniciar, parar e reiniciar aplicativos de forma eficiente, facilitando a 
-gestão contínua dos serviços. Além disso, sua habilidade em monitorar a saúde dos processos em execução, 
-proporcionando informações detalhadas sobre a utilização de recursos como CPU e memória, permitirá uma 
-visão abrangente do desempenho dos servidores.
-
-
-% Descrever como vai ser a coleta de dados, monitoramento via software com interface gráfica
-% ou biblioteca e outputs via command line
-
-
-% MEMÓRIA
-% THROUGHPUT VAZAO -  quantidade de requisições por tempo, sendo o tempo desde o começo da primeira amostra até o final da última amostra,
-% LATÊNCIA DO EVENT LOOP (PM2) - se refere ao atraso entre a solicitação de uma operação assíncrona e a conclusão efetiva dessa operação
-% CPU 
-
-
 \subsection{Definição dos cenários de teste}
 
 Serão definidos três cenários de teste para avaliar o desempenho das implementações quando confrontadas
@@ -591,25 +533,44 @@ utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma
 \textit{cluster} (Código~\ref{cod:async-cluster}).
 \end{enumerate}
 
+
+\subsection{Construção do ambiente de teste}
+
+Será configurado um ambiente de teste composto por uma aplicação servidor, com o intuito de registrar e avaliar as métricas como consumo
+de memória \textit{RAM} e \textit{CPU}, \textit{thoughput}, que se refere à quantidade de requisições feitas à aplicação por unidade de tempo,
+e latência do \textit{event loop} da aplicação nos três cenários propostos. 
+O servidor de aplicação será baseado em \textit{Node.JS}, utilizando a versão 20.3.0. A aplicação será executada em uma máquina
+com o sistema operacional \textit{Windows} 10 64 \textit{bits}, possuindo 24 \textit{gigabytes} de memória \textit{RAM} e um 
+processador com 4 núcleos.
+
+Para automatizar o envio de requisições ao servidor em diferentes cenários, 
+foi desenvolvido um \textit{script shell}. O mesmo permite configurar a quantidade de 
+requisições e automatizar o processo de envio de solicitações \textit{HTTP}. O Código~\ref{cod:shelltest} 
+apresenta um exemplo em que são enviadas dez solicitações ao servidor. Para tornar o ambiente de 
+teste mais realista, é possível definir a quantidade de solicitações enviadas simultaneamente, 
+utilizando a opção \textit{-P4} da ferramenta \textit{xargs}, que permite a execução de comandos em lote. O envio 
+das requisições é realizado por meio do comando \textit{curl}, que especifica o caminho e o método \textit{HTTP} apropriado.
+
+\begin{lstlisting}[caption={Exemplo de \textit{script} para disparo de requisições}, label=cod:shelltest]
+	seq 1 10 | xargs -Iname -P4  curl -X GET "http://localhost:${PORT}"
+\end{lstlisting}
+
+A ferramenta \textit{PM2} na versão 5.3.0 \cite{PM2}, oferece um \textit{dashboard} de monitoramento em tempo real da aplicação,
+permitindo a captura do uso de memória \textit{RAM}, uso de \textit{CPU} e latência do \textit{event loop} do \textit{Node.js}, 
+que se refere ao intervalo entre o registro de uma \textit{callback} e a execução da mesma.
+No âmbito deste trabalho, o PM2 será empregado como uma ferramenta integral para a execução e 
+monitoramento dos servidores. Com suas características abrangentes de gerenciamento de processos, o 
+\textit{PM2} oferece a capacidade de iniciar, parar e reiniciar aplicativos de forma eficiente, facilitando a 
+gestão contínua dos serviços. Além disso, sua habilidade em monitorar a saúde dos processos em execução, 
+proporcionando informações detalhadas sobre a utilização de recursos como \textit{CPU} e memória, permitirá uma 
+visão abrangente do desempenho dos servidores.
+
+
 \subsection{Coleta e análise de dados}
 
 Os indicadores de desempenho a serem coletados e analisados para cada uma das implementações, durante a transferência
 dos dados contidos na base previamente citada serão: Uso de memória \textit{RAM}, uso de \textit{CPU}, \textit{throughput}
 e latência do \textit{event loop}.
-
-% No \textit{software} \textit{Apache JMeter}, serão desenvolvidos 3 cenários de teste correspondentes às 3 diferentes implementações.
-% Para avaliar o \textit{throughput} de cada caso de teste, serão usados X clientes, os quais enviarão solicitações à aplicação
-% de destino. As requisições dos clientes não serão feitas ao mesmo tempo, mas sim de forma escalonada, com cada
-% cliente disparando uma nova requisição a cada segundo. Isso resultará em um total de X requisições ao longo do teste.
-% Os valores de \textit{throughput} para cada cenário serão capturados ao fim da bateria de testes e agrupados para comparação.
-
-Com a biblioteca \textit{autocannon}, serão configurados os 3 cenários de teste correspondentes às 3 diferentes implementações.
-Para avaliar o \textit{throughput} de cada caso de teste, serão usados [X] clientes, os quais enviarão solicitações à aplicação
-de destino. As requisições dos clientes não serão feitas ao mesmo tempo, mas sim de forma escalonada, com cada
-cliente disparando uma nova requisição a cada segundo.
-Os valores de \textit{throughput} para cada cenário serão registrados após a conclusão da série de testes e posteriormente
-exibidos em um terminal na forma de uma tabela. Estes dados serão então extraídos e organizados em outra tabela,
-que irá agrupar os resultados de todos os cenários para comparação.
 
 Já as métricas capturadas pela plataforma \textit{PM2} são registradas em tempo real em forma de gráficos, que possibilitam uma 
 análise, nesse caso, do uso de memória \textit{RAM}, uso de \textit{CPU} e latência do \textit{event loop}, durante o tempo em

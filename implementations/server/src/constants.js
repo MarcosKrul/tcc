@@ -1,5 +1,5 @@
-const PORT_SYNC = 3001;
-const PORT_ASYNC = 3000;
+const PORT_SYNC = 3000;
+const PORT_ASYNC = 3001;
 const PORT_ASYNC_CLUSTER = 3002;
 
 const filename = "./database/part_10/metadata-1.csv";
