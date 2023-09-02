@@ -40,11 +40,11 @@
 \definecolor{purple}{rgb}{0.65, 0.12, 0.82}
 
 \lstdefinelanguage{JavaScript}{
-  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+  keywords={typeof, new, true, false, catch, function, return, null, try, async, catch, switch, var, if, in, while, do, else, case, break, const, for, await},
   keywordstyle=\color{blue}\bfseries,
   ndkeywords={class, export, boolean, throw, implements, import, this},
   ndkeywordstyle=\color{darkgray}\bfseries,
-  identifierstyle=\color{black},
+  identifierstyle=\color{black},.
   sensitive=false,
   comment=[l]{//},
   morecomment=[s]{/*}{*/},
@@ -518,15 +518,41 @@ acordo com as técnicas e métodos descritos nas seções subsequentes deste tra
 \subsection{Construção do ambiente de teste}
 
 Será configurado um ambiente de teste composto por uma aplicação servidor, com o intuito de registrar e avaliar as métricas como consumo
-de memória \textit{RAM} e \textit{CPU}, \textit{thoughput} (vazão de requisições 
-por unidade de tempo) e latência do \textit{event loop} da aplicação nos três cenários propostos. 
-O servidor de aplicação será baseado em \textit{Node.JS}, utilizando a versão 20.3.0. 
+de memória \textit{RAM} e \textit{CPU}, \textit{thoughput} e latência do \textit{event loop} da aplicação nos três cenários propostos. 
+O servidor de aplicação será baseado em \textit{Node.JS}, utilizando a versão 20.3.0. A aplicação será executada em uma máquina
+com o sistema operacional \textit{Windows} 10 64 \textit{bits}, possuindo 24 \textit{gigabytes} de memória \textit{RAM} e um 
+processador com 4 núcleos e 4 \textit{threads}.
 
 Para uma parte do monitoramento das aplicações será utilizado o \textit{software} \textit{Apache JMeter}, na
 versão 5.6.2 \cite{JMETER}. Por meio de sua interface gráfica, esta ferramenta permite a criação de casos de teste,
 com configurações de quantidade de clientes, repetições de uma mesma requisição e a adição de variáveis a serem 
-observadas em cada requisição completada. A métrica a ser capturada utilizando esta ferramenta será a vazão (\textit{thoughput}),
+observadas em cada requisição completada. A métrica a ser capturada utilizando esta ferramenta será o \textit{thoughput},
 que se refere à quantidade de requisições feitas à aplicação por unidade de tempo.
+
+Para uma parte do monitoramento das aplicações será utilizada biblioteca para \textit{Node.js} \textit{Autocannon}, na
+versão 7.12.0 \cite{AUTOCANNON}. A biblioteca oferece opções de configuração para efetuar o disparo de requisições e coletar
+dados relevantes destas. É possível, por meio de um \textit{script} feito em \textit{JavaScript}, definir a quantidade de clientes,
+a quantidade de requisições que estes irão fazer, e se estas ocorreram simultaneamente. A métrica a ser capturada utilizando
+esta ferramenta será o \textit{thoughput}, que se refere à quantidade de requisições feitas à aplicação por unidade de tempo.
+O Código~\ref{cod:autocannon} apresenta a configuração utilizada, destacando as propriedades críticas para o teste.
+A primeira delas é \textit{connections}, que define o número de conexões simultâneas, ou seja, quantos clientes estarão realizando requisições concorrentes.
+Em seguida, a propriedade \textit{amount}, que representa o total de requisições a serem executadas pelos clientes durante o teste.
+Por fim, a propriedade \textit{connectionRate} determina o limite máximo de requisições que um único cliente pode realizar a cada segundo.
+Como propriedades auxiliares, para o acesso ao servidor, mas que não afetarão as métricas, temos a passagem da \textit{URL} do servidor,
+o método \textit{GET} e o tipo de conexão no cabeçalho, \textit{keep-alive}, que deixa explícito que a conexão deve manter-se aberta
+para o recebimento dos dados na resposta.
+
+\begin{lstlisting}[caption={Implementação de uma instância do \textit{autocannon} para testes}, label=cod:autocannon]
+	const instance = autocannon({
+		url: `http://localhost:${PORT}`,
+		connections: 10,
+		amount: 100,
+		connectionRate: 2,
+		timeout: 999999,
+		method: "GET",
+		headers: { connection: "keep-alive" },
+	});
+\end{lstlisting}
 
 A ferramenta \textit{PM2} na versão 5.3.0 \cite{PM2}, oferece um \textit{dashboard} de monitoramento em tempo real da aplicação,
 permitindo a captura do uso de memória \textit{RAM}, uso de \textit{CPU} e latência do \textit{event loop} do \textit{Node.js}, 
@@ -551,7 +577,7 @@ visão abrangente do desempenho dos servidores.
 
 \subsection{Definição dos cenários de teste}
 
-Serão definidos dois cenários de teste para avaliar o desempenho das implementações quando confrontadas
+Serão definidos três cenários de teste para avaliar o desempenho das implementações quando confrontadas
 com uma transferência de um volume de dados de 1.65 \textit{gigabytes}. Os cenários de teste serão 
 nomeados da seguinte forma:
 
@@ -571,18 +597,34 @@ Os indicadores de desempenho a serem coletados e analisados para cada uma das im
 dos dados contidos na base previamente citada serão: Uso de memória \textit{RAM}, uso de \textit{CPU}, \textit{throughput}
 e latência do \textit{event loop}.
 
-No \textit{software} \textit{Apache JMeter}, serão desenvolvidos 3 cenários de teste correspondentes às 3 diferentes implementações.
-Para avaliar o \textit{throughput} de cada caso de teste, serão usados X clientes, os quais enviarão solicitações à aplicação
+% No \textit{software} \textit{Apache JMeter}, serão desenvolvidos 3 cenários de teste correspondentes às 3 diferentes implementações.
+% Para avaliar o \textit{throughput} de cada caso de teste, serão usados X clientes, os quais enviarão solicitações à aplicação
+% de destino. As requisições dos clientes não serão feitas ao mesmo tempo, mas sim de forma escalonada, com cada
+% cliente disparando uma nova requisição a cada segundo. Isso resultará em um total de X requisições ao longo do teste.
+% Os valores de \textit{throughput} para cada cenário serão capturados ao fim da bateria de testes e agrupados para comparação.
+
+Com a biblioteca \textit{autocannon}, serão configurados os 3 cenários de teste correspondentes às 3 diferentes implementações.
+Para avaliar o \textit{throughput} de cada caso de teste, serão usados [X] clientes, os quais enviarão solicitações à aplicação
 de destino. As requisições dos clientes não serão feitas ao mesmo tempo, mas sim de forma escalonada, com cada
-cliente disparando uma nova requisição a cada segundo. Isso resultará em um total de X requisições ao longo do teste.
-Os valores de \textit{throughput} para cada cenário serão capturados ao fim da bateria de testes e agrupados para comparação.
+cliente disparando uma nova requisição a cada segundo.
+Os valores de \textit{throughput} para cada cenário serão registrados após a conclusão da série de testes e posteriormente
+exibidos em um terminal na forma de uma tabela. Estes dados serão então extraídos e organizados em outra tabela,
+que irá agrupar os resultados de todos os cenários para comparação.
 
 Já as métricas capturadas pela plataforma \textit{PM2} são registradas em tempo real em forma de gráficos, que possibilitam uma 
 análise, nesse caso, do uso de memória \textit{RAM}, uso de \textit{CPU} e latência do \textit{event loop}, durante o tempo em
-que ocorre a requisição e transferência de dados.
+que ocorre a requisição e transferência de dados. Capturas de tela destes gráficos serão feitas no \textit{dashboard} da plataforma
+\textit{PM2} e dispostas de acordo com seus respectivos cenários.
 
 
-\section{Resultados e discussão} 
+\section{Resultados e discussão}
+
+Esta seção desempenha um papel central neste estudo, apresentando e analisando os resultados obtidos de 
+acordo com a metodologia previamente descrita. Nesta seção, os dados coletados são examinados, suas implicações são interpretadas 
+e as descobertas são discutidas à luz das questões de pesquisa estabelecidas. Os itens aqui apresentados representam o 
+resultado de análises rigorosas e constituem uma contribuição significativa para a compreensão do tópico em questão. Por 
+meio de uma análise crítica dos resultados, procura-se não apenas responder às questões de pesquisa, mas também identificar 
+tendências, anomalias e insights que possam enriquecer o corpo de conhecimento existente na área de estudo.
 
 \begin{table}[!h]
 \centering
@@ -596,6 +638,43 @@ Valor 1 & Valor 2 & Valor 3\\
 \hline
 \end{tabular}
 \end{table}
+
+
+% INCLUIR IMAGENS DOS GRÁFICOS
+
+\subsection{Cenário 1: Implementação de leitura síncrona}
+
+\begin{figure}[h]
+\centering
+\caption{Modelo da abordagem EDA no \textit{Node.JS}}
+\includegraphics[width=0.8\textwidth]{images/pt-br/eda-arch-nodejs.png}
+\label{fig:nodejs_eda_model}
+Fonte: Adaptado de \cite{BUGS}.
+\end{figure}
+
+
+\subsection{Cenário 2: Implementação de leitura assíncrona}
+ 
+\begin{figure}[h]
+\centering
+\caption{Modelo da abordagem EDA no \textit{Node.JS}}
+\includegraphics[width=0.8\textwidth]{images/pt-br/eda-arch-nodejs.png}
+\label{fig:nodejs_eda_model}
+Fonte: Adaptado de \cite{BUGS}.
+\end{figure}
+
+
+\subsection{Cenário 3: Implementação de leitura assíncrona somada à utilização de \textit{cluster}}
+
+\begin{figure}[h]
+\centering
+\caption{Modelo da abordagem EDA no \textit{Node.JS}}
+\includegraphics[width=0.8\textwidth]{images/pt-br/eda-arch-nodejs.png}
+\label{fig:nodejs_eda_model}
+Fonte: Adaptado de \cite{BUGS}.
+\end{figure}
+
+
 
 
 \section{Considerações finais}

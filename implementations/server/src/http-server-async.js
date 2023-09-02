@@ -1,18 +1,13 @@
 import byteSize from "byte-size";
 import csvtojson from "csvtojson";
+import { format } from "date-fns";
 import { createReadStream } from "node:fs";
 import { stat } from "node:fs/promises";
 import { createServer } from "node:http";
 import { Readable, Transform, Writable } from "node:stream";
 import { TransformStream } from "node:stream/web";
 
-import {
-  abortController,
-  PORT_ASYNC,
-  filename,
-  headers,
-  throughputMetric,
-} from "./constants.js";
+import { abortController, PORT_ASYNC, filename, headers } from "./constants.js";
 
 let itemsProcessed = 0;
 let maxMemoryUsage = process.memoryUsage().rss;
@@ -23,8 +18,6 @@ const measureMemoryUsage = () => {
 };
 
 createServer(async (request, response) => {
-  throughputMetric.mark();
-
   if (request.method === "OPTIONS") {
     response.writeHead(204, headers);
     response.end();
@@ -34,6 +27,7 @@ createServer(async (request, response) => {
   request.once("close", () => {
     console.log(`Connection was closed with ${itemsProcessed} items processed`);
     console.log(`Max memory usage: ${byteSize(maxMemoryUsage)}`);
+    console.log(`${format(new Date(), "dd/MM/yyyy HH:mm:ss")} finished`);
     abortController.abort();
   });
 
@@ -41,7 +35,10 @@ createServer(async (request, response) => {
 
   try {
     const { size } = await stat(filename);
-    console.log("Processing: ", `${byteSize(size)}`);
+    console.log(
+      `${format(new Date(), "dd/MM/yyyy HH:mm:ss")} Processing: `,
+      `${byteSize(size)}`
+    );
 
     await Readable.toWeb(createReadStream(filename))
       .pipeThrough(

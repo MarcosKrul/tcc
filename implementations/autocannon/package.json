@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node src/index.js"
+    "test:sync": "node --max-old-space-size=8192 src/index.js 3001",
+    "test:async": "node src/index.js 3000",
+    "test:async:cluster": "node src/index.js 3002"
   },
   "keywords": [],
   "author": "",

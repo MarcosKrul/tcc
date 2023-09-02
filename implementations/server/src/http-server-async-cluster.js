@@ -1,5 +1,6 @@
 import byteSize from "byte-size";
 import csvtojson from "csvtojson";
+import { format } from "date-fns";
 import cluster from "node:cluster";
 import { createReadStream } from "node:fs";
 import { stat } from "node:fs/promises";
@@ -13,7 +14,6 @@ import {
   PORT_ASYNC_CLUSTER,
   filename,
   headers,
-  throughputMetric,
 } from "./constants.js";
 
 let itemsProcessed = 0;
@@ -39,8 +39,6 @@ if (cluster.isPrimary) {
   });
 } else {
   createServer(async (request, response) => {
-    throughputMetric.mark();
-
     if (request.method === "OPTIONS") {
       response.writeHead(204, headers);
       response.end();
@@ -52,6 +50,7 @@ if (cluster.isPrimary) {
         `Connection was closed with ${itemsProcessed} items processed`
       );
       console.log(`Max memory usage: ${byteSize(maxMemoryUsage)}`);
+      console.log(`${format(new Date(), "dd/MM/yyyy HH:mm:ss")} finished`);
       abortController.abort();
     });
 
@@ -59,7 +58,10 @@ if (cluster.isPrimary) {
 
     try {
       const { size } = await stat(filename);
-      console.log("Processing: ", `${byteSize(size)}`);
+      console.log(
+        `${format(new Date(), "dd/MM/yyyy HH:mm:ss")} Processing: `,
+        `${byteSize(size)}`
+      );
 
       await Readable.toWeb(createReadStream(filename))
         .pipeThrough(
