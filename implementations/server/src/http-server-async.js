@@ -9,8 +9,8 @@ import { performance } from "node:perf_hooks";
 import { Readable, Transform, Writable } from "node:stream";
 import { TransformStream } from "node:stream/web";
 
+import { saveRequestMetrics } from "./analytics.js";
 import { PORT_ASYNC, filename, headers } from "./constants.js";
-import { getRuntimeFormatted } from "./runtimeControl.js";
 
 let itemsProcessed = 0;
 let maxMemoryUsage = process.memoryUsage().rss;
@@ -31,20 +31,14 @@ createServer(async (request, response) => {
   }
 
   request.once("close", () => {
-    console.log(
-      `${format(
-        new Date(),
-        "dd/MM/yyyy HH:mm:ss"
-      )} Connection ${requestId} was closed with ${getRuntimeFormatted(
-        startTime,
-        performance.now()
-      )}s`
-    );
-    console.log(
-      `${itemsProcessed} items processed with Max memory usage: ${byteSize(
-        maxMemoryUsage
-      )}`
-    );
+    saveRequestMetrics({
+      requestId,
+      server: "async",
+      startTime,
+      endTime: performance.now(),
+      itemsProcessed,
+      maxMemoryUsage,
+    });
   });
 
   response.writeHead(200, headers);

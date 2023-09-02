@@ -6,8 +6,8 @@ import { stat } from "node:fs/promises";
 import { createServer } from "node:http";
 import { performance } from "node:perf_hooks";
 
+import { saveRequestMetrics } from "./analytics.js";
 import { PORT_SYNC, filename, headers } from "./constants.js";
-import { getRuntimeFormatted } from "./runtimeControl.js";
 
 createServer(async (request, response) => {
   let startTime = -1;
@@ -20,15 +20,12 @@ createServer(async (request, response) => {
   }
 
   request.once("close", () => {
-    console.log(
-      `${format(
-        new Date(),
-        "dd/MM/yyyy HH:mm:ss"
-      )} Connection ${requestId} was closed with ${getRuntimeFormatted(
-        startTime,
-        performance.now()
-      )}s`
-    );
+    saveRequestMetrics({
+      requestId,
+      server: "sync",
+      startTime,
+      endTime: performance.now(),
+    });
   });
 
   response.writeHead(200, headers);

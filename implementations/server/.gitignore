@@ -2,3 +2,6 @@
 
 database/*
 !database/.gitkeep
+
+tmp/*.json
+!tmp/.gitkeep
