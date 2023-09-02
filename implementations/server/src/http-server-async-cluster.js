@@ -2,19 +2,17 @@ import byteSize from "byte-size";
 import csvtojson from "csvtojson";
 import { format } from "date-fns";
 import cluster from "node:cluster";
+import { randomUUID } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { stat } from "node:fs/promises";
 import { createServer } from "node:http";
 import os from "node:os";
+import { performance } from "node:perf_hooks";
 import { Readable, Transform, Writable } from "node:stream";
 import { TransformStream } from "node:stream/web";
 
-import {
-  abortController,
-  PORT_ASYNC_CLUSTER,
-  filename,
-  headers,
-} from "./constants.js";
+import { PORT_ASYNC_CLUSTER, filename, headers } from "./constants.js";
+import { getRuntimeFormatted } from "./runtimeControl.js";
 
 let itemsProcessed = 0;
 let maxMemoryUsage = process.memoryUsage().rss;
@@ -38,6 +36,9 @@ if (cluster.isPrimary) {
     cluster.fork();
   });
 } else {
+  let startTime = -1;
+  const requestId = randomUUID();
+
   createServer(async (request, response) => {
     if (request.method === "OPTIONS") {
       response.writeHead(204, headers);
@@ -47,19 +48,31 @@ if (cluster.isPrimary) {
 
     request.once("close", () => {
       console.log(
-        `Connection was closed with ${itemsProcessed} items processed`
+        `${format(
+          new Date(),
+          "dd/MM/yyyy HH:mm:ss"
+        )} Connection ${requestId} was closed with ${getRuntimeFormatted(
+          startTime,
+          performance.now()
+        )}s`
       );
-      console.log(`Max memory usage: ${byteSize(maxMemoryUsage)}`);
-      console.log(`${format(new Date(), "dd/MM/yyyy HH:mm:ss")} finished`);
-      abortController.abort();
+      console.log(
+        `${itemsProcessed} items processed with Max memory usage: ${byteSize(
+          maxMemoryUsage
+        )}`
+      );
     });
 
     response.writeHead(200, headers);
 
     try {
+      startTime = performance.now();
       const { size } = await stat(filename);
       console.log(
-        `${format(new Date(), "dd/MM/yyyy HH:mm:ss")} Processing: `,
+        `${format(
+          new Date(),
+          "dd/MM/yyyy HH:mm:ss"
+        )} ${requestId} Processing: `,
         `${byteSize(size)}`
       );
 
@@ -91,7 +104,7 @@ if (cluster.isPrimary) {
             },
           })
         )
-        .pipeTo(Writable.toWeb(response), { signal: abortController.signal });
+        .pipeTo(Writable.toWeb(response));
     } catch (error) {
       console.error(`Error at server: ${error.message}`);
       response.statusCode = 500;

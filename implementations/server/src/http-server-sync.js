@@ -1,12 +1,18 @@
 import byteSize from "byte-size";
 import { format } from "date-fns";
+import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import { stat } from "node:fs/promises";
 import { createServer } from "node:http";
+import { performance } from "node:perf_hooks";
 
-import { PORT_SYNC, abortController, filename, headers } from "./constants.js";
+import { PORT_SYNC, filename, headers } from "./constants.js";
+import { getRuntimeFormatted } from "./runtimeControl.js";
 
 createServer(async (request, response) => {
+  let startTime = -1;
+  const requestId = randomUUID();
+
   if (request.method === "OPTIONS") {
     response.writeHead(204, headers);
     response.end();
@@ -14,17 +20,24 @@ createServer(async (request, response) => {
   }
 
   request.once("close", () => {
-    console.log(`Connection was closed`);
-    console.log(`${format(new Date(), "dd/MM/yyyy HH:mm:ss")} finished`);
-    abortController.abort();
+    console.log(
+      `${format(
+        new Date(),
+        "dd/MM/yyyy HH:mm:ss"
+      )} Connection ${requestId} was closed with ${getRuntimeFormatted(
+        startTime,
+        performance.now()
+      )}s`
+    );
   });
 
   response.writeHead(200, headers);
 
   try {
+    startTime = performance.now();
     const { size } = await stat(filename);
     console.log(
-      `${format(new Date(), "dd/MM/yyyy HH:mm:ss")} Processing: `,
+      `${format(new Date(), "dd/MM/yyyy HH:mm:ss")} ${requestId} Processing: `,
       `${byteSize(size)}`
     );
 

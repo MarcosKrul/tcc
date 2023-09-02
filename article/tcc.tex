@@ -628,7 +628,7 @@ tendências, anomalias e insights que possam enriquecer o corpo de conhecimento 
 
 \begin{table}[!h]
 \centering
-\caption{Throughput para os 3 cenários propostos}
+\caption{Throughput para os 3 cenários propostos} 
 \label{tab:exemplo}
 \begin{tabular}{|p{4cm}|p{4cm}|p{4cm}|}
 \hline
@@ -679,7 +679,23 @@ Fonte: Adaptado de \cite{BUGS}.
 
 \section{Considerações finais}
 
+Este estudo investigou o desempenho de sistemas web desenvolvidos com \textit{Node.js} em cenários com transferência de dados
+na ordem de \textit{gigabytes}, considerando três abordagens diferentes de leitura de arquivos. Os resultados destacam
+a importância da escolha da estratégia correta para operações de leitura em sistemas feitos com \textit{Node.js}.
 
+Em resumo, a leitura síncrona de arquivos demonstrou ser ineficiente em situações de alta demanda, resultando em 
+tempos de resposta insatisfatórios, e, quando confrontada com a leitura e transferência de um arquivo de TANTOS \textit{megabytes}
+nao tankou e foi de base. Por outro lado, o método assíncrono se mostrou um caminho possível para a manipulção de um arquivo de
+grandes proporções, mesmo consumindo recursos, ainda que reduzidos em relação à leitura síncrona, como é o caso do uso de
+memória \textit{RAM}, este cenário demonstrou a possibilidade do \textit{Node.js} para tais casos. No entanto, a implementação 
+de leitura assíncrona combinada com o uso de \textit{clusters} se destacou como a abordagem mais eficiente e escalável, otimizando 
+significativamente o desempenho em cenários de alta concorrência, por realizar o processamento necessário de forma distribuída. 
+É fundamental destacar um dos principais benefícios proporcionados pelo uso do método assíncrono, que é a capacidade de lidar 
+com múltiplas solicitações concorrentes. Ao contrário do método síncrono, o método assíncrono não impede a execução normal 
+de outras instruções, permitindo que várias tarefas sejam processadas simultaneamente de forma eficiente.
+
+Este estudo serve como base para otimizar sistemas web em \textit{Node.js}, enfatizando a importância de escolher a 
+abordagem adequada de acordo com as necessidades específicas do projeto.
 
 \bibliographystyle{sbc}
 \bibliography{referencias}
