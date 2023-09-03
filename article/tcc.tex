@@ -631,7 +631,10 @@ resultado de análises rigorosas e constituem uma contribuição significativa p
 
 A tabela \cite{tab:metrics} apresenta a comparação dos valores de \textit{throughput} e tempo de resposta do servidor,
 entre os três cenários estipulados, síncrono, assíncrono e assíncrono com uso de \textit{clusters}, quando confrontados
-com 10 . É evidente que, assim como
+com 10 requisições, sendo quatro simultâneas, até atingir o total de requisições. Todas as requisições realizam a leitura
+do arquivo de 1.65 \textit{gigabytes}. 
+
+É evidente que, assim como
 esperado, o cenário síncrono apresentou um \textit{throughput} inferior aos cenários assíncronos, ou seja, esta implementação
 teve menos poder para lidar com requisições simultâneas. Também o tempo médio de resposta do servidor foi superior no caso
 síncrono, estas duas métricas são justificadas devido à limitação de bloqueio da \textit{thread} principal do 
