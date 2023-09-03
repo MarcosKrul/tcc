@@ -351,9 +351,13 @@ com tamanhos de arquivo na ordem de \textit{gigabytes}.
 O estudo será realizado em um ambiente controlado, onde serão desenvolvidos cenários de teste com diferentes 
 implementações de arquitetura para a resolução do problema de envio de dados, a fim de aferir métricas de desempenho do servidor, 
 como o consumo de memória \textit{RAM}, \textit{throughput} (quantidade de requisições processadas por unidade 
-de tempo - vazão). Uma implementação utilizará uma arquitetura não escalável e não 
+de tempo - vazão) e a média do tempo de resposta do servidor. Uma implementação utilizará uma arquitetura não escalável e não 
 pensada para o caso específico de transferência de um grande volume de dados, e outra aplicará técnicas focadas na 
 manipulação de maiores volumes de dados.
+
+Por meio da análise das implementações a serem definidas em seguida, procura-se salientar a melhora de performance,
+principalmente no que diz respeito à múltiplas requisições paralelas, visto que uma implementação síncrona de operações
+\textit{I/O} causa o bloqueio da \textit{thread} principal do \textit{Node.js}, não permitindo processamento paralelo.
 
 
 \subsection{Implementações}
@@ -519,6 +523,8 @@ acordo com as técnicas e métodos descritos nas seções subsequentes deste tra
 
 \subsection{Definição dos cenários de teste}
 
+% metodologia - começar com poucas requisições e ir aumentando
+
 Serão definidos três cenários de teste para avaliar o desempenho das implementações quando confrontadas
 com uma transferência de um volume de dados de 1.65 \textit{gigabytes}. Os cenários de teste serão 
 nomeados da seguinte forma:
@@ -537,8 +543,8 @@ utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma
 \subsection{Construção do ambiente de teste}
 
 Será configurado um ambiente de teste composto por uma aplicação servidor, com o intuito de registrar e avaliar as métricas como consumo
-de memória \textit{RAM} e \textit{CPU}, \textit{thoughput}, que se refere à quantidade de requisições feitas à aplicação por unidade de tempo,
-e latência do \textit{event loop} da aplicação nos três cenários propostos. 
+de memória \textit{RAM} e \textit{CPU}, \textit{throughput}, que se refere à quantidade de requisições feitas à aplicação por unidade de tempo,
+e a média do tempo tempo de resposta do servidor [latência do \textit{event loop} da aplicação] nos três cenários propostos. 
 O servidor de aplicação será baseado em \textit{Node.JS}, utilizando a versão 20.3.0. A aplicação será executada em uma máquina
 com o sistema operacional \textit{Windows} 10 64 \textit{bits}, possuindo 24 \textit{gigabytes} de memória \textit{RAM} e um 
 processador com 4 núcleos.
@@ -550,13 +556,14 @@ apresenta um exemplo em que são enviadas dez solicitações ao servidor. Para t
 teste mais realista, é possível definir a quantidade de solicitações enviadas simultaneamente, 
 utilizando a opção \textit{-P4} da ferramenta \textit{xargs}, que permite a execução de comandos em lote. O envio 
 das requisições é realizado por meio do comando \textit{curl}, que especifica o caminho e o método \textit{HTTP} apropriado.
+Em resumo, serão enviadas quatro requisições ao mesmo tempo ao servidor até que se complete a quantidade total de solicitações.
 
 \begin{lstlisting}[caption={Exemplo de \textit{script} para disparo de requisições}, label=cod:shelltest]
 	seq 1 10 | xargs -Iname -P4  curl -X GET "http://localhost:${PORT}"
 \end{lstlisting}
 
 A ferramenta \textit{PM2} na versão 5.3.0 \cite{PM2}, oferece um \textit{dashboard} de monitoramento em tempo real da aplicação,
-permitindo a captura do uso de memória \textit{RAM}, uso de \textit{CPU} e latência do \textit{event loop} do \textit{Node.js}, 
+permitindo a captura do uso de memória \textit{RAM}, uso de \textit{CPU} e [latência do \textit{event loop}] do \textit{Node.js}, 
 que se refere ao intervalo entre o registro de uma \textit{callback} e a execução da mesma.
 No âmbito deste trabalho, o PM2 será empregado como uma ferramenta integral para a execução e 
 monitoramento dos servidores. Com suas características abrangentes de gerenciamento de processos, o 
@@ -570,10 +577,47 @@ visão abrangente do desempenho dos servidores.
 
 Os indicadores de desempenho a serem coletados e analisados para cada uma das implementações, durante a transferência
 dos dados contidos na base previamente citada serão: Uso de memória \textit{RAM}, uso de \textit{CPU}, \textit{throughput}
-e latência do \textit{event loop}.
+e a média do tempo de resposta do servidor [latência do \textit{event loop}].
+
+O Código~\ref{cod:analytics} demonstra o \textit{script} utilizado para calcular as métricas \textit{throughput} e 
+média do tempo de resposta do servidor. Para ambas, faz-se necessário definir a soma dos tempos de processamento de
+todas as solicitações respondidas pelo servidor, somada à conversão do tempo em milissegundos para minutos.
+
+\begin{lstlisting}[caption={Implementação do cálculo das métricas \textit{throughput} e média do tempo de resposta}, label=cod:analytics]
+	const timeProcessingInSeconds =
+    data.requests.reduce(
+      (acc, current) => acc + (current.endTime - current.startTime),
+      firstRequest.endTime - firstRequest.startTime
+    ) / 1000;
+
+  const analytics = {
+    throughput: getFormattedMetric({
+      value: numRequests / timeProcessingInSeconds,
+      unity: "req/sec",
+    }),
+    avg: getFormattedMetric({
+      value: timeProcessingInSeconds / numRequests,
+      unity: "s",
+    }),
+  };
+\end{lstlisting}
+
+O \textit{throughput} e a média do tempo de resposta do servidor serão coletadas com código apresentado anteriormente.
+Os dados necessários para o cálculo destas duas métricas serão armazenados em arquivos para análise após o fim de uma 
+bateria de testes. Para ambos, faz-se necessário a captura do tempo de ínicio de uma requisição
+e o tempo de fim da mesma. Estas duas variáveis serão obtidas utilizando
+o módulo nativo \textit{perf\textunderscore hooks} da plataforma \textit{Node.JS}. 
+O método \textit{now} deste módulo retorna o valor em milissegundos e será invocado no ínicio da 
+\textit{callback} que trata as requisições do servidor, e, no evento de 
+fechamento destas, o valor de ínicio, o valor de tempo atual e
+uma identificação única da requisição serão armazenados em um arquivo \textit{JSON}. Após o encerramento do servidor, será 
+possível, utilizando a soma da diferença dos tempos de início e fim de cada requisição, e a quantidade de requisições realizadas, calcular o 
+\textit{throughput}, que terá a unidade requisições por minuto. Para o cálculo da média simples de tempo de resposta do servidor, 
+as mesmas variáveis serão utilizadas, desta maneira, o valor pode ser calculado dividindo a diferença entre o tempo de fim e o 
+tempo de início pelo número de requisições e somando o resultado.
 
 Já as métricas capturadas pela plataforma \textit{PM2} são registradas em tempo real em forma de gráficos, que possibilitam uma 
-análise, nesse caso, do uso de memória \textit{RAM}, uso de \textit{CPU} e latência do \textit{event loop}, durante o tempo em
+análise, nesse caso, do uso de memória \textit{RAM}, uso de \textit{CPU} e [latência do \textit{event loop}], durante o tempo em
 que ocorre a requisição e transferência de dados. Capturas de tela destes gráficos serão feitas no \textit{dashboard} da plataforma
 \textit{PM2} e dispostas de acordo com seus respectivos cenários.
 
@@ -583,22 +627,35 @@ que ocorre a requisição e transferência de dados. Capturas de tela destes gr�
 Esta seção desempenha um papel central neste estudo, apresentando e analisando os resultados obtidos de 
 acordo com a metodologia previamente descrita. Nesta seção, os dados coletados são examinados, suas implicações são interpretadas 
 e as descobertas são discutidas à luz das questões de pesquisa estabelecidas. Os itens aqui apresentados representam o 
-resultado de análises rigorosas e constituem uma contribuição significativa para a compreensão do tópico em questão. Por 
-meio de uma análise crítica dos resultados, procura-se não apenas responder às questões de pesquisa, mas também identificar 
-tendências, anomalias e insights que possam enriquecer o corpo de conhecimento existente na área de estudo.
+resultado de análises rigorosas e constituem uma contribuição significativa para a compreensão do tópico em questão.
+
+A tabela \cite{tab:metrics} apresenta a comparação dos valores de \textit{throughput} e tempo de resposta do servidor,
+entre os três cenários estipulados, síncrono, assíncrono e assíncrono com uso de \textit{clusters}, quando confrontados
+com 10 . É evidente que, assim como
+esperado, o cenário síncrono apresentou um \textit{throughput} inferior aos cenários assíncronos, ou seja, esta implementação
+teve menos poder para lidar com requisições simultâneas. Também o tempo médio de resposta do servidor foi superior no caso
+síncrono, estas duas métricas são justificadas devido à limitação de bloqueio da \textit{thread} principal do 
+\textit{Node.js} durante uma leitura de arquivo síncrona, coisa que não ocorre em leituras assíncronas e permite que o
+servidor execute tarefas paralelas. Comparando os dois métodos assíncronos, é também notável a melhora na performance da 
+implementação que utiliza \textit{clusters} para obter mais poder de processamento paralelo, pois esta aproveita
+os núcleos disponíveis do processador para que o servidor consiga atender à mais solicitações simultaneamente,
+dando escalabilidade horizontal ao servidor.
 
 \begin{table}[!h]
 \centering
-\caption{Throughput para os 3 cenários propostos} 
-\label{tab:exemplo}
-\begin{tabular}{|p{4cm}|p{4cm}|p{4cm}|}
+\caption{Métrica de tempo calculadas por arquitetura de servidor} 
+\label{tab:metrics}
+\begin{tabular}{|p{4cm}|p{4cm}|p{4cm}|p{4cm}|}
 \hline
-\textbf{Coluna 1} & \textbf{Coluna 2} & \textbf{Coluna 3} \\
+\textbf{Métrica} & \textbf{Síncrono} & \textbf{Assíncrono} & \textbf{Assíncrono com \textit{cluster}} \\
 \hline
-Valor 1 & Valor 2 & Valor 3\\
+\textit{Throughput} (req/min) & 0.042 & 0.180 & 0.325\\
+\hline
+Média do tempo de resposta (min) & 24.064 & 5.565 & 3.079\\
 \hline
 \end{tabular}
 \end{table}
+
 
 
 % INCLUIR IMAGENS DOS GRÁFICOS
@@ -636,8 +693,6 @@ Fonte: Adaptado de \cite{BUGS}.
 \end{figure}
 
 
-
-
 \section{Considerações finais}
 
 Este estudo investigou o desempenho de sistemas web desenvolvidos com \textit{Node.js} em cenários com transferência de dados
@@ -654,9 +709,6 @@ significativamente o desempenho em cenários de alta concorrência, por realizar
 É fundamental destacar um dos principais benefícios proporcionados pelo uso do método assíncrono, que é a capacidade de lidar 
 com múltiplas solicitações concorrentes. Ao contrário do método síncrono, o método assíncrono não impede a execução normal 
 de outras instruções, permitindo que várias tarefas sejam processadas simultaneamente de forma eficiente.
-
-Este estudo serve como base para otimizar sistemas web em \textit{Node.js}, enfatizando a importância de escolher a 
-abordagem adequada de acordo com as necessidades específicas do projeto.
 
 \bibliographystyle{sbc}
 \bibliography{referencias}

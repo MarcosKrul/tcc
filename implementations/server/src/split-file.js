@@ -1,7 +1,7 @@
 import { createReadStream, existsSync, mkdirSync, writeFile } from "node:fs";
 import readline from "readline";
 
-import { splitFactor } from "./constants.js";
+import { SPLIT_FACTOR } from "./constants.js";
 
 const createDir = (filePath) => {
   if (existsSync(filePath)) return;
@@ -13,7 +13,7 @@ const splitFile = async () => {
   let linesRead = 0;
   let fileCreated = 1;
 
-  createDir(`database/part_${splitFactor}`);
+  createDir(`database/part_${SPLIT_FACTOR}`);
 
   const readStream = createReadStream("database/metadata.csv");
   const rl = readline.createInterface({
@@ -25,10 +25,10 @@ const splitFile = async () => {
     linesRead += 1;
     data.push(line);
 
-    if (linesRead * splitFactor >= 1000000) {
+    if (linesRead * SPLIT_FACTOR >= 1000000) {
       linesRead = 0;
       writeFile(
-        `database/part_${splitFactor}/metadata-${fileCreated}.csv`,
+        `database/part_${SPLIT_FACTOR}/metadata-${fileCreated}.csv`,
         data.join("\n"),
         "utf-8",
         (err) => {

@@ -19,7 +19,7 @@ createServer(async (request, response) => {
     return;
   }
 
-  request.once("close", () => {
+  request.on("end", () => {
     saveRequestMetrics({
       requestId,
       server: "sync",
