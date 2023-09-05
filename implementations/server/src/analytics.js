@@ -9,7 +9,7 @@ const getRuntimeFormatted = (start, end) =>
   `${Number((end - start) / 1000).toFixed(3)}s`;
 
 const getFilePath = (server) =>
-  path.join(process.env.PWD, "tmp", `${server}.json`);
+  path.join(process.env.PWD, "tmp", server, "requests.json");
 
 const getData = (filePath) => {
   if (!fs.existsSync(filePath)) return { requests: [], count: 0 };
@@ -50,7 +50,7 @@ const calcMetrics = ({ server }) => {
   };
 
   fs.writeFileSync(
-    path.join(process.env.PWD, "tmp", `analytics-${server}.json`),
+    path.join(process.env.PWD, "tmp", server, "analytics.json"),
     JSON.stringify(analytics)
   );
 };

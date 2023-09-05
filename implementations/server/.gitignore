@@ -3,5 +3,7 @@
 database/*
 !database/.gitkeep
 
-tmp/*.json
+tmp/**/*.json
+tmp/**/*.csv
+tmp/**/*.png
 !tmp/.gitkeep

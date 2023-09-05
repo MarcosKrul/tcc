@@ -299,7 +299,8 @@ O \textit{Node.js} fornece o módulo de \textit{cluster} para permitir a execuç
 mesma máquina. Esse módulo é semelhante ao módulo \textit{child\textunderscore process}, também nativo do \textit{Node.js},
 que fornece o método \textit{fork} para criar subprocessos, sendo a principal diferença entre os dois módulos
 um mecanismo adicional que permite o roteamento de solicitações recebidas, distribuindo-as entre as instâncias
-criadas \cite[p. 76]{DISTRIBUTEDNODE}.
+criadas. O roteamento das solicitações é feito usando o algoritmo \textit{round-robin}, que encaminha a solicitação
+para o próximo processo filho disponível, em uma ordem circular. \cite[p. 76]{DISTRIBUTEDNODE}.
 
 \section{Trabalhos relacionados}
 
@@ -351,7 +352,8 @@ com tamanhos de arquivo na ordem de \textit{gigabytes}.
 O estudo será realizado em um ambiente controlado, onde serão desenvolvidos cenários de teste com diferentes 
 implementações de arquitetura para a resolução do problema de envio de dados, a fim de aferir métricas de desempenho do servidor, 
 como o consumo de memória \textit{RAM}, \textit{throughput} (quantidade de requisições processadas por unidade 
-de tempo - vazão) e a média do tempo de resposta do servidor. Uma implementação utilizará uma arquitetura não escalável e não 
+de tempo - vazão) e a média do tempo de resposta do servidor, que se refere ao tempo total que uma requisição leva
+para ser completa. Uma implementação utilizará uma arquitetura não escalável e não 
 pensada para o caso específico de transferência de um grande volume de dados, e outra aplicará técnicas focadas na 
 manipulação de maiores volumes de dados.
 
@@ -546,31 +548,21 @@ Será configurado um ambiente de teste composto por uma aplicação servidor, co
 de memória \textit{RAM} e \textit{CPU}, \textit{throughput}, que se refere à quantidade de requisições feitas à aplicação por unidade de tempo,
 e a média do tempo tempo de resposta do servidor [latência do \textit{event loop} da aplicação] nos três cenários propostos. 
 O servidor de aplicação será baseado em \textit{Node.JS}, utilizando a versão 20.3.0. A aplicação será executada em uma máquina
-com o sistema operacional \textit{Windows} 10 64 \textit{bits}, possuindo 24 \textit{gigabytes} de memória \textit{RAM} e um 
-processador com 4 núcleos.
+com 24 \textit{gigabytes} de memória \textit{RAM} e um processador com 4 núcleos.
 
 Para automatizar o envio de requisições ao servidor em diferentes cenários, 
 foi desenvolvido um \textit{script shell}. Esse \textit{script} permite configurar a quantidade de 
 requisições e automatiza o processo de envio de solicitações \textit{HTTP}. O Código~\ref{cod:shelltest} 
-apresenta um exemplo em que são enviadas dez solicitações ao servidor. Para tornar o ambiente de 
-teste mais realista, é possível definir a quantidade de solicitações enviadas simultaneamente, 
-utilizando a opção \textit{-P4} da ferramenta \textit{xargs}, que permite a execução de comandos em lote. O envio 
+apresenta a configuração adotada em que são enviadas dez solicitações ao servidor. Para tornar o ambiente de 
+teste mais realista, definiu-se a quantidade de solicitações enviadas simultaneamente, 
+utilizando a opção \textit{-P}, com a quantidade de núcleos disponíveis da máquina executante (obtido com \textit{nproc}), 
+da ferramenta \textit{xargs}, que permite a execução de comandos em lote. O envio 
 das requisições é realizado por meio do comando \textit{curl}, que especifica o caminho e o método \textit{HTTP} apropriado.
 Em resumo, serão enviadas quatro requisições ao mesmo tempo ao servidor até que se complete a quantidade total de solicitações.
 
-\begin{lstlisting}[caption={Exemplo de \textit{script} para disparo de requisições}, label=cod:shelltest]
-	seq 1 10 | xargs -Iname -P4  curl -X GET "http://localhost:${PORT}"
+\begin{lstlisting}[caption={\textit{Script} para disparo de requisições}, label=cod:shelltest]
+	seq 1 10 | xargs -Iname -P $(nproc)  curl -X GET "http://localhost:${PORT}"
 \end{lstlisting}
-
-A ferramenta \textit{PM2} na versão 5.3.0 \cite{PM2}, oferece um \textit{dashboard} de monitoramento em tempo real da aplicação,
-permitindo a captura do uso de memória \textit{RAM}, uso de \textit{CPU} e [latência do \textit{event loop}] do \textit{Node.js}, 
-que se refere ao intervalo entre o registro de uma \textit{callback} e a execução da mesma.
-No âmbito deste trabalho, o PM2 será empregado como uma ferramenta integral para a execução e 
-monitoramento dos servidores. Com suas características abrangentes de gerenciamento de processos, o 
-\textit{PM2} oferece a capacidade de iniciar, parar e reiniciar aplicativos de forma eficiente, facilitando a 
-gestão contínua dos serviços. Além disso, sua habilidade em monitorar a saúde dos processos em execução, 
-proporcionando informações detalhadas sobre a utilização de recursos como \textit{CPU} e memória, permitirá uma 
-visão abrangente do desempenho dos servidores.
 
 
 \subsection{Coleta e análise de dados}
@@ -616,10 +608,46 @@ possível, utilizando a soma da diferença dos tempos de início e fim de cada r
 as mesmas variáveis serão utilizadas, desta maneira, o valor pode ser calculado dividindo a diferença entre o tempo de fim e o 
 tempo de início pelo número de requisições e somando o resultado.
 
-Já as métricas capturadas pela plataforma \textit{PM2} são registradas em tempo real em forma de gráficos, que possibilitam uma 
-análise, nesse caso, do uso de memória \textit{RAM}, uso de \textit{CPU} e [latência do \textit{event loop}], durante o tempo em
-que ocorre a requisição e transferência de dados. Capturas de tela destes gráficos serão feitas no \textit{dashboard} da plataforma
-\textit{PM2} e dispostas de acordo com seus respectivos cenários.
+O Código~\ref{cod:monit_single} foi implementado com o objetivo de executar o servidor e armazenar, em tempo real,
+as métricas de uso de recursos de máquina, como consumos de memória \textit{RAM} e \textit{CPU}. Os valores 
+são obtidos através da ferramenta \textit{ps} (relatório dos processos atuais), buscando através do 
+\textit{PID} (\textit{process identifier}, identificador de processo). Os valores são salvos em tempo real em um arquivo 
+\textit{CSV} a cada segundo (\textit{sleep 1}). O valor de consumo de memória \textit{RAM} é salvo após uma divisão por 1024, 
+para que o mesmo seja convertido para \textit{megabytes}. 
+
+\begin{lstlisting}[caption={\textit{Script} para monitrar processos \textit{single thread}}, label=cod:monit_single]
+	node "$SERVER_FILE_NAME" &
+	node_pid=$!
+
+	while ps -p $node_pid > /dev/null; do
+		timestamp=$(date +'%Y-%m-%d %H:%M:%S')
+		usage_info=$(ps -p $node_pid -o rss,%cpu --no-headers)
+
+		if [ -n "$usage_info" ]; then
+			rss_mb=$(echo "$usage_info" | awk '{printf "%.2f", $1/1024}')
+			cpu_usage=$(echo "$usage_info" | awk '{printf "%.2f", $2}')
+			echo "$timestamp;$rss_mb;$cpu_usage" >> "$LOG_DIRECTORY/$LOG_FILE"
+		else
+			echo "Processo Node.js não encontrado."
+			exit 1
+		fi
+
+		sleep 1
+	done
+\end{lstlisting}
+
+O código anterior corresponde ao monitoramento do servidor nas arquiteturas com apenas um processo. Para o cenário
+com \textit{cluster}, onde serão criados processos filhos, faz-se necessário uma adaptação 
+demonstrada no Código~\ref{cod:monit_multi}. Neste, são recuperados os identificadores dos processos filhos 
+a partir da ferramenta \textit{pgrep}, para que seja possível iterelá-los e monitorá-los individualmente, 
+criando um arquivo de saída para cada.
+
+\begin{lstlisting}[caption={\textit{Script} para monitrar processos \textit{multi thread}}, label=cod:monit_multi]
+	worker_pids=$(pgrep -P $node_pid)
+	for worker_pid in $worker_pids; do
+		{...}
+	done
+\end{lstlisting}
 
 
 \section{Resultados e discussão}
@@ -648,7 +676,7 @@ dando escalabilidade horizontal ao servidor.
 \centering
 \caption{Métrica de tempo calculadas por arquitetura de servidor} 
 \label{tab:metrics}
-\begin{tabular}{|p{4cm}|p{4cm}|p{4cm}|p{4cm}|}
+\begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{3cm}|}
 \hline
 \textbf{Métrica} & \textbf{Síncrono} & \textbf{Assíncrono} & \textbf{Assíncrono com \textit{cluster}} \\
 \hline
@@ -660,6 +688,11 @@ Média do tempo de resposta (min) & 24.064 & 5.565 & 3.079\\
 \end{table}
 
 
+No V8 do Node.js, a contagem de referências é verificada periodicamente em um processo chamado "ciclo", 
+que pode pausar brevemente a execução do programa. Isso requer memória adicional para o Coletor de 
+Lixo (GC), aumentando o consumo de memória além do necessário pelo programa. A linguagem dinâmica 
+pode levar a um uso menos eficiente da memória. Portanto, é crucial aplicar padrões de desenvolvimento 
+para otimizar o uso de memória. \cite[p. 35]{DIOGORESENDE}
 
 % INCLUIR IMAGENS DOS GRÁFICOS
 
