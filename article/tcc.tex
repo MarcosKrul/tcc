@@ -803,6 +803,7 @@ fazendo com que o lixo (memória não utilizada) permaneça por mais tempo do qu
 \caption{Síncrono: Uso de memória \textit{RAM} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/sync_memory_usage.png}
 \label{fig:sync_memory_usage}
+
 Fonte: Os Autores.
 \end{figure}
 
@@ -819,6 +820,7 @@ do processamento dos dados.
 \caption{Síncrono: Uso de \textit{CPU} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/sync_cpu_usage.png}
 \label{fig:sync_cpu_usage}
+
 Fonte: Os Autores.
 \end{figure}
 
@@ -837,18 +839,20 @@ tamanho diferente.
 \caption{Assíncrono: Uso de memória \textit{RAM} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async_memory_usage.png}
 \label{fig:async_memory_usage}
+
 Fonte: Os Autores.
 \end{figure}
 
 Contudo, a responsabilidade é transferida para o \textit{CPU},
 que apresenta um uso bem mais elevado e próximo ao 100\text{\%}, como é possível
-observar na \autoref{fig_async_cpu_usage}
+observar na \autoref{fig:async_cpu_usage}
 
 \begin{figure}[!h]
 \centering
 \caption{Assíncrono: Uso de \textit{CPU} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async_cpu_usage.png}
 \label{fig:async_cpu_usage}
+
 Fonte: Os Autores.
 \end{figure}
 
@@ -864,9 +868,10 @@ ainda assim menor que o da implementação assíncrona.
 
 \begin{figure}[!h]
 \centering
-\caption{Assíncrono com \textit{clusters}: Uso de memória \textit{RAM} X tempo}
+\caption{Assíncrono primeiro \textit{cluster}: Uso de memória \textit{RAM} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_memory_usage_0.png}
 \label{fig:async-cluster_memory_usage_0}
+
 Fonte: Os Autores.
 \end{figure}
 
@@ -878,9 +883,10 @@ da implementação assíncrona, se traduz para a melhora das métricas de desemp
 
 \begin{figure}[!h]
 \centering
-\caption{Assíncrono com \textit{clusters}: Uso de \textit{CPU} X tempo}
+\caption{Assíncrono primeiro \textit{cluster}: Uso de \textit{CPU} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_cpu_usage_0.png}
 \label{fig:async-cluster_cpu_usage_0}
+
 Fonte: Os Autores.
 \end{figure}
 
@@ -894,17 +900,19 @@ levam à mesma conclusão sobre o uso destes recursos da máquina.
 
 \begin{figure}[!h]
 \centering
-\caption{Assíncrono com \textit{clusters}: Uso de memória \textit{RAM} X tempo}
+\caption{Assíncrono segundo \textit{cluster}: Uso de memória \textit{RAM} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_memory_usage_1.png}
 \label{fig:async-cluster_memory_usage_1}
+
 Fonte: Os Autores.
 \end{figure}
 
 \begin{figure}[!h]
 \centering
-\caption{Assíncrono com \textit{clusters}: Uso de \textit{CPU} X tempo}
+\caption{Assíncrono segundo \textit{cluster}: Uso de \textit{CPU} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_cpu_usage_1.png}
 \label{fig:async-cluster_cpu_usage_1}
+
 Fonte: Os Autores.
 \end{figure}
 
@@ -912,17 +920,19 @@ Fonte: Os Autores.
 
 \begin{figure}[!h]
 \centering
-\caption{Assíncrono com \textit{clusters}: Uso de memória \textit{RAM} X tempo}
+\caption{Assíncrono terceiro \textit{cluster}: Uso de memória \textit{RAM} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_memory_usage_2.png}
 \label{fig:async-cluster_memory_usage_2}
+
 Fonte: Os Autores.
 \end{figure}
 
 \begin{figure}[!h]
 \centering
-\caption{Assíncrono com \textit{clusters}: Uso de \textit{CPU} X tempo}
+\caption{Assíncrono terceiro \textit{cluster}: Uso de \textit{CPU} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_cpu_usage_2.png}
 \label{fig:async-cluster_cpu_usage_2}
+
 Fonte: Os Autores.
 \end{figure}
 
@@ -930,17 +940,19 @@ Fonte: Os Autores.
 
 \begin{figure}[!h]
 \centering
-\caption{Assíncrono com \textit{clusters}: Uso de memória \textit{RAM} X tempo}
+\caption{Assíncrono quarto \textit{cluster}: Uso de memória \textit{RAM} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_memory_usage_3.png}
 \label{fig:async-cluster_memory_usage_3}
+
 Fonte: Os Autores.
 \end{figure}
 
 \begin{figure}[!h]
 \centering
-\caption{Assíncrono com \textit{clusters}: Uso de \textit{CPU} X tempo}
+\caption{Assíncrono quarto \textit{cluster}: Uso de \textit{CPU} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_cpu_usage_3.png}
 \label{fig:async-cluster_cpu_usage_3}
+
 Fonte: Os Autores.
 \end{figure}
 
@@ -961,14 +973,14 @@ na ordem de \textit{gigabytes}, considerando três abordagens diferentes de leit
 a importância da escolha da estratégia correta para operações de leitura em sistemas feitos com \textit{Node.js}.
 
 Em resumo, a leitura síncrona de arquivos demonstrou ser ineficiente em situações de alta demanda, resultando em 
-tempos de resposta insatisfatórios, e, quando confrontada com a leitura e transferência de um arquivo de TANTOS \textit{megabytes}
-nao tankou e foi de base. Por outro lado, o método assíncrono se mostrou um caminho possível para a manipulção de um arquivo de
+tempos de resposta insatisfatórios, e, quando confrontada com a leitura e transferência de um arquivo de 1.65 \textit{gigabytes},
+apresentou um desempenho, no geral, ruim. Por outro lado, o método assíncrono se mostrou um caminho possível para a manipulção de um arquivo de
 grandes proporções, mesmo consumindo recursos, ainda que reduzidos em relação à leitura síncrona, como é o caso do uso de
-memória \textit{RAM}, este cenário demonstrou a possibilidade do \textit{Node.js} para tais casos. No entanto, a implementação 
+memória \textit{RAM}, este cenário demonstrou a possibilidade do \textit{Node.js} para tais casos. Ainda, a implementação 
 de leitura assíncrona combinada com o uso de \textit{clusters} se destacou como a abordagem mais eficiente e escalável, otimizando 
 significativamente o desempenho em cenários de alta concorrência, por realizar o processamento necessário de forma distribuída. 
 É fundamental destacar um dos principais benefícios proporcionados pelo uso do método assíncrono, que é a capacidade de lidar 
-com múltiplas solicitações concorrentes. Ao contrário do método síncrono, o método assíncrono não impede a execução normal 
+com múltiplas solicitações concorrentes, ao contrário do método síncrono, o método assíncrono não impede a execução normal 
 de outras instruções, permitindo que várias tarefas sejam processadas simultaneamente de forma eficiente.
 
 \bibliographystyle{sbc}
