@@ -538,7 +538,7 @@ ou seja, realização da leitura de arquivos de forma síncrona (Código~\ref{co
 utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma assíncrona (Código~\ref{cod:async}).
 \item Cenário 3: Implementação com arquitetura escalável para transferências da ordem de \textit{gigabytes}, 
 utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma assíncrona somada à utilização de
-\textit{cluster} (Código~\ref{cod:async-cluster}).
+\textit{clusters} (Código~\ref{cod:async-cluster}).
 \end{enumerate}
 
 
@@ -546,7 +546,7 @@ utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma
 
 Será configurado um ambiente de teste composto por uma aplicação servidor, com o intuito de registrar e avaliar as métricas como consumo
 de memória \textit{RAM} e \textit{CPU}, \textit{throughput}, que se refere à quantidade de requisições feitas à aplicação por unidade de tempo,
-e a média do tempo tempo de resposta do servidor [latência do \textit{event loop} da aplicação] nos três cenários propostos. 
+e a média do tempo tempo de resposta do servidor nos três cenários propostos. 
 O servidor de aplicação será baseado em \textit{Node.JS}, utilizando a versão 20.3.0. A aplicação será executada em uma máquina
 com 24 \textit{gigabytes} de memória \textit{RAM} e um processador com 4 núcleos.
 
@@ -569,7 +569,7 @@ Em resumo, serão enviadas quatro requisições ao mesmo tempo ao servidor até 
 
 Os indicadores de desempenho a serem coletados e analisados para cada uma das implementações, durante a transferência
 dos dados contidos na base previamente citada serão: Uso de memória \textit{RAM}, uso de \textit{CPU}, \textit{throughput}
-e a média do tempo de resposta do servidor [latência do \textit{event loop}].
+e a média do tempo de resposta do servidor.
 
 O Código~\ref{cod:analytics} demonstra o \textit{script} utilizado para calcular as métricas \textit{throughput} e 
 média do tempo de resposta do servidor. Para ambas, faz-se necessário definir a soma dos tempos de processamento de
@@ -637,7 +637,7 @@ para que o mesmo seja convertido para \textit{megabytes}.
 \end{lstlisting}
 
 O código anterior corresponde ao monitoramento do servidor nas arquiteturas com apenas um processo. Para o cenário
-com \textit{cluster}, onde serão criados processos filhos, faz-se necessário uma adaptação 
+com \textit{clusters}, onde serão criados processos filhos, faz-se necessário uma adaptação 
 demonstrada no Código~\ref{cod:monit_multi}. Neste, são recuperados os identificadores dos processos filhos 
 a partir da ferramenta \textit{pgrep}, para que seja possível iterelá-los e monitorá-los individualmente, 
 criando um arquivo de saída para cada.
@@ -650,8 +650,9 @@ criando um arquivo de saída para cada.
 \end{lstlisting}
 
 Os gráficos referentes ao consumo de recursos de máquina, como \textit{RAM} e \textit{CPU}, são
-gerados automaticamente a partir dos \textit{scripts} em \textit{Python}, 
-
+gerados automaticamente a partir dos \textit{scripts} em \textit{Python}, como mostra o Código~\ref{cod:base_python}.
+Os arquivos com o monitoramento em tempo real são lidos com o uso da biblioteca \textit{Pandas}, e
+as figuras são geradas com o uso da biblioteca \textit{Matplotlib}.
 
 \begin{lstlisting}[caption={\textit{Script} base em \textit{Python} para geração de gráficos.}, label=cod:base_python]
 	def run(server, contentFileName, id=None):
@@ -680,6 +681,70 @@ gerados automaticamente a partir dos \textit{scripts} em \textit{Python},
 		)
 \end{lstlisting}
 
+Para a arquitetura com utilização de \textit{clusters}, faz-se necessária a criação de gráficos exclusivos aos processos
+filhos. Para atender a este objetivo, adequou-se o \textit{script} como mostra o Código~\ref{cod:multi_python} para, 
+inicialmente, realizar uma leitura de todos os arquivos de monitoramento do servidor desta arquitetura em específico.
+
+\begin{lstlisting}[caption={Geração dos gráficos para servidor com arquitetura de \textit{cluster}}, label=cod:multi_python]
+	csv_files = [f for f in os.listdir(f"{BASE_PATH}") if f.endswith('.csv')]
+
+	for index, file in enumerate(csv_files):
+		run(
+			contentFileName=file,
+			server=server,
+			id=index
+		)
+\end{lstlisting}
+
+O monitoramento do servidor é realizado desde sua inicialização até que ocorra uma interrupção. Para que seja possível uma
+análise correta em relação ao tempo no qual este recebeu as requisições, faz-se necessário adaptações nos códigos para
+que seja marcado os tempos de ínicio de fim da bateria de solicitações. O Código~\ref{cod:analytics_startend}, executado
+ao mesmo tempo que o Código~\ref{cod:analytics}, demonstra a recuperação dos valores de ínicio de fim da bateria de
+requisições, através de operações simples para busca dos valores de máximo e mínimo, fazendo com que estes sejam
+gravados no mesmo arquivo de resultados.
+
+\begin{lstlisting}[caption={Recuperação dos valores de início e fim da bateria de solicitações.}, label=cod:analytics_startend]
+	const start =
+    data.requests.length > 0
+      ? data.requests.reduce(
+          (acc, current) => (current.startTime < acc ? current.startTime : acc),
+          data.requests[0].startTime
+        )
+      : startTime;
+
+  const end =
+    data.requests.length > 0
+      ? data.requests.reduce(
+          (acc, current) => (current.endTime > acc ? current.endTime : acc),
+          data.requests[0].endTime
+        )
+      : endTime;
+\end{lstlisting}
+
+O Código~\ref{analytics_startend:fig} demonstra o uso das informações de início de fim da bateria de requisições para
+criação dos gráficos. Esses valores (em milissegundos) são adicionados ao primeiro valor do arquivo de monitoramento
+(valor o qual diz respeito ao instante em que o servidor foi iniciado), para que seja possível marcar esses valores no 
+gráfico com pontos específicos. Posteriormente, são recuperados os valores de uso de \textit{CPU} e \textit{RAM} referentes
+a estes tempos.
+
+\begin{lstlisting}[caption={Recuperação das coordenadas de início e fim da bateria de solicitações.}, label=cod:analytics_startend:fig]
+	end = -1
+  start = -1
+
+  with open(f"{BASE_PATH}/requests.json", "r") as json_file:
+    content = json.load(json_file)
+    start = content['start']
+    end = content['end']
+
+  target_start = df['timestamp'][0] + timedelta(milliseconds=start)
+  target_end = df['timestamp'][0] + timedelta(milliseconds=end)
+
+  start_time = min(df['timestamp'], key=lambda x: abs((x - target_start).total_seconds()))
+  end_time = min(df['timestamp'], key=lambda x: abs((x - target_end).total_seconds()))
+
+  start_usage = df[df['timestamp'] == start_time]
+  end_usage = df[df['timestamp'] == end_time]
+\end{lstlisting}
 
 \section{Resultados e discussão}
 
@@ -688,7 +753,7 @@ acordo com a metodologia previamente descrita. Nesta seção, os dados coletados
 e as descobertas são discutidas à luz das questões de pesquisa estabelecidas. Os itens aqui apresentados representam o 
 resultado de análises rigorosas e constituem uma contribuição significativa para a compreensão do tópico em questão.
 
-A tabela \cite{tab:metrics} apresenta a comparação dos valores de \textit{throughput} e tempo de resposta do servidor,
+A tabela \autoref{tab:metrics} apresenta a comparação dos valores de \textit{throughput} e tempo de resposta do servidor,
 entre os três cenários estipulados, síncrono, assíncrono e assíncrono com uso de \textit{clusters}, quando confrontados
 com 10 requisições, sendo quatro simultâneas, até atingir o total de requisições. Todas as requisições realizam a leitura
 do arquivo de 1.65 \textit{gigabytes}. 
@@ -709,7 +774,7 @@ dando escalabilidade horizontal ao servidor.
 \label{tab:metrics}
 \begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{3cm}|}
 \hline
-\textbf{Métrica} & \textbf{Síncrono} & \textbf{Assíncrono} & \textbf{Assíncrono com \textit{cluster}} \\
+\textbf{Métrica} & \textbf{Síncrono} & \textbf{Assíncrono} & \textbf{Assíncrono com \textit{clusters}} \\
 \hline
 \textit{Throughput} (req/min) & 0.042 & 0.180 & 0.325\\
 \hline
@@ -719,45 +784,174 @@ Média do tempo de resposta (min) & 24.064 & 5.565 & 3.079\\
 \end{table}
 
 
-No V8 do Node.js, a contagem de referências é verificada periodicamente em um processo chamado "ciclo", 
-que pode pausar brevemente a execução do programa. Isso requer memória adicional para o Coletor de 
-Lixo (GC), aumentando o consumo de memória além do necessário pelo programa. A linguagem dinâmica 
-pode levar a um uso menos eficiente da memória. Portanto, é crucial aplicar padrões de desenvolvimento 
-para otimizar o uso de memória. \cite[p. 35]{DIOGORESENDE}
+A \autoref{fig:sync_memory_usage} apresenta o uso de memória \textit{RAM} da implementação síncrona,
+durante o tempo de uma requisição para a transferência do arquivo de 1.65 \textit{gigabytes}. É 
+possível notar o uso elevado de memória, com um pico de X \textit{megabytes}, assim como é observável
+que a memória se mantém constante, isso ocorre pois o método síncrono lê o arquivo, que é constante,
+por inteiro e o armazena na memória.
 
-% INCLUIR IMAGENS DOS GRÁFICOS
+Também pode-se observar que mesmo ao término da leitura,
+a memória \textit{RAM} utilizada não é desalocada imediatamente, ficando em um valor estável.
+Isso ocorre porque na \textit{V8} do \textit{Node.js}, a contagem de referências é verificada periodicamente em um
+processo chamado "ciclo", que pode pausar brevemente a execução do programa, isso requer memória 
+adicional para o \textit{Garbage Collector}, portanto, o \textit{GC} é executado periodicamente,
+fazendo com que o lixo (memória não utilizada) permaneça por mais tempo do que o necessário. \cite[p. 35]{DIOGORESENDE}
 
-\subsection{Cenário 1: Implementação de leitura síncrona}
 
-\begin{figure}[h]
+\begin{figure}[!h]
 \centering
-\caption{Modelo da abordagem EDA no \textit{Node.JS}}
-\includegraphics[width=0.8\textwidth]{images/pt-br/eda-arch-nodejs.png}
-\label{fig:nodejs_eda_model}
-Fonte: Adaptado de \cite{BUGS}.
+\caption{Síncrono: Uso de memória \textit{RAM} X tempo}
+\includegraphics[width=0.8\textwidth]{images/pt-br/results/sync_memory_usage.png}
+\label{fig:sync_memory_usage}
+Fonte: Os Autores.
 \end{figure}
 
 
-\subsection{Cenário 2: Implementação de leitura assíncrona}
- 
-\begin{figure}[h]
+Ao contrário da memória \textit{RAM} que inicia no menor valor, a \autoref{fig:sync_cpu_usage}
+mostra que o \textit{CPU} tem um uso elevado na criação do servidor, mas que logo
+cai para valores muito baixos até que receba uma requisição para o processamento do arquivo. 
+Diferente da memória \textit{RAM}, o uso de \textit{CPU} cai uniformemente ao final 
+do processamento dos dados.
+
+
+\begin{figure}[!h]
 \centering
-\caption{Modelo da abordagem EDA no \textit{Node.JS}}
-\includegraphics[width=0.8\textwidth]{images/pt-br/eda-arch-nodejs.png}
-\label{fig:nodejs_eda_model}
-Fonte: Adaptado de \cite{BUGS}.
+\caption{Síncrono: Uso de \textit{CPU} X tempo}
+\includegraphics[width=0.8\textwidth]{images/pt-br/results/sync_cpu_usage.png}
+\label{fig:sync_cpu_usage}
+Fonte: Os Autores.
 \end{figure}
 
 
-\subsection{Cenário 3: Implementação de leitura assíncrona somada à utilização de \textit{cluster}}
+Para o uso de memória \textit{RAM} da implementação assíncrona já é possível
+notar uma grande diferença, esta implementação faz muito menos uso do recurso que
+o método anterior, atingindo, aproximadamente, 200 \textit{megabytes} em seu pico
+\autoref{fig:async_memory_usage}. O uso da memória no método assíncrono também se
+difere do síncrono por não manter a memória constante, pois o método lê \textit{chunks}
+que não necessariamente tem o mesmo tamanho, pois cada linha do arquivo pode ter um
+tamanho diferente.
 
-\begin{figure}[h]
+
+\begin{figure}[!h]
 \centering
-\caption{Modelo da abordagem EDA no \textit{Node.JS}}
-\includegraphics[width=0.8\textwidth]{images/pt-br/eda-arch-nodejs.png}
-\label{fig:nodejs_eda_model}
-Fonte: Adaptado de \cite{BUGS}.
+\caption{Assíncrono: Uso de memória \textit{RAM} X tempo}
+\includegraphics[width=0.8\textwidth]{images/pt-br/results/async_memory_usage.png}
+\label{fig:async_memory_usage}
+Fonte: Os Autores.
 \end{figure}
+
+Contudo, a responsabilidade é transferida para o \textit{CPU},
+que apresenta um uso bem mais elevado e próximo ao 100\text{\%}, como é possível
+observar na \autoref{fig_async_cpu_usage}
+
+\begin{figure}[!h]
+\centering
+\caption{Assíncrono: Uso de \textit{CPU} X tempo}
+\includegraphics[width=0.8\textwidth]{images/pt-br/results/async_cpu_usage.png}
+\label{fig:async_cpu_usage}
+Fonte: Os Autores.
+\end{figure}
+
+
+A implementação assíncrona somada ao uso de \textit{clusters} teve os melhores resultados
+em relação às métricas de \textit{throughput} e média de tempo de resposta do servidor,
+como demonstrado na \autoref{tab:metrics}. Para o uso de memória \textit{RAM} 
+(\autoref{fig:async-cluster_memory_usage_0}), esta implementação
+apresentou os menores valores se analisarmos cada processo filho isoladamente, porém, se os
+agregarmos, o uso deste recurso torna-se mais elevado que o da implementação assíncrona, mas
+ainda assim menor que o da implementação assíncrona.
+
+
+\begin{figure}[!h]
+\centering
+\caption{Assíncrono com \textit{clusters}: Uso de memória \textit{RAM} X tempo}
+\includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_memory_usage_0.png}
+\label{fig:async-cluster_memory_usage_0}
+Fonte: Os Autores.
+\end{figure}
+
+O uso de \textit{CPU} \autoref{fig:async-cluster_cpu_usage_0} se comporta da mesma maneira
+maneira, mantendo valores mais brandos se observado apenas um processo filho de forma isolada.
+Nota-se que o consumo de recursos que cada processo filho utiliza a mais que o único processo
+da implementação assíncrona, se traduz para a melhora das métricas de desempenho de 
+\textit{throughput} e média de tempo de resposta do servidor.
+
+\begin{figure}[!h]
+\centering
+\caption{Assíncrono com \textit{clusters}: Uso de \textit{CPU} X tempo}
+\includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_cpu_usage_0.png}
+\label{fig:async-cluster_cpu_usage_0}
+Fonte: Os Autores.
+\end{figure}
+
+
+Os gráficos apresentados da \autoref{fig:async-cluster_memory_usage_1} até a 
+\autoref{fig:async-cluster_cpu_usage_3} mostram o uso de memória \textit{RAM}
+e \textit{CPU} para os demais processos filhos da implementação assíncrona com o uso
+de \textit{clusters}. Os dados são similares entre os quatro processos filhos e 
+levam à mesma conclusão sobre o uso destes recursos da máquina.
+
+
+\begin{figure}[!h]
+\centering
+\caption{Assíncrono com \textit{clusters}: Uso de memória \textit{RAM} X tempo}
+\includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_memory_usage_1.png}
+\label{fig:async-cluster_memory_usage_1}
+Fonte: Os Autores.
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\caption{Assíncrono com \textit{clusters}: Uso de \textit{CPU} X tempo}
+\includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_cpu_usage_1.png}
+\label{fig:async-cluster_cpu_usage_1}
+Fonte: Os Autores.
+\end{figure}
+
+%async-cluster_cpu_usage_2.png
+
+\begin{figure}[!h]
+\centering
+\caption{Assíncrono com \textit{clusters}: Uso de memória \textit{RAM} X tempo}
+\includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_memory_usage_2.png}
+\label{fig:async-cluster_memory_usage_2}
+Fonte: Os Autores.
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\caption{Assíncrono com \textit{clusters}: Uso de \textit{CPU} X tempo}
+\includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_cpu_usage_2.png}
+\label{fig:async-cluster_cpu_usage_2}
+Fonte: Os Autores.
+\end{figure}
+
+%async-cluster_cpu_usage_3.png
+
+\begin{figure}[!h]
+\centering
+\caption{Assíncrono com \textit{clusters}: Uso de memória \textit{RAM} X tempo}
+\includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_memory_usage_3.png}
+\label{fig:async-cluster_memory_usage_3}
+Fonte: Os Autores.
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\caption{Assíncrono com \textit{clusters}: Uso de \textit{CPU} X tempo}
+\includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_cpu_usage_3.png}
+\label{fig:async-cluster_cpu_usage_3}
+Fonte: Os Autores.
+\end{figure}
+
+
+Após análise das quatro métricas escolhidas, apresentadas por meio da tabela de comparações
+entre os cenários e gráficos individuais destes, pode-se concluir que das três 
+implementações, a que obteve pior desempenho e pior uso dos recursos, quando confrontada 
+com a base de dados de 1.65 \textit{gigabytes}, foi a síncrona. O uso da memória \textit{RAM}
+foi o mais elevado, e, mesmo assim, o cenário teve um desempenho pior em relação ao 
+\textit{throughput} e média do tempo de resposta do servidor, demorando muito mais
+para atender às requisições do que os outros cenários.
 
 
 \section{Considerações finais}

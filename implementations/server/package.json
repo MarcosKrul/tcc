@@ -22,9 +22,12 @@
     "start": "./scripts/start.sh",
     "del": "./scripts/del.sh",
     "split": "node src/split-file.js",
-    "test:sync": "./scripts/run.sh 3000 sync singleThread",
-    "test:async": "./scripts/run.sh 3001 async singleThread",
-    "test:async:cluster": "./scripts/run.sh 3002 async-cluster multiThreads"
+    "test:sync": "./scripts/run.sh 3000 sync",
+    "test:async": "./scripts/run.sh 3001 async",
+    "test:async:cluster": "./scripts/run.sh 3002 async-cluster",
+    "fig:sync": "./scripts/generate-fig.sh sync singleThread",
+    "fig:async": "./scripts/generate-fig.sh async singleThread",
+    "fig:async:cluster": "./scripts/generate-fig.sh async-cluster multiThreads"
   },
   "keywords": [],
   "author": "Marcos Renan Krul <marcoskrul2k@gmail.com> & Renato Cristiano Ruppel <heruppel2@gmail.com>",

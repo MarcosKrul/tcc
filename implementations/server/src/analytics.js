@@ -12,7 +12,8 @@ const getFilePath = (server) =>
   path.join(process.env.PWD, "tmp", server, "requests.json");
 
 const getData = (filePath) => {
-  if (!fs.existsSync(filePath)) return { requests: [], count: 0 };
+  if (!fs.existsSync(filePath))
+    return { requests: [], count: 0, start: 0, end: 0 };
   const raw = fs.readFileSync(filePath);
   return JSON.parse(raw);
 };
@@ -79,8 +80,26 @@ const saveRequestMetrics = ({
     maxMemoryUsage ? `Max memory usage: ${byteSize(maxMemoryUsage)}` : ""
   );
 
+  const start =
+    data.requests.length > 0
+      ? data.requests.reduce(
+          (acc, current) => (current.startTime < acc ? current.startTime : acc),
+          data.requests[0].startTime
+        )
+      : startTime;
+
+  const end =
+    data.requests.length > 0
+      ? data.requests.reduce(
+          (acc, current) => (current.endTime > acc ? current.endTime : acc),
+          data.requests[0].endTime
+        )
+      : endTime;
+
   const newData = {
     count: (data.count ?? 0) + 1,
+    end,
+    start,
     requests: [
       ...data.requests,
       {
