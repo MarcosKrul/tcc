@@ -351,7 +351,7 @@ com tamanhos de arquivo na ordem de \textit{gigabytes}.
 
 O estudo será realizado em um ambiente controlado, onde serão desenvolvidos cenários de teste com diferentes 
 implementações de arquitetura para a resolução do problema de envio de dados, a fim de aferir métricas de desempenho do servidor, 
-como o consumo de memória \textit{RAM}, \textit{throughput} (quantidade de requisições processadas por unidade 
+como o consumo de memória \textit{RAM}, \textit{CPU}, \textit{throughput} (quantidade de requisições processadas por unidade 
 de tempo - vazão) e a média do tempo de resposta do servidor, que se refere ao tempo total que uma requisição leva
 para ser completa. Uma implementação utilizará uma arquitetura não escalável e não 
 pensada para o caso específico de transferência de um grande volume de dados, e outra aplicará técnicas focadas na 
@@ -481,7 +481,7 @@ pelo módulo nativo \textit{stream} da plataforma do \textit{Node.JS}.
 		.pipeTo(Writable.toWeb(response));
 \end{lstlisting}
 
-O Código~\ref{cod:async-cluster}, ainda, foi utilizado para a terceira versão do servidor, somando à técninca de leitura
+O Código~\ref{cod:async-cluster}, ainda, foi utilizado para a terceira versão do servidor, somando a técnica de leitura
 assíncrona de arquivos com a clusterização, implementada a partir de módulo \textit{cluster}, nativo da plataforma
 \textit{Node.JS}. É possível observar que o processo principal será responsável pela criação de processos filhos a partir
 do comando \textit{fork}, criando uma quantidade de processos referente ao número de núcleos de processamento presentes
@@ -544,8 +544,8 @@ utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma
 
 \subsection{Construção do ambiente de teste}
 
-Será configurado um ambiente de teste composto por uma aplicação servidor, com o intuito de registrar e avaliar as métricas como consumo
-de memória \textit{RAM} e \textit{CPU}, \textit{throughput}, que se refere à quantidade de requisições feitas à aplicação por unidade de tempo,
+Será configurado um ambiente de teste composto por uma aplicação servidor, com o intuito de registrar e avaliar as seguintes métricas:
+Consumo de recursos de máquina, como memória \textit{RAM} e \textit{CPU}, \textit{throughput}, que se refere à quantidade de requisições feitas à aplicação por unidade de tempo,
 e a média do tempo tempo de resposta do servidor nos três cenários propostos. 
 O servidor de aplicação será baseado em \textit{Node.JS}, utilizando a versão 20.3.0. A aplicação será executada em uma máquina
 com 24 \textit{gigabytes} de memória \textit{RAM} e um processador com 4 núcleos.
@@ -594,12 +594,12 @@ todas as solicitações respondidas pelo servidor, somada à conversão do tempo
   };
 \end{lstlisting}
 
-O \textit{throughput} e a média do tempo de resposta do servidor serão coletadas com código apresentado anteriormente.
 Os dados necessários para o cálculo destas duas métricas serão armazenados em arquivos para análise após o fim de uma 
 bateria de testes. Para ambos, faz-se necessário a captura do tempo de ínicio de uma requisição
 e o tempo de fim da mesma. Estas duas variáveis serão obtidas utilizando
 o módulo nativo \textit{perf\textunderscore hooks} da plataforma \textit{Node.JS}. 
-O método \textit{now} deste módulo retorna o valor em milissegundos e será invocado no ínicio da 
+O método \textit{now} deste módulo retorna o valor em milissegundos, a partir da inicialização
+do servidor, e será invocado no ínicio da 
 \textit{callback} que trata as requisições do servidor, e, no evento de 
 fechamento destas, o valor de ínicio, o valor de tempo atual e
 uma identificação única da requisição serão armazenados em um arquivo \textit{JSON}. Após o encerramento do servidor, será 
@@ -698,7 +698,7 @@ inicialmente, realizar uma leitura de todos os arquivos de monitoramento do serv
 
 O monitoramento do servidor é realizado desde sua inicialização até que ocorra uma interrupção. Para que seja possível uma
 análise correta em relação ao tempo no qual este recebeu as requisições, faz-se necessário adaptações nos códigos para
-que seja marcado os tempos de ínicio de fim da bateria de solicitações. O Código~\ref{cod:analytics_startend}, executado
+que sejam marcados os tempos de ínicio de fim da bateria de solicitações. O Código~\ref{cod:analytics_startend}, executado
 ao mesmo tempo que o Código~\ref{cod:analytics}, demonstra a recuperação dos valores de ínicio de fim da bateria de
 requisições, através de operações simples para busca dos valores de máximo e mínimo, fazendo com que estes sejam
 gravados no mesmo arquivo de resultados.
@@ -721,7 +721,7 @@ gravados no mesmo arquivo de resultados.
       : endTime;
 \end{lstlisting}
 
-O Código~\ref{analytics_startend:fig} demonstra o uso das informações de início de fim da bateria de requisições para
+O Código~\ref{cod:analytics_startend} demonstra o uso das informações de início e fim da bateria de requisições para
 criação dos gráficos. Esses valores (em milissegundos) são adicionados ao primeiro valor do arquivo de monitoramento
 (valor o qual diz respeito ao instante em que o servidor foi iniciado), para que seja possível marcar esses valores no 
 gráfico com pontos específicos. Posteriormente, são recuperados os valores de uso de \textit{CPU} e \textit{RAM} referentes
@@ -760,13 +760,13 @@ do arquivo de 1.65 \textit{gigabytes}.
 
 É evidente que, assim como
 esperado, o cenário síncrono apresentou um \textit{throughput} inferior aos cenários assíncronos, ou seja, esta implementação
-teve menos poder para lidar com requisições simultâneas. Também o tempo médio de resposta do servidor foi superior no caso
+teve menos poder para processar requisições simultâneas. Também o tempo médio de resposta do servidor foi superior no caso
 síncrono, estas duas métricas são justificadas devido à limitação de bloqueio da \textit{thread} principal do 
 \textit{Node.js} durante uma leitura de arquivo síncrona, coisa que não ocorre em leituras assíncronas e permite que o
 servidor execute tarefas paralelas. Comparando os dois métodos assíncronos, é também notável a melhora na performance da 
 implementação que utiliza \textit{clusters} para obter mais poder de processamento paralelo, pois esta aproveita
 os núcleos disponíveis do processador para que o servidor consiga atender à mais solicitações simultaneamente,
-dando escalabilidade horizontal ao servidor.
+dando escalabilidade horizontal.
 
 \begin{table}[!h]
 \centering
@@ -787,8 +787,8 @@ Média do tempo de resposta (min) & 24.064 & 5.565 & 3.079\\
 A \autoref{fig:sync_memory_usage} apresenta o uso de memória \textit{RAM} da implementação síncrona,
 durante o tempo de uma requisição para a transferência do arquivo de 1.65 \textit{gigabytes}. É 
 possível notar o uso elevado de memória, com um pico de X \textit{megabytes}, assim como é observável
-que a memória se mantém constante, isso ocorre pois o método síncrono lê o arquivo, que é constante,
-por inteiro e o armazena na memória.
+que a memória se mantém constante, isso ocorre pois o método síncrono lê o arquivo, que possui
+tamanho contante, por inteiro e o armazena na memória.
 
 Também pode-se observar que mesmo ao término da leitura,
 a memória \textit{RAM} utilizada não é desalocada imediatamente, ficando em um valor estável.
@@ -830,8 +830,10 @@ notar uma grande diferença, esta implementação faz muito menos uso do recurso
 o método anterior, atingindo, aproximadamente, 200 \textit{megabytes} em seu pico
 \autoref{fig:async_memory_usage}. O uso da memória no método assíncrono também se
 difere do síncrono por não manter a memória constante, pois o método lê \textit{chunks}
-que não necessariamente tem o mesmo tamanho, pois cada linha do arquivo pode ter um
-tamanho diferente.
+que não necessariamente tem o mesmo tamanho, cada linha do arquivo pode ter um
+tamanho diferente. Contudo, a responsabilidade é transferida para o \textit{CPU},
+que apresenta um uso bem mais elevado e próximo ao 100\text{\%}, como é possível
+observar na \autoref{fig:async_cpu_usage}
 
 
 \begin{figure}[!h]
@@ -843,9 +845,7 @@ tamanho diferente.
 Fonte: Os Autores.
 \end{figure}
 
-Contudo, a responsabilidade é transferida para o \textit{CPU},
-que apresenta um uso bem mais elevado e próximo ao 100\text{\%}, como é possível
-observar na \autoref{fig:async_cpu_usage}
+
 
 \begin{figure}[!h]
 \centering
@@ -875,7 +875,7 @@ ainda assim menor que o da implementação assíncrona.
 Fonte: Os Autores.
 \end{figure}
 
-O uso de \textit{CPU} \autoref{fig:async-cluster_cpu_usage_0} se comporta da mesma maneira
+O uso de \textit{CPU} (\autoref{fig:async-cluster_cpu_usage_0}) se comporta da mesma
 maneira, mantendo valores mais brandos se observado apenas um processo filho de forma isolada.
 Nota-se que o consumo de recursos que cada processo filho utiliza a mais que o único processo
 da implementação assíncrona, se traduz para a melhora das métricas de desempenho de 
@@ -968,19 +968,19 @@ para atender às requisições do que os outros cenários.
 
 \section{Considerações finais}
 
-Este estudo investigou o desempenho de sistemas web desenvolvidos com \textit{Node.js} em cenários com transferência de dados
+Este estudo investigou o desempenho de sistemas \textit{web} desenvolvidos com \textit{Node.js} em cenários com transferência de dados
 na ordem de \textit{gigabytes}, considerando três abordagens diferentes de leitura de arquivos. Os resultados destacam
 a importância da escolha da estratégia correta para operações de leitura em sistemas feitos com \textit{Node.js}.
 
 Em resumo, a leitura síncrona de arquivos demonstrou ser ineficiente em situações de alta demanda, resultando em 
 tempos de resposta insatisfatórios, e, quando confrontada com a leitura e transferência de um arquivo de 1.65 \textit{gigabytes},
-apresentou um desempenho, no geral, ruim. Por outro lado, o método assíncrono se mostrou um caminho possível para a manipulção de um arquivo de
+apresentou um desempenho, no geral, insatisfatório. Por outro lado, o método assíncrono se mostrou um caminho possível para a manipulção de um arquivo de
 grandes proporções, mesmo consumindo recursos, ainda que reduzidos em relação à leitura síncrona, como é o caso do uso de
 memória \textit{RAM}, este cenário demonstrou a possibilidade do \textit{Node.js} para tais casos. Ainda, a implementação 
 de leitura assíncrona combinada com o uso de \textit{clusters} se destacou como a abordagem mais eficiente e escalável, otimizando 
 significativamente o desempenho em cenários de alta concorrência, por realizar o processamento necessário de forma distribuída. 
 É fundamental destacar um dos principais benefícios proporcionados pelo uso do método assíncrono, que é a capacidade de lidar 
-com múltiplas solicitações concorrentes, ao contrário do método síncrono, o método assíncrono não impede a execução normal 
+com múltiplas solicitações concorrentes, ao contrário do método síncrono, este não impede a execução normal 
 de outras instruções, permitindo que várias tarefas sejam processadas simultaneamente de forma eficiente.
 
 \bibliographystyle{sbc}
