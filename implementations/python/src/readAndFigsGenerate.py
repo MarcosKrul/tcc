@@ -5,12 +5,6 @@ from generateFig import generateFig
 import numpy as np
 from datetime import datetime, timedelta
 
-titles = {
-  "sync": "Síncrono",
-  "async": "Assíncrono",
-  "async-cluster": "Assíncrono com Cluster",
-}
-
 def run(server, contentFileName, id=None):
   BASE_PATH = os.path.abspath(f"../server/tmp/{server}")
 
@@ -36,7 +30,6 @@ def run(server, contentFileName, id=None):
   end_usage = df[df['timestamp'] == end_time]
 
   generateFig(
-    title=f"Gráfico Tempo X Consumo de RAM para {titles[server]}",
     x_label="Tempo",
     y_label="Memória (MB)",
     fileName=f"{BASE_PATH}/{server}_memory_usage{f'_{id}' if id is not None else ''}.png",
@@ -49,7 +42,6 @@ def run(server, contentFileName, id=None):
   )
 
   generateFig(
-    title=f"Gráfico Tempo X Consumo de CPU {titles[server]}",
     x_label="Tempo",
     y_label="CPU (%)",
     fileName=f"{BASE_PATH}/{server}_cpu_usage{f'_{id}' if id is not None else ''}.png",
