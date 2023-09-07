@@ -16,7 +16,7 @@ LOG_FILE="memory_cpu_usage.csv"
 rm $LOG_FILE
 
 while ps -p $node_pid > /dev/null; do
-  timestamp=$(date +'%Y-%m-%d %H:%M:%S')
+  timestamp=$(date +'%H:%M:%S')
   usage_info=$(ps -p $node_pid -o rss,%cpu --no-headers)
 
   if [ -n "$usage_info" ]; then

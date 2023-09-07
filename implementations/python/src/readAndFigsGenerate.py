@@ -2,8 +2,7 @@ import os
 import json
 from getData import getData
 from generateFig import generateFig
-import numpy as np
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 def run(server, contentFileName, id=None):
   BASE_PATH = os.path.abspath(f"../server/tmp/{server}")
@@ -17,8 +16,8 @@ def run(server, contentFileName, id=None):
 
   with open(f"{BASE_PATH}/requests.json", "r") as json_file:
     content = json.load(json_file)
-    start = content['start']
-    end = content['end']
+    start = content['start'] - 1000
+    end = content['end'] - 1000
 
   target_start = df['timestamp'][0] + timedelta(milliseconds=start)
   target_end = df['timestamp'][0] + timedelta(milliseconds=end)
