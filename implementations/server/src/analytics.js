@@ -6,7 +6,7 @@ import path from "node:path";
 import { NUM_REQUESTS } from "./constants.js";
 
 const getRuntimeFormatted = (start, end) =>
-  `${Number((end - start) / 1000).toFixed(3)}s`;
+  `${Number((end - start) / 1000 / 60).toFixed(3)} min`;
 
 const getFilePath = (server) =>
   path.join(process.env.PWD, "tmp", server, "requests.json");
@@ -75,7 +75,7 @@ const saveRequestMetrics = ({
     )} Connection ${requestId} was closed with ${getRuntimeFormatted(
       startTime,
       endTime
-    )}s`,
+    )} min`,
     itemsProcessed ? `${itemsProcessed} items processed` : "",
     maxMemoryUsage ? `Max memory usage: ${byteSize(maxMemoryUsage)}` : ""
   );

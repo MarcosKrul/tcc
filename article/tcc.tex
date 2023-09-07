@@ -564,6 +564,10 @@ Em resumo, serão enviadas quatro requisições ao mesmo tempo ao servidor até 
 	seq 1 10 | xargs -Iname -P $(nproc)  curl -X GET "http://localhost:${PORT}"
 \end{lstlisting}
 
+Para que as análises do consumo de recursos de máquina como \textit{RAM} e \textit{CPU} em relação
+ao tempo de vida do servidor sejam coerrentes, as coletas serão iniciadas e extendidas em cinco 
+minutos antes e após a finalização da bateria de requisições.
+
 
 \subsection{Coleta e análise de dados}
 
@@ -585,11 +589,11 @@ todas as solicitações respondidas pelo servidor, somada à conversão do tempo
   const analytics = {
     throughput: getFormattedMetric({
       value: numRequests / timeProcessingInSeconds,
-      unity: "req/sec",
+      unity: "req/min",
     }),
     avg: getFormattedMetric({
       value: timeProcessingInSeconds / numRequests,
-      unity: "s",
+      unity: "min",
     }),
   };
 \end{lstlisting}
@@ -722,8 +726,8 @@ gravados no mesmo arquivo de resultados.
 \end{lstlisting}
 
 O Código~\ref{cod:analytics_startend} demonstra o uso das informações de início e fim da bateria de requisições para
-criação dos gráficos. Esses valores (em milissegundos) são adicionados ao primeiro valor do arquivo de monitoramento
-(valor o qual diz respeito ao instante em que o servidor foi iniciado), para que seja possível marcar esses valores no 
+criação dos gráficos. Esses valores (iniciados em zero e incrementados em milissegundos) são somados ao primeiro valor do arquivo de monitoramento
+(valor o qual diz respeito ao tempo exato em que o servidor foi iniciado), para que seja possível marcar esses valores no 
 gráfico com pontos específicos. Posteriormente, são recuperados os valores de uso de \textit{CPU} e \textit{RAM} referentes
 a estes tempos.
 
@@ -745,6 +749,11 @@ a estes tempos.
   start_usage = df[df['timestamp'] == start_time]
   end_usage = df[df['timestamp'] == end_time]
 \end{lstlisting}
+
+As cordenadas referentes ao tempo são calculadas baseadas em uma estimativa, visto que os valores de \timestamp{timestamp}
+nos arquivos de monitoramento são incrementados a cada segundos e, não necessariamente, o início ou término da bateria de 
+solicitações irá coincidir com algum valor monitorado. Portanto, o Código~\ref{cod:analytics_startend} realiza uma busca
+para encontrar o \textit{timestamp} mais próximo dos valores de início e fim, com um erro de, no máximo, um segundo.
 
 \section{Resultados e discussão}
 
