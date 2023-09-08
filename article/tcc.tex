@@ -553,15 +553,15 @@ com 24 \textit{gigabytes} de memória \textit{RAM} e um processador com 4 núcle
 Para automatizar o envio de requisições ao servidor em diferentes cenários, 
 foi desenvolvido um \textit{script shell}. Esse \textit{script} permite configurar a quantidade de 
 requisições e automatiza o processo de envio de solicitações \textit{HTTP}. O Código~\ref{cod:shelltest} 
-apresenta a configuração adotada em que são enviadas dez solicitações ao servidor. Para tornar o ambiente de 
-teste mais realista, definiu-se a quantidade de solicitações enviadas simultaneamente, 
+apresenta a configuração adotada em que são enviadas 12 solicitações ao servidor (dada as características da máquina). 
+Para tornar o ambiente de teste mais realista, definiu-se a quantidade de solicitações enviadas simultaneamente, 
 utilizando a opção \textit{-P}, com a quantidade de núcleos disponíveis da máquina executante (obtido com \textit{nproc}), 
 da ferramenta \textit{xargs}, que permite a execução de comandos em lote. O envio 
 das requisições é realizado por meio do comando \textit{curl}, que especifica o caminho e o método \textit{HTTP} apropriado.
 Em resumo, serão enviadas quatro requisições ao mesmo tempo ao servidor até que se complete a quantidade total de solicitações.
 
 \begin{lstlisting}[caption={\textit{Script} para disparo de requisições}, label=cod:shelltest]
-	seq 1 10 | xargs -Iname -P $(nproc)  curl -X GET "http://localhost:${PORT}"
+	seq 1 $((${THREADS} * 3)) | xargs -Iname -P $(nproc)  curl -X GET "http://localhost:${PORT}"
 \end{lstlisting}
 
 Para que as análises do consumo de recursos de máquina como \textit{RAM} e \textit{CPU} em relação
@@ -576,7 +576,7 @@ dos dados contidos na base previamente citada serão: Uso de memória \textit{RA
 e a média do tempo de resposta do servidor.
 
 O Código~\ref{cod:analytics} demonstra o \textit{script} utilizado para calcular as métricas \textit{throughput} e 
-média do tempo de resposta do servidor. Para ambas, faz-se necessário definir a soma dos tempos de processamento de
+média do tempo de resposta do servidor (\textit{avg}). Para ambas, faz-se necessário definir a soma dos tempos de processamento de
 todas as solicitações respondidas pelo servidor, somada à conversão do tempo em milissegundos para minutos.
 
 \begin{lstlisting}[caption={Implementação do cálculo das métricas \textit{throughput} e média do tempo de resposta}, label=cod:analytics]
@@ -609,22 +609,23 @@ fechamento destas, o valor de ínicio, o valor de tempo atual e
 uma identificação única da requisição serão armazenados em um arquivo \textit{JSON}. Após o encerramento do servidor, será 
 possível, utilizando a soma da diferença dos tempos de início e fim de cada requisição, e a quantidade de requisições realizadas, calcular o 
 \textit{throughput}, que terá a unidade requisições por minuto. Para o cálculo da média simples de tempo de resposta do servidor, 
-as mesmas variáveis serão utilizadas, desta maneira, o valor pode ser calculado dividindo a diferença entre o tempo de fim e o 
-tempo de início pelo número de requisições e somando o resultado.
+as mesmas variáveis serão utilizadas, desta maneira, o valor pode ser calculado pelo somatório da 
+divisão entre a diferença dos tempos de início e fim pelo número de requisições.
 
 O Código~\ref{cod:monit_single} foi implementado com o objetivo de executar o servidor e armazenar, em tempo real,
 as métricas de uso de recursos de máquina, como consumos de memória \textit{RAM} e \textit{CPU}. Os valores 
 são obtidos através da ferramenta \textit{ps} (relatório dos processos atuais), buscando através do 
 \textit{PID} (\textit{process identifier}, identificador de processo). Os valores são salvos em tempo real em um arquivo 
-\textit{CSV} a cada segundo (\textit{sleep 1}). O valor de consumo de memória \textit{RAM} é salvo após uma divisão por 1024, 
-para que o mesmo seja convertido para \textit{megabytes}. 
+\textit{CSV} a cada segundo (\textit{sleep 1}), enquanto o processo estiver ativo. 
+O valor de consumo de memória \textit{RAM} é salvo após uma divisão por 1024, para que o mesmo 
+seja convertido para \textit{megabytes}. 
 
 \begin{lstlisting}[caption={\textit{Script} para monitrar processos \textit{single thread}}, label=cod:monit_single]
 	node "$SERVER_FILE_NAME" &
 	node_pid=$!
 
 	while ps -p $node_pid > /dev/null; do
-		timestamp=$(date +'%Y-%m-%d %H:%M:%S')
+		timestamp=$(date +'%H:%M:%S')
 		usage_info=$(ps -p $node_pid -o rss,%cpu --no-headers)
 
 		if [ -n "$usage_info" ]; then
@@ -644,7 +645,7 @@ O código anterior corresponde ao monitoramento do servidor nas arquiteturas com
 com \textit{clusters}, onde serão criados processos filhos, faz-se necessário uma adaptação 
 demonstrada no Código~\ref{cod:monit_multi}. Neste, são recuperados os identificadores dos processos filhos 
 a partir da ferramenta \textit{pgrep}, para que seja possível iterelá-los e monitorá-los individualmente, 
-criando um arquivo de saída para cada.
+criando um arquivo de saída para cada, da mesma forma como mostra o código anterior.
 
 \begin{lstlisting}[caption={\textit{Script} para monitrar processos \textit{multi thread}}, label=cod:monit_multi]
 	worker_pids=$(pgrep -P $node_pid)
@@ -702,7 +703,7 @@ inicialmente, realizar uma leitura de todos os arquivos de monitoramento do serv
 
 O monitoramento do servidor é realizado desde sua inicialização até que ocorra uma interrupção. Para que seja possível uma
 análise correta em relação ao tempo no qual este recebeu as requisições, faz-se necessário adaptações nos códigos para
-que sejam marcados os tempos de ínicio de fim da bateria de solicitações. O Código~\ref{cod:analytics_startend}, executado
+que sejam marcados os tempos de ínicio e de fim da bateria de solicitações. O Código~\ref{cod:analytics_startend}, executado
 ao mesmo tempo que o Código~\ref{cod:analytics}, demonstra a recuperação dos valores de ínicio de fim da bateria de
 requisições, através de operações simples para busca dos valores de máximo e mínimo, fazendo com que estes sejam
 gravados no mesmo arquivo de resultados.
@@ -764,7 +765,7 @@ resultado de análises rigorosas e constituem uma contribuição significativa p
 
 A tabela \autoref{tab:metrics} apresenta a comparação dos valores de \textit{throughput} e tempo de resposta do servidor,
 entre os três cenários estipulados, síncrono, assíncrono e assíncrono com uso de \textit{clusters}, quando confrontados
-com 10 requisições, sendo quatro simultâneas, até atingir o total de requisições. Todas as requisições realizam a leitura
+com 12 requisições, sendo quatro simultâneas, até atingir o total de requisições. Todas as requisições realizam a leitura
 do arquivo de 1.65 \textit{gigabytes}. 
 
 É evidente que, assim como
@@ -925,7 +926,6 @@ Fonte: Os Autores.
 Fonte: Os Autores.
 \end{figure}
 
-%async-cluster_cpu_usage_2.png
 
 \begin{figure}[!h]
 \centering
@@ -945,7 +945,6 @@ Fonte: Os Autores.
 Fonte: Os Autores.
 \end{figure}
 
-%async-cluster_cpu_usage_3.png
 
 \begin{figure}[!h]
 \centering

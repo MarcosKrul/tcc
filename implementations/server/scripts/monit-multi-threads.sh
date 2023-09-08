@@ -12,7 +12,7 @@ rm -rf $LOG_DIRECTORY/*.csv
 rm -rf $LOG_DIRECTORY/*.json
 rm -rf $LOG_DIRECTORY/*.png
 
-while true; do
+while ps -p $node_pid > /dev/null; do
   worker_pids=$(pgrep -P $node_pid)
   timestamp=$(date +'%Y-%m-%d %H:%M:%S')
 
