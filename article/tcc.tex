@@ -553,7 +553,7 @@ com 24 \textit{gigabytes} de memória \textit{RAM} e um processador com 4 núcle
 Para automatizar o envio de requisições ao servidor em diferentes cenários, 
 foi desenvolvido um \textit{script shell}. Esse \textit{script} permite configurar a quantidade de 
 requisições e automatiza o processo de envio de solicitações \textit{HTTP}. O Código~\ref{cod:shelltest} 
-apresenta a configuração adotada em que são enviadas 12 solicitações ao servidor (dada as características da máquina). 
+apresenta a configuração adotada em que são enviadas 12 solicitações ao servidor, número escolhido dadas as características da máquina. 
 Para tornar o ambiente de teste mais realista, definiu-se a quantidade de solicitações enviadas simultaneamente, 
 utilizando a opção \textit{-P}, com a quantidade de núcleos disponíveis da máquina executante (obtido com \textit{nproc}), 
 da ferramenta \textit{xargs}, que permite a execução de comandos em lote. O envio 
@@ -993,5 +993,9 @@ de outras instruções, permitindo que várias tarefas sejam processadas simulta
 
 \bibliographystyle{sbc}
 \bibliography{referencias}
+
+\section*{Anexo}
+
+\href{https://github.com/MarcosKrul/tcc%7D%7B}{Link do repositório contendo o desenvolvimento.}
 
 \end{document}
