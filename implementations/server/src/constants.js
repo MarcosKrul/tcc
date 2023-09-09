@@ -1,3 +1,5 @@
+import os from "node:os";
+
 const PORT_SYNC = 3000;
 const PORT_ASYNC = 3001;
 const PORT_ASYNC_CLUSTER = 3002;
@@ -11,7 +13,7 @@ const headers = {
 
 const SPLIT_FACTOR = 10;
 
-const NUM_REQUESTS = 10;
+const NUM_REQUESTS = os.cpus().length * 3;
 
 export {
   PORT_ASYNC,
