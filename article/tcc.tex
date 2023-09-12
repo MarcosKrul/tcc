@@ -372,7 +372,7 @@ processamento, minimizar os gargalos de execução e otimizar o consumo de recur
 
 \begin{lstlisting}[caption={Código base para um servidor \textit{Node.JS}}, label=cod:base]
 	createServer(async (request, response) => {
-		let startTime = -1;
+		let startTime;
   	const requestId = randomUUID();
 
 		if (request.method === "OPTIONS") {
@@ -564,8 +564,8 @@ Em resumo, serão enviadas quatro requisições ao mesmo tempo ao servidor até 
 	seq 1 $((${THREADS} * 3)) | xargs -Iname -P $(nproc)  curl -X GET "http://localhost:${PORT}"
 \end{lstlisting}
 
-Para que as análises do consumo de recursos de máquina como \textit{RAM} e \textit{CPU} em relação
-ao tempo de vida do servidor sejam coerrentes, as coletas serão iniciadas e extendidas em cinco 
+Para que as análises do consumo de recursos de máquina, como \textit{RAM} e \textit{CPU}, em relação
+ao tempo de vida do servidor sejam coerentes, as coletas serão iniciadas e estendidas em cinco 
 minutos antes e após a finalização da bateria de requisições.
 
 
@@ -728,14 +728,11 @@ gravados no mesmo arquivo de resultados.
 
 O Código~\ref{cod:analytics_startend} demonstra o uso das informações de início e fim da bateria de requisições para
 criação dos gráficos. Esses valores (iniciados em zero e incrementados em milissegundos) são somados ao primeiro valor do arquivo de monitoramento
-(valor o qual diz respeito ao tempo exato em que o servidor foi iniciado), para que seja possível marcar esses valores no 
+(valor que diz respeito ao tempo exato em que o servidor foi iniciado), para que seja possível marcar esses valores no 
 gráfico com pontos específicos. Posteriormente, são recuperados os valores de uso de \textit{CPU} e \textit{RAM} referentes
 a estes tempos.
 
 \begin{lstlisting}[caption={Recuperação das coordenadas de início e fim da bateria de solicitações.}, label=cod:analytics_startend:fig]
-	end = -1
-  start = -1
-
   with open(f"{BASE_PATH}/requests.json", "r") as json_file:
     content = json.load(json_file)
     start = content['start'] - 1000
@@ -786,9 +783,9 @@ dando escalabilidade horizontal.
 \hline
 \textbf{Métrica} & \textbf{Síncrono} & \textbf{Assíncrono} & \textbf{Assíncrono com \textit{clusters}} \\
 \hline
-\textit{Throughput} (req/min) & 0.042 & 0.180 & 0.325\\
+\textit{Throughput} (req/min) & 0.042 & 0.179 & 0.335\\
 \hline
-Média do tempo de resposta (min) & 24.064 & 5.565 & 3.079\\
+Média do tempo de resposta (min) & 24.064 & 5.581 & 2.985\\
 \hline
 \end{tabular}
 \end{table}
