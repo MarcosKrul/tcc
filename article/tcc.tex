@@ -10,6 +10,7 @@
 \usepackage{subcaption}
 \usepackage{listings}
 \usepackage{color}
+\usepackage{float}
 \renewcommand\lstlistingname{Código}
 \def\lstlistingautorefname{Código}
 
@@ -775,7 +776,7 @@ implementação que utiliza \textit{clusters} para obter mais poder de processam
 os núcleos disponíveis do processador para que o servidor consiga atender à mais solicitações simultaneamente,
 dando escalabilidade horizontal.
 
-\begin{table}[!h]
+\begin{table}[H]
 \centering
 \caption{Métrica de tempo calculadas por arquitetura de servidor} 
 \label{tab:metrics}
@@ -805,7 +806,7 @@ adicional para o \textit{Garbage Collector}, portanto, o \textit{GC} é executad
 fazendo com que o lixo (memória não utilizada) permaneça por mais tempo do que o necessário. \cite[p. 35]{DIOGORESENDE}
 
 
-\begin{figure}[!h]
+\begin{figure}[H]
 \centering
 \caption{Síncrono: Uso de memória \textit{RAM} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/sync_memory_usage.png}
@@ -822,7 +823,7 @@ Diferente da memória \textit{RAM}, o uso de \textit{CPU} cai uniformemente ao f
 do processamento dos dados.
 
 
-\begin{figure}[!h]
+\begin{figure}[H]
 \centering
 \caption{Síncrono: Uso de \textit{CPU} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/sync_cpu_usage.png}
@@ -843,7 +844,7 @@ que apresenta um uso bem mais elevado e próximo ao 100\text{\%}, como é possí
 observar na \autoref{fig:async_cpu_usage}
 
 
-\begin{figure}[!h]
+\begin{figure}[H]
 \centering
 \caption{Assíncrono: Uso de memória \textit{RAM} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async_memory_usage.png}
@@ -854,7 +855,7 @@ Fonte: Os Autores.
 
 
 
-\begin{figure}[!h]
+\begin{figure}[H]
 \centering
 \caption{Assíncrono: Uso de \textit{CPU} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async_cpu_usage.png}
@@ -873,7 +874,7 @@ agregarmos, o uso deste recurso torna-se mais elevado que o da implementação a
 ainda assim menor que o da implementação assíncrona.
 
 
-\begin{figure}[!h]
+\begin{figure}[H]
 \centering
 \caption{Assíncrono primeiro \textit{cluster}: Uso de memória \textit{RAM} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_memory_usage_0.png}
@@ -888,7 +889,7 @@ Nota-se que o consumo de recursos que cada processo filho utiliza a mais que o �
 da implementação assíncrona, se traduz para a melhora das métricas de desempenho de 
 \textit{throughput} e média de tempo de resposta do servidor.
 
-\begin{figure}[!h]
+\begin{figure}[H]
 \centering
 \caption{Assíncrono primeiro \textit{cluster}: Uso de \textit{CPU} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_cpu_usage_0.png}
@@ -905,7 +906,7 @@ de \textit{clusters}. Os dados são similares entre os quatro processos filhos e
 levam à mesma conclusão sobre o uso destes recursos da máquina.
 
 
-\begin{figure}[!h]
+\begin{figure}[H]
 \centering
 \caption{Assíncrono segundo \textit{cluster}: Uso de memória \textit{RAM} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_memory_usage_1.png}
@@ -914,7 +915,7 @@ levam à mesma conclusão sobre o uso destes recursos da máquina.
 Fonte: Os Autores.
 \end{figure}
 
-\begin{figure}[!h]
+\begin{figure}[H]
 \centering
 \caption{Assíncrono segundo \textit{cluster}: Uso de \textit{CPU} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_cpu_usage_1.png}
@@ -924,7 +925,7 @@ Fonte: Os Autores.
 \end{figure}
 
 
-\begin{figure}[!h]
+\begin{figure}[H]
 \centering
 \caption{Assíncrono terceiro \textit{cluster}: Uso de memória \textit{RAM} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_memory_usage_2.png}
@@ -933,7 +934,7 @@ Fonte: Os Autores.
 Fonte: Os Autores.
 \end{figure}
 
-\begin{figure}[!h]
+\begin{figure}[H]
 \centering
 \caption{Assíncrono terceiro \textit{cluster}: Uso de \textit{CPU} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_cpu_usage_2.png}
@@ -943,7 +944,7 @@ Fonte: Os Autores.
 \end{figure}
 
 
-\begin{figure}[!h]
+\begin{figure}[H]
 \centering
 \caption{Assíncrono quarto \textit{cluster}: Uso de memória \textit{RAM} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_memory_usage_3.png}
@@ -952,7 +953,7 @@ Fonte: Os Autores.
 Fonte: Os Autores.
 \end{figure}
 
-\begin{figure}[!h]
+\begin{figure}[H]
 \centering
 \caption{Assíncrono quarto \textit{cluster}: Uso de \textit{CPU} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_cpu_usage_3.png}
