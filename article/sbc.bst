@@ -220,7 +220,7 @@ FUNCTION {format.names}
 	      if$
 	      t "others" =
 		{ " et~al." * }
-		{ " and " * t * }
+		{ " e " * t * }
 	      if$
 	    }
 	  if$
@@ -380,8 +380,8 @@ FUNCTION {format.pages}
 { pages empty$
     { "" }
     { pages multi.page.check
-	{ "pages" pages n.dashify tie.or.space.connect }
-	{ "page" pages tie.or.space.connect }
+	{ "páginas" pages n.dashify tie.or.space.connect }
+	{ "páginas" pages tie.or.space.connect }
       if$
     }
   if$
@@ -846,7 +846,7 @@ FUNCTION {format.lab.names}
 	'skip$
 	{ s #2 "{ff }{vv }{ll}{ jj}" format.name$ "others" =
 	    { " et~al." * }
-	    { " and " * s #2 "{vv~}{ll}" format.name$ * }
+	    { " e " * s #2 "{vv~}{ll}" format.name$ * }
 	  if$
 	}
       if$

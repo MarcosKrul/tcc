@@ -1,6 +1,7 @@
 \documentclass[12pt]{article}
 
 \usepackage{sbc-template}
+\bibliographystyle{sbc}
 \usepackage{graphicx,url}
 \usepackage[utf8]{inputenc}
 \usepackage[brazil]{babel}
@@ -41,7 +42,7 @@
 \definecolor{purple}{rgb}{0.65, 0.12, 0.82}
 
 \lstdefinelanguage{JavaScript}{
-  keywords={typeof, new, true, false, catch, function, return, null, try, async, catch, switch, var, if, in, while, do, else, case, break, const, for, await},
+  keywords={typeof, new, true, false, catch, function, return, null, try, async, catch, switch, var, if, in, while, do, else, case, break, const, for, await, with, open, as},
   keywordstyle=\color{blue}\bfseries,
   ndkeywords={class, export, boolean, throw, implements, import, this},
   ndkeywordstyle=\color{darkgray}\bfseries,
@@ -216,7 +217,7 @@ clientes \cite{BUGS} \cite{ATOMICITY},
 como, por exemplo, operações de I/O para as quais sistemas operacionais não oferecem uma versão não-bloqueante 
 \cite{NODEBLOCKEVENTLOOP}. 
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \caption{Modelo da abordagem EDA no \textit{Node.JS}}
 \includegraphics[width=0.8\textwidth]{images/pt-br/eda-arch-nodejs.png}
