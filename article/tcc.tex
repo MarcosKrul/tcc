@@ -805,11 +805,9 @@ Média do tempo de resposta (min) & 26.314 & 5.581 & 2.985\\
 \end{table}
 
 
-A \autoref{fig:sync_memory_usage} apresenta o uso de memória \textit{RAM} da implementação síncrona,
-durante o tempo de uma requisição para a transferência do arquivo de 1.65 \textit{gigabytes}. É 
-possível notar o uso elevado de memória, com um pico de X \textit{megabytes}, assim como é observável
-que a memória se mantém constante, isso ocorre pois o método síncrono lê o arquivo, que possui
-tamanho contante, por inteiro e o armazena na memória.
+Para a implementação síncrona, é possível observar que, para a transferência do arquivo de 1.65 \textit{gigabytes}, 
+houve um elevado de memória, com um pico de 6300 \textit{megabytes}. Ainda, observa-se que o uso de memória mantêm-se 
+constante devido ao armazenamento do arquivo em memória (\autoref{fig:sync_memory_usage}).
 
 Também pode-se observar que mesmo ao término da leitura,
 a memória \textit{RAM} utilizada não é desalocada imediatamente, ficando em um valor estável.
@@ -829,11 +827,11 @@ Fonte: Os Autores.
 \end{figure}
 
 
-Ao contrário da memória \textit{RAM} que inicia no menor valor, a \autoref{fig:sync_cpu_usage}
-mostra que o \textit{CPU} tem um uso elevado na criação do servidor, mas que logo
+Ao contrário da memória \textit{RAM} que inicia no menor valor, 
+o \textit{CPU} tem um uso elevado na criação do servidor, mas que logo
 cai para valores muito baixos até que receba uma requisição para o processamento do arquivo. 
 Diferente da memória \textit{RAM}, o uso de \textit{CPU} cai uniformemente ao final 
-do processamento dos dados.
+do processamento dos dados (\autoref{fig:sync_cpu_usage}).
 
 
 \begin{figure}[H]
@@ -849,12 +847,11 @@ Fonte: Os Autores.
 Para o uso de memória \textit{RAM} da implementação assíncrona já é possível
 notar uma grande diferença, esta implementação faz muito menos uso do recurso que
 o método anterior, atingindo, aproximadamente, 200 \textit{megabytes} em seu pico
-\autoref{fig:async_memory_usage}. O uso da memória no método assíncrono também se
+(\autoref{fig:async_memory_usage}). O uso da memória no método assíncrono também se
 difere do síncrono por não manter a memória constante, pois o método lê \textit{chunks}
 que não necessariamente tem o mesmo tamanho, cada linha do arquivo pode ter um
 tamanho diferente. Contudo, a responsabilidade é transferida para o \textit{CPU},
-que apresenta um uso bem mais elevado e próximo ao 100\text{\%}, como é possível
-observar na \autoref{fig:async_cpu_usage}
+que apresenta um uso bem mais elevado e próximo ao 100\text{\%} (\autoref{fig:async_cpu_usage}).
 
 
 \begin{figure}[H]
@@ -879,9 +876,8 @@ Fonte: Os Autores.
 
 
 A implementação assíncrona somada ao uso de \textit{clusters} teve os melhores resultados
-em relação às métricas de \textit{throughput} e média de tempo de resposta do servidor,
-como demonstrado na \autoref{tab:metrics}. Para o uso de memória \textit{RAM} 
-(\autoref{fig:async-cluster_memory_usage_0}), esta implementação
+em relação às métricas de \textit{throughput} e média de tempo de resposta do servidor (\autoref{tab:metrics}). 
+Para o uso de memória \textit{RAM} (\autoref{fig:async-cluster_memory_usage_0}), esta implementação
 apresentou os menores valores se analisarmos cada processo filho isoladamente, porém, se os
 agregarmos, o uso deste recurso torna-se mais elevado que o da implementação assíncrona, mas
 ainda assim menor que o da implementação assíncrona.
