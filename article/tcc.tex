@@ -222,11 +222,9 @@ como, por exemplo, operações de I/O para as quais sistemas operacionais não o
 
 \begin{figure}[H]
 \centering
-\caption{Modelo da abordagem EDA no \textit{Node.JS}}
 \includegraphics[width=0.8\textwidth]{images/pt-br/eda-arch-nodejs.png}
-\label{fig:nodejs_eda_model}
-
-Fonte: Adaptado de \cite{BUGS}.
+\caption{Modelo da abordagem EDA no \textit{Node.JS}}\label{fig:nodejs_eda_model}
+% Fonte: Adaptado de \cite{BUGS}.
 \end{figure}
 
 Na arquitetura orientada a eventos da plataforma do \textit{Node.JS} (\autoref{fig:nodejs_eda_model}), 
@@ -416,27 +414,28 @@ processamento, minimizar os gargalos de execução e otimizar o consumo de recur
   .on("listening", () => console.log(`server is running at ${PORT}`));
 \end{lstlisting}
 
-O Quadro~\ref{cod:base} apresenta a estrutura base para criação de servidores simples usando a 
-plataforma do \textit{Node.JS}. Para tal, é utilizada a função \textit{createServer} do módulo nativo \textit{http}.
+A estrutura base para criação de servidores simples usando a 
+plataforma do \textit{Node.JS} (\autoref{cod:base}) foi utilizada para todas as arquiteturas desenvolvidas. 
+Para tal, é utilizada a função \textit{createServer} do módulo nativo \textit{http}.
 A sua \textit{callback} recebe os objetos de requisição e resposta para tratamentos como definição de cabeçalhos, leitura
 de valores de entrada e escrita de valores de saída. Dessa forma, o servidor para este estudo irá responder à chamadas
 realizadas no caminho raíz da aplicação, em determinada porta arbitrária.
 
-A primeira implementação realizada, ilustrada no Quadro~\ref{cod:sync}, realiza a leitura do arquivo de 1.65 GB
+A primeira implementação desenvolvida (\autoref{cod:sync}), realiza a leitura do arquivo de 1.65 GB
 de forma síncrona utilizando chamadas do módulo \textit{fs} (\textit{file system}), ou seja, todo o conteúdo será
 inserido dentro de um único \textit{buffer} e retornado assim que a operação esteja concluída. Este trecho de código
-deve ser inserido dentro do servidor previamente implementado no Quadro~\ref{cod:base}.
+deve ser inserido dentro do servidor previamente implementado (\autoref{cod:base}).
 
 \begin{lstlisting}[caption={Implementação da leitura do arquivo de forma síncrona}, label=cod:sync]
 	const data = fs.readFileSync(filename);
 	response.end(data);
 \end{lstlisting}
 
-O Quadro~\ref{cod:async} apresenta a implementação inicial para a leitura do arquivo de 1.65 GB de forma assíncrona,
+A implementação inicial para a leitura do arquivo de 1.65 GB de forma assíncrona,
 onde o conteúdo será processado sob demanada em pequenas porções - denominadas \textit{chunks}. Para tal, é utilizada
 a função \textit{createReadStream} presente no módulo \textit{fs} (nativo da plataforma do \textit{Node.JS}) para
-criar um \textit{stream} de leitura. Este trecho de código deve ser inserido dentro do servidor previamente 
-implementado no Quadro~\ref{cod:base}.
+criar um \textit{stream} de leitura (\autoref{cod:async}). Este trecho de código deve ser inserido dentro do servidor previamente 
+implementado (\autoref{cod:base}).
 
 O código apresenta uma sequência de operações que visam processar dados de um arquivo \textit{CSV} e 
 transformá-los em formato \textit{JSON} (\textit{JavaScript object notation}). Através de uma abordagem baseada 
@@ -486,12 +485,12 @@ pelo módulo nativo \textit{stream} da plataforma do \textit{Node.JS}.
 		.pipeTo(Writable.toWeb(response));
 \end{lstlisting}
 
-O Quadro~\ref{cod:async-cluster}, ainda, foi utilizado para a terceira versão do servidor, somando a técnica de leitura
+Na terceira versão do servidor, somando a técnica de leitura
 assíncrona de arquivos com a clusterização, implementada a partir de módulo \textit{cluster}, nativo da plataforma
-\textit{Node.JS}. É possível observar que o processo principal será responsável pela criação de processos filhos a partir
+\textit{Node.JS} (\autoref{cod:async-cluster}), é possível observar que o processo principal será responsável pela criação de processos filhos a partir
 do comando \textit{fork}, criando uma quantidade de processos referente ao número de núcleos de processamento presentes
 no processador da máquina. Os processos filhos, por sua vez, serão responsáveis pela instanciação de um servidor com 
-a implementação de leitura assíncrona, igualmente como apresentada no Quadro~\ref{cod:async}.
+a implementação de leitura assíncrona (\autoref{cod:async}).
 
 \begin{lstlisting}[caption={Implementação da técnica de clusterização}, label=cod:async-cluster]
 	if (cluster.isPrimary) {
@@ -538,12 +537,12 @@ nomeados da seguinte forma:
 
 \begin{enumerate}[a)]
 \item Cenário 1: Implementação com arquitetura não específica para transferências da ordem de \textit{gigabytes}, 
-ou seja, realização da leitura de arquivos de forma síncrona (Quadro~\ref{cod:sync}).
+ou seja, realização da leitura de arquivos de forma síncrona (\autoref{cod:sync}).
 \item Cenário 2: Implementação com arquitetura escalável para transferências da ordem de \textit{gigabytes}, 
-utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma assíncrona (Quadro~\ref{cod:async}).
+utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma assíncrona (\autoref{cod:async}).
 \item Cenário 3: Implementação com arquitetura escalável para transferências da ordem de \textit{gigabytes}, 
 utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma assíncrona somada à utilização de
-\textit{clusters} (Quadro~\ref{cod:async-cluster}).
+\textit{clusters} (\autoref{cod:async-cluster}).
 \end{enumerate}
 
 
@@ -557,13 +556,13 @@ com 24 \textit{gigabytes} de memória \textit{RAM} e um processador com 4 núcle
 
 Para automatizar o envio de requisições ao servidor em diferentes cenários, 
 foi desenvolvido um \textit{script shell}. Esse \textit{script} permite configurar a quantidade de 
-requisições e automatiza o processo de envio de solicitações \textit{HTTP}. O Quadro~\ref{cod:shelltest} 
-apresenta a configuração adotada em que são enviadas 12 solicitações ao servidor, número escolhido dadas as características da máquina. 
+requisições e automatiza o processo de envio de solicitações \textit{HTTP}. Na configuração adotada,
+são enviadas 12 solicitações ao servidor, número obtido dadas as características da máquina. 
 Para tornar o ambiente de teste mais realista, definiu-se a quantidade de solicitações enviadas simultaneamente, 
 utilizando a opção \textit{-P}, com a quantidade de núcleos disponíveis da máquina executante (obtido com \textit{nproc}), 
 da ferramenta \textit{xargs}, que permite a execução de comandos em lote. O envio 
 das requisições é realizado por meio do comando \textit{curl}, que especifica o caminho e o método \textit{HTTP} apropriado.
-Em resumo, serão enviadas quatro requisições ao mesmo tempo ao servidor até que se complete a quantidade total de solicitações.
+Em resumo, serão enviadas quatro requisições ao mesmo tempo ao servidor até que se complete a quantidade total de solicitações (\autoref{cod:shelltest}).
 
 \begin{lstlisting}[caption={\textit{Script} para disparo de requisições}, label=cod:shelltest]
 	seq 1 $((${THREADS} * 3)) | xargs -Iname -P $(nproc)  curl -X GET "http://localhost:${PORT}"
@@ -580,9 +579,9 @@ Os indicadores de desempenho a serem coletados e analisados para cada uma das im
 dos dados contidos na base previamente citada serão: Uso de memória \textit{RAM}, uso de \textit{CPU}, \textit{throughput}
 e a média do tempo de resposta do servidor.
 
-O Quadro~\ref{cod:analytics} demonstra o \textit{script} utilizado para calcular as métricas \textit{throughput} e 
+O \textit{script} abaixo é utilizado para calcular as métricas \textit{throughput} e 
 média do tempo de resposta do servidor (\textit{avg}). Para ambas, faz-se necessário definir a soma dos tempos de processamento de
-todas as solicitações respondidas pelo servidor, somada à conversão do tempo em milissegundos para minutos.
+todas as solicitações respondidas pelo servidor, somada à conversão do tempo em milissegundos para minutos (\autoref{cod:analytics}).
 
 \begin{lstlisting}[caption={Implementação do cálculo das métricas \textit{throughput} e média do tempo de resposta}, label=cod:analytics]
 	const timeProcessingInSeconds =
@@ -617,13 +616,13 @@ possível, utilizando a soma da diferença dos tempos de início e fim de cada r
 as mesmas variáveis serão utilizadas, desta maneira, o valor pode ser calculado pelo somatório da 
 divisão entre a diferença dos tempos de início e fim pelo número de requisições.
 
-O Quadro~\ref{cod:monit_single} foi implementado com o objetivo de executar o servidor e armazenar, em tempo real,
+\textit{Scripts} foram implementados com o objetivo de executar o servidor e armazenar, em tempo real,
 as métricas de uso de recursos de máquina, como consumos de memória \textit{RAM} e \textit{CPU}. Os valores 
 são obtidos através da ferramenta \textit{ps} (relatório dos processos atuais), buscando através do 
 \textit{PID} (\textit{process identifier}, identificador de processo). Os valores são salvos em tempo real em um arquivo 
 \textit{CSV} a cada segundo (\textit{sleep 1}), enquanto o processo estiver ativo. 
 O valor de consumo de memória \textit{RAM} é salvo após uma divisão por 1024, para que o mesmo 
-seja convertido para \textit{megabytes}. 
+seja convertido para \textit{megabytes} (\autoref{cod:monit_single}). 
 
 \begin{lstlisting}[caption={\textit{Script} para monitrar processos \textit{single thread}}, label=cod:monit_single]
 	node "$SERVER_FILE_NAME" &
@@ -647,10 +646,10 @@ seja convertido para \textit{megabytes}.
 \end{lstlisting}
 
 O código anterior corresponde ao monitoramento do servidor nas arquiteturas com apenas um processo. Para o cenário
-com \textit{clusters}, onde serão criados processos filhos, faz-se necessário uma adaptação 
-demonstrada no Quadro~\ref{cod:monit_multi}. Neste, são recuperados os identificadores dos processos filhos 
+com \textit{clusters}, onde serão criados processos filhos, faz-se necessário uma adaptação no código utilizado anteriormente. 
+Neste, são recuperados os identificadores dos processos filhos 
 a partir da ferramenta \textit{pgrep}, para que seja possível iterelá-los e monitorá-los individualmente, 
-criando um arquivo de saída para cada, da mesma forma como mostra o código anterior.
+criando um arquivo de saída para cada, da mesma forma como mostra o código anterior (\autoref{cod:monit_multi}).
 
 \begin{lstlisting}[caption={\textit{Script} para monitrar processos \textit{multi thread}}, label=cod:monit_multi]
 	worker_pids=$(pgrep -P $node_pid)
@@ -660,9 +659,9 @@ criando um arquivo de saída para cada, da mesma forma como mostra o código ant
 \end{lstlisting}
 
 Os gráficos referentes ao consumo de recursos de máquina, como \textit{RAM} e \textit{CPU}, são
-gerados automaticamente a partir dos \textit{scripts} em \textit{Python}, como mostra o Quadro~\ref{cod:base_python}.
+gerados automaticamente a partir dos \textit{scripts} em \textit{Python}.
 Os arquivos com o monitoramento em tempo real são lidos com o uso da biblioteca \textit{Pandas}, e
-as figuras são geradas com o uso da biblioteca \textit{Matplotlib}.
+as figuras são geradas com o uso da biblioteca \textit{Matplotlib} (\autoref{cod:base_python}).
 
 \begin{lstlisting}[caption={\textit{Script} base em \textit{Python} para geração de gráficos.}, label=cod:base_python]
 	def run(server, contentFileName, id=None):
@@ -701,8 +700,8 @@ as figuras são geradas com o uso da biblioteca \textit{Matplotlib}.
 \end{lstlisting}
 
 Para a arquitetura com utilização de \textit{clusters}, faz-se necessária a criação de gráficos exclusivos aos processos
-filhos. Para atender a este objetivo, adequou-se o \textit{script} como mostra o Quadro~\ref{cod:multi_python} para, 
-inicialmente, realizar uma leitura de todos os arquivos de monitoramento do servidor desta arquitetura em específico.
+filhos. Para atender a este objetivo, adequou-se o \textit{script} para, 
+inicialmente, realizar uma leitura de todos os arquivos de monitoramento do servidor desta arquitetura em específico (\autoref{cod:multi_python}).
 
 \begin{lstlisting}[caption={Geração dos gráficos para servidor com arquitetura de \textit{cluster}}, label=cod:multi_python]
 	csv_files = [f for f in os.listdir(f"{BASE_PATH}") if f.endswith('.csv')]
@@ -717,10 +716,10 @@ inicialmente, realizar uma leitura de todos os arquivos de monitoramento do serv
 
 O monitoramento do servidor é realizado desde sua inicialização até que ocorra uma interrupção. Para que seja possível uma
 análise correta em relação ao tempo no qual este recebeu as requisições, faz-se necessário adaptações nos códigos para
-que sejam marcados os tempos de ínicio e de fim da bateria de solicitações. O Quadro~\ref{cod:analytics_startend}, executado
-ao mesmo tempo que o Quadro~\ref{cod:analytics}, demonstra a recuperação dos valores de ínicio de fim da bateria de
+que sejam marcados os tempos de ínicio e de fim da bateria de solicitações. Os códigos acima, executados simultaneamente,
+demonstram a recuperação dos valores de ínicio de fim da bateria de
 requisições, através de operações simples para busca dos valores de máximo e mínimo, fazendo com que estes sejam
-gravados no mesmo arquivo de resultados.
+gravados no mesmo arquivo de resultados (\autoref{cod:analytics} e \autoref{cod:analytics_startend}).
 
 \begin{lstlisting}[caption={Recuperação dos valores de início e fim da bateria de solicitações.}, label=cod:analytics_startend]
 	const start =
@@ -740,11 +739,10 @@ gravados no mesmo arquivo de resultados.
       : endTime;
 \end{lstlisting}
 
-O Quadro~\ref{cod:analytics_startend} demonstra o uso das informações de início e fim da bateria de requisições para
-criação dos gráficos. Esses valores (iniciados em zero e incrementados em milissegundos) são somados ao primeiro valor do arquivo de monitoramento
+Os valores (iniciados em zero e incrementados em milissegundos) são somados ao primeiro valor do arquivo de monitoramento
 (valor que diz respeito ao tempo exato em que o servidor foi iniciado), para que seja possível marcar esses valores no 
 gráfico com pontos específicos. Posteriormente, são recuperados os valores de uso de \textit{CPU} e \textit{RAM} referentes
-a estes tempos.
+a estes tempos (\autoref{cod:analytics_startend}).
 
 \begin{lstlisting}[caption={Recuperação das coordenadas de início e fim da bateria de solicitações.}, label=cod:analytics_startend:fig]
   with open(f"{BASE_PATH}/requests.json", "r") as json_file:
@@ -763,9 +761,9 @@ a estes tempos.
 \end{lstlisting}
 
 As cordenadas referentes ao tempo são calculadas baseadas em uma estimativa, visto que os valores de \timestamp{timestamp}
-nos arquivos de monitoramento são incrementados a cada segundos e, não necessariamente, o início ou término da bateria de 
-solicitações irá coincidir com algum valor monitorado. Portanto, o Quadro~\ref{cod:analytics_startend} realiza uma busca
-para encontrar o \textit{timestamp} mais próximo dos valores de início e fim, com um erro de, no máximo, um segundo.
+nos arquivos de monitoramento são incrementados a cada segundo e, não necessariamente, o início ou término da bateria de 
+solicitações irá coincidir com algum valor monitorado. Portanto, realiza uma busca
+para encontrar o \textit{timestamp} mais próximo dos valores de início e fim, com um erro de, no máximo, um segundo (\autoref{cod:analytics_startend}).
 
 \section{Resultados e discussão}
 
@@ -791,8 +789,7 @@ dando escalabilidade horizontal.
 
 \begin{table}[H]
 \centering
-\caption{Métrica de tempo calculadas por arquitetura de servidor} 
-\label{tab:metrics}
+\caption{Métrica de tempo calculadas por arquitetura de servidor}\label{tab:metrics}
 \begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{3cm}|}
 \hline
 \textbf{Métrica} & \textbf{Síncrono} & \textbf{Assíncrono} & \textbf{Assíncrono com \textit{clusters}} \\
@@ -806,8 +803,10 @@ Média do tempo de resposta (min) & 22.818 & 5.801 & 4.477\\
 
 
 Para a implementação síncrona, é possível observar que, para a transferência do arquivo de 1.65 \textit{gigabytes}, 
-houve um elevado de memória, com um pico de 6300 \textit{megabytes}. Ainda, observa-se que o uso de memória mantêm-se 
-constante devido ao armazenamento do arquivo em memória (\autoref{fig:sync_memory_usage}).
+houve um elevado de memória chegando a valores superiores que 6 GB. Tal comportamento era esperado
+devido à carga de quatro requisições imposta ao servidor, dessa forma todo o conteúdo do arquivo foi quadruplicado em memória.
+Ainda, observa-se que o uso de memória mantêm-se constante devido ao armazenamento do 
+arquivo em memória (\autoref{fig:sync_memory_usage}).
 
 Também pode-se observar que mesmo ao término da leitura,
 a memória \textit{RAM} utilizada não é desalocada imediatamente, ficando em um valor estável.
@@ -819,11 +818,8 @@ fazendo com que o lixo (memória não utilizada) permaneça por mais tempo do qu
 
 \begin{figure}[H]
 \centering
-\caption{Síncrono: Uso de memória \textit{RAM} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/sync_memory_usage.png}
-\label{fig:sync_memory_usage}
-
-Fonte: Os Autores.
+\caption{Síncrono: Uso de memória \textit{RAM} X tempo}\label{fig:sync_memory_usage}
 \end{figure}
 
 
@@ -836,149 +832,132 @@ do processamento dos dados (\autoref{fig:sync_cpu_usage}).
 
 \begin{figure}[H]
 \centering
-\caption{Síncrono: Uso de \textit{CPU} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/sync_cpu_usage.png}
-\label{fig:sync_cpu_usage}
-
-Fonte: Os Autores.
+\caption{Síncrono: Uso de \textit{CPU} X tempo}\label{fig:sync_cpu_usage}
 \end{figure}
 
 
-Para o uso de memória \textit{RAM} da implementação assíncrona já é possível
-notar uma grande diferença, esta implementação faz muito menos uso do recurso que
-o método anterior, atingindo, aproximadamente, 200 \textit{megabytes} em seu pico
+Para o uso de memória \textit{RAM} da implementação assíncrona, já é possível
+observar uma notável diferença no uso deste recurso, onde esta implementação 
+atinge valores inferiores à 200 \textit{megabytes} em seu pico
 (\autoref{fig:async_memory_usage}). O uso da memória no método assíncrono também se
 difere do síncrono por não manter a memória constante, pois o método lê \textit{chunks}
 que não necessariamente tem o mesmo tamanho, cada linha do arquivo pode ter um
 tamanho diferente. Contudo, a responsabilidade é transferida para o \textit{CPU},
-que apresenta um uso bem mais elevado e próximo ao 100\text{\%} (\autoref{fig:async_cpu_usage}).
+que apresenta um uso bem mais elevado e superior ao 100\text{\%} (\autoref{fig:async_cpu_usage}).
 
 
 \begin{figure}[H]
 \centering
-\caption{Assíncrono: Uso de memória \textit{RAM} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async_memory_usage.png}
-\label{fig:async_memory_usage}
-
-Fonte: Os Autores.
+\caption{Assíncrono: Uso de memória \textit{RAM} X tempo}\label{fig:async_memory_usage}
 \end{figure}
 
 
 
 \begin{figure}[H]
 \centering
-\caption{Assíncrono: Uso de \textit{CPU} X tempo}
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async_cpu_usage.png}
-\label{fig:async_cpu_usage}
-
-Fonte: Os Autores.
+\caption{Assíncrono: Uso de \textit{CPU} X tempo}\label{fig:async_cpu_usage}
 \end{figure}
 
 
 A implementação assíncrona somada ao uso de \textit{clusters} teve os melhores resultados
 em relação às métricas de \textit{throughput} e média de tempo de resposta do servidor (\autoref{tab:metrics}). 
-Para o uso de memória \textit{RAM} (\autoref{fig:async-cluster_memory_usage_0}), esta implementação
+Para o uso de memória \textit{RAM} (\autoref{fig:async-cluster_usage_0a}), esta implementação
 apresentou os menores valores se analisarmos cada processo filho isoladamente, porém, se os
 agregarmos, o uso deste recurso torna-se mais elevado que o da implementação assíncrona, mas
 ainda assim menor que o da implementação assíncrona.
 
-
-\begin{figure}[H]
-\centering
-\caption{Assíncrono primeiro \textit{cluster}: Uso de memória \textit{RAM} X tempo}
-\includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_memory_usage_0.png}
-\label{fig:async-cluster_memory_usage_0}
-
-Fonte: Os Autores.
-\end{figure}
-
-O uso de \textit{CPU} (\autoref{fig:async-cluster_cpu_usage_0}) se comporta da mesma
+O uso de \textit{CPU} (\autoref{fig:async-cluster_usage_0b}) se comporta da mesma
 maneira, mantendo valores mais brandos se observado apenas um processo filho de forma isolada.
-Nota-se que o consumo de recursos que cada processo filho utiliza a mais que o único processo
+Nota-se que o consumo de recursos que os processos filhos utilizam (somados) a mais que o único processo
 da implementação assíncrona, se traduz para a melhora das métricas de desempenho de 
 \textit{throughput} e média de tempo de resposta do servidor.
 
-\begin{figure}[H]
-\centering
-\caption{Assíncrono primeiro \textit{cluster}: Uso de \textit{CPU} X tempo}
-\includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_cpu_usage_0.png}
-\label{fig:async-cluster_cpu_usage_0}
 
-Fonte: Os Autores.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[H]{0.45\textwidth}
+			\centering
+			\subcaption{Uso de memória \textit{RAM} X tempo}\label{fig:async-cluster_usage_0a}
+			\includegraphics[width=1\textwidth]{images/pt-br/results/async-cluster_memory_usage_0.png}
+	\end{subfigure}
+	\hfill%
+	\begin{subfigure}[H]{0.45\textwidth}
+			\centering
+			\subcaption{Uso de \textit{CPU} X tempo}\label{fig:async-cluster_usage_0b}
+			\includegraphics[width=1\textwidth]{images/pt-br/results/async-cluster_cpu_usage_0.png}
+	\end{subfigure}
+	
+	\caption{Assíncrono: Primeiro \textit{cluster}}\label{fig:async-cluster_usage_0}
 \end{figure}
 
-
-Os gráficos apresentados da \autoref{fig:async-cluster_memory_usage_1} até a 
-\autoref{fig:async-cluster_cpu_usage_3} mostram o uso de memória \textit{RAM}
+Os gráficos apresentados da \autoref{fig:async-cluster_usage_1} até a 
+\autoref{fig:async-cluster_usage_3} mostram o uso de memória \textit{RAM}
 e \textit{CPU} para os demais processos filhos da implementação assíncrona com o uso
 de \textit{clusters}. Os dados são similares entre os quatro processos filhos e 
 levam à mesma conclusão sobre o uso destes recursos da máquina.
 
 
 \begin{figure}[H]
-\centering
-\caption{Assíncrono segundo \textit{cluster}: Uso de memória \textit{RAM} X tempo}
-\includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_memory_usage_1.png}
-\label{fig:async-cluster_memory_usage_1}
-
-Fonte: Os Autores.
+	\centering
+	\begin{subfigure}[H]{0.45\textwidth}
+			\centering
+			\subcaption{Uso de memória \textit{RAM} X tempo}\label{fig:async-cluster_usage_1a}
+			\includegraphics[width=1\textwidth]{images/pt-br/results/async-cluster_memory_usage_1.png}
+	\end{subfigure}
+	\hfill%
+	\begin{subfigure}[H]{0.45\textwidth}
+			\centering
+			\subcaption{Uso de \textit{CPU} X tempo}\label{fig:async-cluster_usage_1b}
+			\includegraphics[width=1\textwidth]{images/pt-br/results/async-cluster_cpu_usage_1.png}
+	\end{subfigure}
+	
+	\caption{Assíncrono: Segundo \textit{cluster}}\label{fig:async-cluster_usage_1}
 \end{figure}
 
 \begin{figure}[H]
-\centering
-\caption{Assíncrono segundo \textit{cluster}: Uso de \textit{CPU} X tempo}
-\includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_cpu_usage_1.png}
-\label{fig:async-cluster_cpu_usage_1}
-
-Fonte: Os Autores.
-\end{figure}
-
-
-\begin{figure}[H]
-\centering
-\caption{Assíncrono terceiro \textit{cluster}: Uso de memória \textit{RAM} X tempo}
-\includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_memory_usage_2.png}
-\label{fig:async-cluster_memory_usage_2}
-
-Fonte: Os Autores.
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\caption{Assíncrono terceiro \textit{cluster}: Uso de \textit{CPU} X tempo}
-\includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_cpu_usage_2.png}
-\label{fig:async-cluster_cpu_usage_2}
-
-Fonte: Os Autores.
-\end{figure}
-
-
-\begin{figure}[H]
-\centering
-\caption{Assíncrono quarto \textit{cluster}: Uso de memória \textit{RAM} X tempo}
-\includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_memory_usage_3.png}
-\label{fig:async-cluster_memory_usage_3}
-
-Fonte: Os Autores.
+	\centering
+	\begin{subfigure}[H]{0.45\textwidth}
+			\centering
+			\subcaption{Uso de memória \textit{RAM} X tempo}\label{fig:async-cluster_usage_2a}
+			\includegraphics[width=1\textwidth]{images/pt-br/results/async-cluster_memory_usage_2.png}
+	\end{subfigure}
+	\hfill%
+	\begin{subfigure}[H]{0.45\textwidth}
+			\centering
+			\subcaption{Uso de \textit{CPU} X tempo}\label{fig:async-cluster_usage_2b}
+			\includegraphics[width=1\textwidth]{images/pt-br/results/async-cluster_cpu_usage_2.png}
+	\end{subfigure}
+	
+	\caption{Assíncrono: Terceiro \textit{cluster}}\label{fig:async-cluster_usage_2}
 \end{figure}
 
 \begin{figure}[H]
-\centering
-\caption{Assíncrono quarto \textit{cluster}: Uso de \textit{CPU} X tempo}
-\includegraphics[width=0.8\textwidth]{images/pt-br/results/async-cluster_cpu_usage_3.png}
-\label{fig:async-cluster_cpu_usage_3}
-
-Fonte: Os Autores.
+		\centering
+		\begin{subfigure}[H]{0.45\textwidth}
+				\centering
+				\subcaption{Uso de memória \textit{RAM} X tempo}\label{fig:async-cluster_usage_3a}
+				\includegraphics[width=1\textwidth]{images/pt-br/results/async-cluster_memory_usage_3.png}
+		\end{subfigure}
+		\hfill%
+		\begin{subfigure}[H]{0.45\textwidth}
+				\centering
+				\subcaption{Uso de \textit{CPU} X tempo}\label{fig:async-cluster_usage_3b}
+				\includegraphics[width=1\textwidth]{images/pt-br/results/async-cluster_cpu_usage_3.png}
+		\end{subfigure}
+		
+		\caption{Assíncrono: Quarto \textit{cluster}}\label{fig:async-cluster_usage_3}
 \end{figure}
-
 
 Após análise das quatro métricas escolhidas, apresentadas por meio da tabela de comparações
 entre os cenários e gráficos individuais destes, pode-se concluir que das três 
-implementações, a que obteve pior desempenho e pior uso dos recursos, quando confrontada 
+implementações, a que obteve desempenho inferior e elavado uso dos recursos, quando confrontada 
 com a base de dados de 1.65 \textit{gigabytes}, foi a síncrona. O uso da memória \textit{RAM}
-foi o mais elevado, e, mesmo assim, o cenário teve um desempenho pior em relação ao 
-\textit{throughput} e média do tempo de resposta do servidor, demorando muito mais
-para atender às requisições do que os outros cenários.
+foi o mais elevado, e, mesmo assim, o cenário teve um desempenho reduzido em relação ao 
+\textit{throughput} e média do tempo de resposta do servidor, levando, aproximadamente,
+o quádruplo do tempo para atender às requisições do que os outros cenários.
 
 
 \section{Considerações finais}
@@ -1001,8 +980,10 @@ de outras instruções, permitindo que várias tarefas sejam processadas simulta
 \bibliographystyle{sbc}
 \bibliography{referencias}
 
+\pagebreak
+
 \section*{Anexo}
 
-\href{https://github.com/MarcosKrul/tcc%7D%7B}{Link do repositório contendo o desenvolvimento.}
+\href{https://github.com/MarcosKrul/tcc}{Link do repositório contendo o desenvolvimento.}
 
 \end{document}

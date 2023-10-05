@@ -9,4 +9,4 @@ def generateFig(x_label, y_label, x, y, fileName, start_x, start_y, end_x, end_y
   plt.ylabel(y_label)
   plt.grid(True)
   plt.legend()
-  plt.savefig(fileName)
+  plt.savefig(fileName, bbox_inches='tight')
