@@ -12,8 +12,8 @@
 \usepackage{listings}
 \usepackage{color}
 \usepackage{float}
-\renewcommand\lstlistingname{Código}
-\def\lstlistingautorefname{Código}
+\renewcommand\lstlistingname{Quadro}
+\def\lstlistingautorefname{Quadro}
 
 \newcommand\slsh{\char`\\}
 
@@ -375,7 +375,7 @@ importância de alcançar um desempenho eficiente em aplicações \textit{web} c
 de \textit{gigabytes}, foram adotadas estratégias e técnicas para maximizar a capacidade de 
 processamento, minimizar os gargalos de execução e otimizar o consumo de recursos. 
 
-\begin{lstlisting}[caption={Código base para um servidor \textit{Node.JS}}, label=cod:base]
+\begin{lstlisting}[caption={Quadro base para um servidor \textit{Node.JS}}, label=cod:base]
 	createServer(async (request, response) => {
 		let startTime;
   	const requestId = randomUUID();
@@ -416,27 +416,27 @@ processamento, minimizar os gargalos de execução e otimizar o consumo de recur
   .on("listening", () => console.log(`server is running at ${PORT}`));
 \end{lstlisting}
 
-O Código~\ref{cod:base} apresenta a estrutura base para criação de servidores simples usando a 
+O Quadro~\ref{cod:base} apresenta a estrutura base para criação de servidores simples usando a 
 plataforma do \textit{Node.JS}. Para tal, é utilizada a função \textit{createServer} do módulo nativo \textit{http}.
 A sua \textit{callback} recebe os objetos de requisição e resposta para tratamentos como definição de cabeçalhos, leitura
 de valores de entrada e escrita de valores de saída. Dessa forma, o servidor para este estudo irá responder à chamadas
 realizadas no caminho raíz da aplicação, em determinada porta arbitrária.
 
-A primeira implementação realizada, ilustrada no Código~\ref{cod:sync}, realiza a leitura do arquivo de 1.65 GB
+A primeira implementação realizada, ilustrada no Quadro~\ref{cod:sync}, realiza a leitura do arquivo de 1.65 GB
 de forma síncrona utilizando chamadas do módulo \textit{fs} (\textit{file system}), ou seja, todo o conteúdo será
 inserido dentro de um único \textit{buffer} e retornado assim que a operação esteja concluída. Este trecho de código
-deve ser inserido dentro do servidor previamente implementado no Código~\ref{cod:base}.
+deve ser inserido dentro do servidor previamente implementado no Quadro~\ref{cod:base}.
 
 \begin{lstlisting}[caption={Implementação da leitura do arquivo de forma síncrona}, label=cod:sync]
 	const data = fs.readFileSync(filename);
 	response.end(data);
 \end{lstlisting}
 
-O Código~\ref{cod:async} apresenta a implementação inicial para a leitura do arquivo de 1.65 GB de forma assíncrona,
+O Quadro~\ref{cod:async} apresenta a implementação inicial para a leitura do arquivo de 1.65 GB de forma assíncrona,
 onde o conteúdo será processado sob demanada em pequenas porções - denominadas \textit{chunks}. Para tal, é utilizada
 a função \textit{createReadStream} presente no módulo \textit{fs} (nativo da plataforma do \textit{Node.JS}) para
 criar um \textit{stream} de leitura. Este trecho de código deve ser inserido dentro do servidor previamente 
-implementado no Código~\ref{cod:base}.
+implementado no Quadro~\ref{cod:base}.
 
 O código apresenta uma sequência de operações que visam processar dados de um arquivo \textit{CSV} e 
 transformá-los em formato \textit{JSON} (\textit{JavaScript object notation}). Através de uma abordagem baseada 
@@ -486,12 +486,12 @@ pelo módulo nativo \textit{stream} da plataforma do \textit{Node.JS}.
 		.pipeTo(Writable.toWeb(response));
 \end{lstlisting}
 
-O Código~\ref{cod:async-cluster}, ainda, foi utilizado para a terceira versão do servidor, somando a técnica de leitura
+O Quadro~\ref{cod:async-cluster}, ainda, foi utilizado para a terceira versão do servidor, somando a técnica de leitura
 assíncrona de arquivos com a clusterização, implementada a partir de módulo \textit{cluster}, nativo da plataforma
 \textit{Node.JS}. É possível observar que o processo principal será responsável pela criação de processos filhos a partir
 do comando \textit{fork}, criando uma quantidade de processos referente ao número de núcleos de processamento presentes
 no processador da máquina. Os processos filhos, por sua vez, serão responsáveis pela instanciação de um servidor com 
-a implementação de leitura assíncrona, igualmente como apresentada no Código~\ref{cod:async}.
+a implementação de leitura assíncrona, igualmente como apresentada no Quadro~\ref{cod:async}.
 
 \begin{lstlisting}[caption={Implementação da técnica de clusterização}, label=cod:async-cluster]
 	if (cluster.isPrimary) {
@@ -538,12 +538,12 @@ nomeados da seguinte forma:
 
 \begin{enumerate}[a)]
 \item Cenário 1: Implementação com arquitetura não específica para transferências da ordem de \textit{gigabytes}, 
-ou seja, realização da leitura de arquivos de forma síncrona (Código~\ref{cod:sync}).
+ou seja, realização da leitura de arquivos de forma síncrona (Quadro~\ref{cod:sync}).
 \item Cenário 2: Implementação com arquitetura escalável para transferências da ordem de \textit{gigabytes}, 
-utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma assíncrona (Código~\ref{cod:async}).
+utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma assíncrona (Quadro~\ref{cod:async}).
 \item Cenário 3: Implementação com arquitetura escalável para transferências da ordem de \textit{gigabytes}, 
 utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma assíncrona somada à utilização de
-\textit{clusters} (Código~\ref{cod:async-cluster}).
+\textit{clusters} (Quadro~\ref{cod:async-cluster}).
 \end{enumerate}
 
 
@@ -557,7 +557,7 @@ com 24 \textit{gigabytes} de memória \textit{RAM} e um processador com 4 núcle
 
 Para automatizar o envio de requisições ao servidor em diferentes cenários, 
 foi desenvolvido um \textit{script shell}. Esse \textit{script} permite configurar a quantidade de 
-requisições e automatiza o processo de envio de solicitações \textit{HTTP}. O Código~\ref{cod:shelltest} 
+requisições e automatiza o processo de envio de solicitações \textit{HTTP}. O Quadro~\ref{cod:shelltest} 
 apresenta a configuração adotada em que são enviadas 12 solicitações ao servidor, número escolhido dadas as características da máquina. 
 Para tornar o ambiente de teste mais realista, definiu-se a quantidade de solicitações enviadas simultaneamente, 
 utilizando a opção \textit{-P}, com a quantidade de núcleos disponíveis da máquina executante (obtido com \textit{nproc}), 
@@ -580,7 +580,7 @@ Os indicadores de desempenho a serem coletados e analisados para cada uma das im
 dos dados contidos na base previamente citada serão: Uso de memória \textit{RAM}, uso de \textit{CPU}, \textit{throughput}
 e a média do tempo de resposta do servidor.
 
-O Código~\ref{cod:analytics} demonstra o \textit{script} utilizado para calcular as métricas \textit{throughput} e 
+O Quadro~\ref{cod:analytics} demonstra o \textit{script} utilizado para calcular as métricas \textit{throughput} e 
 média do tempo de resposta do servidor (\textit{avg}). Para ambas, faz-se necessário definir a soma dos tempos de processamento de
 todas as solicitações respondidas pelo servidor, somada à conversão do tempo em milissegundos para minutos.
 
@@ -617,7 +617,7 @@ possível, utilizando a soma da diferença dos tempos de início e fim de cada r
 as mesmas variáveis serão utilizadas, desta maneira, o valor pode ser calculado pelo somatório da 
 divisão entre a diferença dos tempos de início e fim pelo número de requisições.
 
-O Código~\ref{cod:monit_single} foi implementado com o objetivo de executar o servidor e armazenar, em tempo real,
+O Quadro~\ref{cod:monit_single} foi implementado com o objetivo de executar o servidor e armazenar, em tempo real,
 as métricas de uso de recursos de máquina, como consumos de memória \textit{RAM} e \textit{CPU}. Os valores 
 são obtidos através da ferramenta \textit{ps} (relatório dos processos atuais), buscando através do 
 \textit{PID} (\textit{process identifier}, identificador de processo). Os valores são salvos em tempo real em um arquivo 
@@ -648,7 +648,7 @@ seja convertido para \textit{megabytes}.
 
 O código anterior corresponde ao monitoramento do servidor nas arquiteturas com apenas um processo. Para o cenário
 com \textit{clusters}, onde serão criados processos filhos, faz-se necessário uma adaptação 
-demonstrada no Código~\ref{cod:monit_multi}. Neste, são recuperados os identificadores dos processos filhos 
+demonstrada no Quadro~\ref{cod:monit_multi}. Neste, são recuperados os identificadores dos processos filhos 
 a partir da ferramenta \textit{pgrep}, para que seja possível iterelá-los e monitorá-los individualmente, 
 criando um arquivo de saída para cada, da mesma forma como mostra o código anterior.
 
@@ -660,7 +660,7 @@ criando um arquivo de saída para cada, da mesma forma como mostra o código ant
 \end{lstlisting}
 
 Os gráficos referentes ao consumo de recursos de máquina, como \textit{RAM} e \textit{CPU}, são
-gerados automaticamente a partir dos \textit{scripts} em \textit{Python}, como mostra o Código~\ref{cod:base_python}.
+gerados automaticamente a partir dos \textit{scripts} em \textit{Python}, como mostra o Quadro~\ref{cod:base_python}.
 Os arquivos com o monitoramento em tempo real são lidos com o uso da biblioteca \textit{Pandas}, e
 as figuras são geradas com o uso da biblioteca \textit{Matplotlib}.
 
@@ -701,7 +701,7 @@ as figuras são geradas com o uso da biblioteca \textit{Matplotlib}.
 \end{lstlisting}
 
 Para a arquitetura com utilização de \textit{clusters}, faz-se necessária a criação de gráficos exclusivos aos processos
-filhos. Para atender a este objetivo, adequou-se o \textit{script} como mostra o Código~\ref{cod:multi_python} para, 
+filhos. Para atender a este objetivo, adequou-se o \textit{script} como mostra o Quadro~\ref{cod:multi_python} para, 
 inicialmente, realizar uma leitura de todos os arquivos de monitoramento do servidor desta arquitetura em específico.
 
 \begin{lstlisting}[caption={Geração dos gráficos para servidor com arquitetura de \textit{cluster}}, label=cod:multi_python]
@@ -717,8 +717,8 @@ inicialmente, realizar uma leitura de todos os arquivos de monitoramento do serv
 
 O monitoramento do servidor é realizado desde sua inicialização até que ocorra uma interrupção. Para que seja possível uma
 análise correta em relação ao tempo no qual este recebeu as requisições, faz-se necessário adaptações nos códigos para
-que sejam marcados os tempos de ínicio e de fim da bateria de solicitações. O Código~\ref{cod:analytics_startend}, executado
-ao mesmo tempo que o Código~\ref{cod:analytics}, demonstra a recuperação dos valores de ínicio de fim da bateria de
+que sejam marcados os tempos de ínicio e de fim da bateria de solicitações. O Quadro~\ref{cod:analytics_startend}, executado
+ao mesmo tempo que o Quadro~\ref{cod:analytics}, demonstra a recuperação dos valores de ínicio de fim da bateria de
 requisições, através de operações simples para busca dos valores de máximo e mínimo, fazendo com que estes sejam
 gravados no mesmo arquivo de resultados.
 
@@ -740,7 +740,7 @@ gravados no mesmo arquivo de resultados.
       : endTime;
 \end{lstlisting}
 
-O Código~\ref{cod:analytics_startend} demonstra o uso das informações de início e fim da bateria de requisições para
+O Quadro~\ref{cod:analytics_startend} demonstra o uso das informações de início e fim da bateria de requisições para
 criação dos gráficos. Esses valores (iniciados em zero e incrementados em milissegundos) são somados ao primeiro valor do arquivo de monitoramento
 (valor que diz respeito ao tempo exato em que o servidor foi iniciado), para que seja possível marcar esses valores no 
 gráfico com pontos específicos. Posteriormente, são recuperados os valores de uso de \textit{CPU} e \textit{RAM} referentes
@@ -764,7 +764,7 @@ a estes tempos.
 
 As cordenadas referentes ao tempo são calculadas baseadas em uma estimativa, visto que os valores de \timestamp{timestamp}
 nos arquivos de monitoramento são incrementados a cada segundos e, não necessariamente, o início ou término da bateria de 
-solicitações irá coincidir com algum valor monitorado. Portanto, o Código~\ref{cod:analytics_startend} realiza uma busca
+solicitações irá coincidir com algum valor monitorado. Portanto, o Quadro~\ref{cod:analytics_startend} realiza uma busca
 para encontrar o \textit{timestamp} mais próximo dos valores de início e fim, com um erro de, no máximo, um segundo.
 
 \section{Resultados e discussão}
