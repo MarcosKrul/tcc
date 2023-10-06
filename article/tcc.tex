@@ -309,7 +309,7 @@ para o próximo processo filho disponível, em uma ordem circular. \cite[p. 76]{
 
 Nesta seção, serão discutidos trabalhos relacionados que abordaram o desempenho e o consumo de recursos 
 em sistemas \textit{web}, particularmente aqueles desenvolvidos com \textit{Node.js}. Esses estudos ajudam a contextualizar 
-o presente trabalho e fornecem insights valiosos sobre otimizações e estratégias para lidar com demandas 
+o presente trabalho e fornecem \textit{insights} valiosos sobre otimizações e estratégias para lidar com demandas 
 intensas de dados.
 
 Um estudo anterior \cite{CLUSTERTCC} se concentrou na melhoria do desempenho em sistemas \textit{web} por meio de atualizações 
@@ -357,8 +357,8 @@ implementações de arquitetura para a resolução do problema de envio de dados
 como o consumo de memória \textit{RAM}, \textit{CPU}, \textit{throughput} (quantidade de requisições processadas por unidade 
 de tempo - vazão) e a média do tempo de resposta do servidor, que se refere ao tempo total que uma requisição leva
 para ser completa. Uma implementação utilizará uma arquitetura não escalável e não 
-pensada para o caso específico de transferência de um grande volume de dados, e outra aplicará técnicas focadas na 
-manipulação de maiores volumes de dados.
+pensada para o caso específico de transferência de um grande volume de dados, na ordem de \textit{gigabytes}, e outra aplicará técnicas focadas na 
+manipulação de dados na mesma grandeza.
 
 Por meio da análise das implementações a serem definidas em seguida, procura-se salientar a melhora de performance,
 principalmente no que diz respeito à múltiplas requisições paralelas, visto que uma implementação síncrona de operações
@@ -431,18 +431,19 @@ deve ser inserido dentro do servidor previamente implementado (\autoref{cod:base
 	response.end(data);
 \end{lstlisting}
 
-A implementação inicial para a leitura do arquivo de 1.65 GB de forma assíncrona,
-onde o conteúdo será processado sob demanada em pequenas porções - denominadas \textit{chunks}. Para tal, é utilizada
+Para a implementação inicial da leitura do arquivo de 1.65 GB de forma assíncrona,
+onde o conteúdo será processado sob demanada em pequenas porções (\textit{chunks}), é utilizada
 a função \textit{createReadStream} presente no módulo \textit{fs} (nativo da plataforma do \textit{Node.JS}) para
 criar um \textit{stream} de leitura (\autoref{cod:async}). Este trecho de código deve ser inserido dentro do servidor previamente 
 implementado (\autoref{cod:base}).
 
 O código apresenta uma sequência de operações que visam processar dados de um arquivo \textit{CSV} e 
 transformá-los em formato \textit{JSON} (\textit{JavaScript object notation}). Através de uma abordagem baseada 
-em fluxos de dados, o código executa alguma etapas de processamento. Após a criação da \textit{stream}, 
+em fluxos de dados, o código executa alguma etapa de processamento. Após a criação da \textit{stream}, 
 os dados do arquivo são canalizados em um processo de 
 transformação usando o método \textit{pipeThrough} duas vezes. A primeira envolve a 
-conversão dos dados \textit{CSV} em \textit{JSON}, através de uma biblioteca da comunidade (\textit{csvtojson}), 
+conversão dos dados \
+{CSV} em \textit{JSON}, através de uma biblioteca da comunidade (\textit{csvtojson}), 
 selecionando apenas três propriedades escolhidas arbitrariamente. A conversão foi realizada a fim de facilitar
 a manipulação dos dados no formato nativo da linguagem \textit{JavaScript}. O segundo processamento cria uma 
 transformação personalizada, onde os dados \textit{JSON} são processados um a um. 
@@ -450,9 +451,8 @@ Para cada \textit{chunk} do arquivo, os campos são extraídos e usados para cri
 \textit{JSON} com os campos renomeados. Este processamento foi realizado apenas para demonstrar que, além de uma simples
 transferência de dados, é possível realizar processos intermediários dentro do fluxo criado.
 
-Para finalizar o processamento, a saída da transformação é canalizada para uma saída de uma resposta à requisição
-\textit{HTTP}, realizada através do método \textit{pipeTo}. A opção \textit{signal} cria a possibilidade de 
-cancelar a operação, o que é especialmente útil em cenários em que a mesma precisa ser interrompida. Todos os utilitários
+Para finalizar o processamento, a saída da transformação é canalizada para a saída da resposta à requisição
+\textit{HTTP}, realizada através do método \textit{pipeTo}. Todos os utilitários
 usados para leitura (\textit{Readable}), escrita (\textit{Writable}) e transformação (\textit{Transform}) são ofertados
 pelo módulo nativo \textit{stream} da plataforma do \textit{Node.JS}.
 
@@ -562,15 +562,11 @@ Para tornar o ambiente de teste mais realista, definiu-se a quantidade de solici
 utilizando a opção \textit{-P}, com a quantidade de núcleos disponíveis da máquina executante (obtido com \textit{nproc}), 
 da ferramenta \textit{xargs}, que permite a execução de comandos em lote. O envio 
 das requisições é realizado por meio do comando \textit{curl}, que especifica o caminho e o método \textit{HTTP} apropriado.
-Em resumo, serão enviadas quatro requisições ao mesmo tempo ao servidor até que se complete a quantidade total de solicitações (\autoref{cod:shelltest}).
+Em resumo, serão enviadas quatro requisições ao mesmo tempo ao servidor, repetindo este processo três vezes. (\autoref{cod:shelltest}).
 
 \begin{lstlisting}[caption={\textit{Script} para disparo de requisições}, label=cod:shelltest]
 	seq 1 $((${THREADS} * 3)) | xargs -Iname -P $(nproc)  curl -X GET "http://localhost:${PORT}"
 \end{lstlisting}
-
-Para que as análises do consumo de recursos de máquina, como \textit{RAM} e \textit{CPU}, em relação
-ao tempo de vida do servidor sejam coerentes, as coletas serão iniciadas e estendidas em cinco 
-minutos antes e após a finalização da bateria de requisições.
 
 
 \subsection{Coleta e análise de dados}
@@ -579,8 +575,12 @@ Os indicadores de desempenho a serem coletados e analisados para cada uma das im
 dos dados contidos na base previamente citada serão: Uso de memória \textit{RAM}, uso de \textit{CPU}, \textit{throughput}
 e a média do tempo de resposta do servidor.
 
+Para que as análises do consumo de recursos de máquina, como \textit{RAM} e \textit{CPU}, em relação
+ao tempo de vida do servidor sejam coerentes, as coletas serão iniciadas e estendidas em cinco 
+minutos antes e após a finalização da bateria de requisições.
+
 O \textit{script} abaixo é utilizado para calcular as métricas \textit{throughput} e 
-média do tempo de resposta do servidor (\textit{avg}). Para ambas, faz-se necessário definir a soma dos tempos de processamento de
+média do tempo de resposta do servidor (\textit{avg}). Para ambas, torna-se essencial definir a soma dos tempos de processamento de
 todas as solicitações respondidas pelo servidor, somada à conversão do tempo em milissegundos para minutos (\autoref{cod:analytics}).
 
 \begin{lstlisting}[caption={Implementação do cálculo das métricas \textit{throughput} e média do tempo de resposta}, label=cod:analytics]
@@ -637,7 +637,7 @@ seja convertido para \textit{megabytes} (\autoref{cod:monit_single}).
 			cpu_usage=$(echo "$usage_info" | awk '{printf "%.2f", $2}')
 			echo "$timestamp;$rss_mb;$cpu_usage" >> "$LOG_DIRECTORY/$LOG_FILE"
 		else
-			echo "Processo Node.js não encontrado."
+			echo "Processo Node.js nao encontrado."
 			exit 1
 		fi
 
@@ -646,10 +646,10 @@ seja convertido para \textit{megabytes} (\autoref{cod:monit_single}).
 \end{lstlisting}
 
 O código anterior corresponde ao monitoramento do servidor nas arquiteturas com apenas um processo. Para o cenário
-com \textit{clusters}, onde serão criados processos filhos, faz-se necessário uma adaptação no código utilizado anteriormente. 
+com \textit{clusters}, onde serão criados processos filhos, torna-se obrigatório uma adaptação (\autoref{cod:monit_multi}) no código utilizado anteriormente. 
 Neste, são recuperados os identificadores dos processos filhos 
 a partir da ferramenta \textit{pgrep}, para que seja possível iterelá-los e monitorá-los individualmente, 
-criando um arquivo de saída para cada, da mesma forma como mostra o código anterior (\autoref{cod:monit_multi}).
+criando um arquivo de saída para cada, da mesma forma como mostra o código anterior.
 
 \begin{lstlisting}[caption={\textit{Script} para monitrar processos \textit{multi thread}}, label=cod:monit_multi]
 	worker_pids=$(pgrep -P $node_pid)
@@ -699,7 +699,7 @@ as figuras são geradas com o uso da biblioteca \textit{Matplotlib} (\autoref{co
 		)
 \end{lstlisting}
 
-Para a arquitetura com utilização de \textit{clusters}, faz-se necessária a criação de gráficos exclusivos aos processos
+Para a arquitetura com utilização de \textit{clusters}, é preciso a criação de gráficos exclusivos aos processos
 filhos. Para atender a este objetivo, adequou-se o \textit{script} para, 
 inicialmente, realizar uma leitura de todos os arquivos de monitoramento do servidor desta arquitetura em específico (\autoref{cod:multi_python}).
 
@@ -714,12 +714,11 @@ inicialmente, realizar uma leitura de todos os arquivos de monitoramento do serv
 		)
 \end{lstlisting}
 
-O monitoramento do servidor é realizado desde sua inicialização até que ocorra uma interrupção. Para que seja possível uma
-análise correta em relação ao tempo no qual este recebeu as requisições, faz-se necessário adaptações nos códigos para
-que sejam marcados os tempos de ínicio e de fim da bateria de solicitações. Os códigos acima, executados simultaneamente,
-demonstram a recuperação dos valores de ínicio de fim da bateria de
+O monitoramento do servidor é realizado desde sua inicialização até que ocorra uma interrupção (\autoref{cod:analytics}). Para que seja possível uma
+análise correta em relação ao tempo no qual este recebeu as requisições, faz-se necessário adaptação neste código para
+que sejam marcados os tempos de ínicio e de fim da bateria de solicitações. Foram recuperados os valores de ínicio de fim da bateria de
 requisições, através de operações simples para busca dos valores de máximo e mínimo, fazendo com que estes sejam
-gravados no mesmo arquivo de resultados (\autoref{cod:analytics} e \autoref{cod:analytics_startend}).
+gravados no mesmo arquivo de resultados (\autoref{cod:analytics_startend}).
 
 \begin{lstlisting}[caption={Recuperação dos valores de início e fim da bateria de solicitações.}, label=cod:analytics_startend]
 	const start =
@@ -742,7 +741,7 @@ gravados no mesmo arquivo de resultados (\autoref{cod:analytics} e \autoref{cod:
 Os valores (iniciados em zero e incrementados em milissegundos) são somados ao primeiro valor do arquivo de monitoramento
 (valor que diz respeito ao tempo exato em que o servidor foi iniciado), para que seja possível marcar esses valores no 
 gráfico com pontos específicos. Posteriormente, são recuperados os valores de uso de \textit{CPU} e \textit{RAM} referentes
-a estes tempos (\autoref{cod:analytics_startend}).
+a estes tempos.
 
 \begin{lstlisting}[caption={Recuperação das coordenadas de início e fim da bateria de solicitações.}, label=cod:analytics_startend:fig]
   with open(f"{BASE_PATH}/requests.json", "r") as json_file:
@@ -763,7 +762,7 @@ a estes tempos (\autoref{cod:analytics_startend}).
 As cordenadas referentes ao tempo são calculadas baseadas em uma estimativa, visto que os valores de \timestamp{timestamp}
 nos arquivos de monitoramento são incrementados a cada segundo e, não necessariamente, o início ou término da bateria de 
 solicitações irá coincidir com algum valor monitorado. Portanto, realiza uma busca
-para encontrar o \textit{timestamp} mais próximo dos valores de início e fim, com um erro de, no máximo, um segundo (\autoref{cod:analytics_startend}).
+para encontrar o \textit{timestamp} mais próximo dos valores de início e fim, com um erro de, no máximo, um segundo (\autoref{cod:analytics_startend:fig}).
 
 \section{Resultados e discussão}
 
