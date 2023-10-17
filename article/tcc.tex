@@ -58,7 +58,7 @@
 
 \lstset{
 	language=JavaScript, 
-	basicstyle=\small\ttfamily, 
+	basicstyle=\scriptsize\ttfamily, 
 	breaklines=true, 
 	numbers=left, 
 	numberstyle=\tiny\color{black}, 
@@ -90,7 +90,7 @@
 O trabalho realiza um estudo sobre técnicas presentes na plataforma do \textit{Node.JS} para desenvolvimento de servidores \textit{web} 
 que exijam processamento de grandes volumes de dados. Dentre os principais padrões de projeto, destaca-se a arquitetura orientada a eventos,
 fortemente enraizada nos principais núcleos da plataforma, que, juntamente com as \textit{streams}, possibilita a leitura de arquivos 
-com tamanho na ordem de \textit{gigabytes}. Serão criadas aplicações servidoras com o objetivo de testar a capacidade de lidar com altas 
+com tamanho na ordem de \textit{gigabytes}. Foram criadas aplicações servidoras com o objetivo de testar a capacidade de lidar com altas 
 demandas em aplicações web. Além disso, será avaliado como os recursos do servidor são utilizados ao lidar com a leitura e processamento 
 de um arquivo de 1,65 GB. O resultado esperado é demonstrar que a arquitetura orientada a eventos é a solução mais eficaz para o 
 desenvolvimento de aplicações web que lidam com grandes volumes de dados na plataforma Node.JS.
@@ -787,6 +787,7 @@ os núcleos disponíveis do processador para que o servidor consiga atender à m
 dando escalabilidade horizontal.
 
 \begin{table}[H]
+\footnotesize
 \centering
 \caption{Métrica de tempo calculadas por arquitetura de servidor}\label{tab:metrics}
 \begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{3cm}|}
@@ -849,7 +850,7 @@ que apresenta um uso bem mais elevado e superior ao 100\text{\%} (\autoref{fig:a
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async_memory_usage.png}
-\caption{Assíncrono: Uso de memória \textit{RAM} X tempo}\label{fig:async_memory_usage}
+\caption{Implementação assíncrona: Uso de memória \textit{RAM} X tempo}\label{fig:async_memory_usage}
 \end{figure}
 
 
@@ -857,7 +858,7 @@ que apresenta um uso bem mais elevado e superior ao 100\text{\%} (\autoref{fig:a
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{images/pt-br/results/async_cpu_usage.png}
-\caption{Assíncrono: Uso de \textit{CPU} X tempo}\label{fig:async_cpu_usage}
+\caption{Implementação assíncrona: Uso de \textit{CPU} X tempo}\label{fig:async_cpu_usage}
 \end{figure}
 
 
@@ -889,7 +890,7 @@ da implementação assíncrona, se traduz para a melhora das métricas de desemp
 			\includegraphics[width=1\textwidth]{images/pt-br/results/async-cluster_cpu_usage_0.png}
 	\end{subfigure}
 	
-	\caption{Assíncrono: Primeiro \textit{cluster}}\label{fig:async-cluster_usage_0}
+	\caption{Implementação assíncrona: Primeiro \textit{cluster}}\label{fig:async-cluster_usage_0}
 \end{figure}
 
 Os gráficos apresentados da \autoref{fig:async-cluster_usage_1} até a 
@@ -913,7 +914,7 @@ levam à mesma conclusão sobre o uso destes recursos da máquina.
 			\includegraphics[width=1\textwidth]{images/pt-br/results/async-cluster_cpu_usage_1.png}
 	\end{subfigure}
 	
-	\caption{Assíncrono: Segundo \textit{cluster}}\label{fig:async-cluster_usage_1}
+	\caption{Implementação assíncrona: Segundo \textit{cluster}}\label{fig:async-cluster_usage_1}
 \end{figure}
 
 \begin{figure}[H]
@@ -930,7 +931,7 @@ levam à mesma conclusão sobre o uso destes recursos da máquina.
 			\includegraphics[width=1\textwidth]{images/pt-br/results/async-cluster_cpu_usage_2.png}
 	\end{subfigure}
 	
-	\caption{Assíncrono: Terceiro \textit{cluster}}\label{fig:async-cluster_usage_2}
+	\caption{Implementação assíncrona: Terceiro \textit{cluster}}\label{fig:async-cluster_usage_2}
 \end{figure}
 
 \begin{figure}[H]
@@ -947,7 +948,7 @@ levam à mesma conclusão sobre o uso destes recursos da máquina.
 				\includegraphics[width=1\textwidth]{images/pt-br/results/async-cluster_cpu_usage_3.png}
 		\end{subfigure}
 		
-		\caption{Assíncrono: Quarto \textit{cluster}}\label{fig:async-cluster_usage_3}
+		\caption{Implementação assíncrona: Quarto \textit{cluster}}\label{fig:async-cluster_usage_3}
 \end{figure}
 
 Após análise das quatro métricas escolhidas, apresentadas por meio da tabela de comparações
@@ -965,7 +966,7 @@ Este estudo investigou o desempenho de sistemas \textit{web} desenvolvidos com \
 na ordem de \textit{gigabytes}, considerando três abordagens diferentes de leitura de arquivos. Os resultados destacam
 a importância da escolha da estratégia correta para operações de leitura em sistemas feitos com \textit{Node.js}.
 
-Em resumo, a leitura síncrona de arquivos demonstrou ser ineficiente em situações de alta demanda, resultando em 
+Como observado, a leitura síncrona de arquivos demonstrou ser ineficiente em situações de alta demanda, resultando em 
 tempos de resposta insatisfatórios, e, quando confrontada com a leitura e transferência de um arquivo de 1.65 \textit{gigabytes},
 apresentou um desempenho, no geral, insatisfatório. Por outro lado, o método assíncrono se mostrou um caminho possível para a manipulção de um arquivo de
 grandes proporções, mesmo consumindo recursos, ainda que reduzidos em relação à leitura síncrona, como é o caso do uso de
