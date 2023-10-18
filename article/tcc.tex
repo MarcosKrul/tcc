@@ -58,7 +58,7 @@
 
 \lstset{
 	language=JavaScript, 
-	basicstyle=\scriptsize\ttfamily, 
+    	basicstyle=\scriptsize\ttfamily, 
 	breaklines=true, 
 	numbers=left, 
 	numberstyle=\tiny\color{black}, 
@@ -91,7 +91,7 @@ O trabalho realiza um estudo sobre técnicas presentes na plataforma do \textit{
 que exijam processamento de grandes volumes de dados. Dentre os principais padrões de projeto, destaca-se a arquitetura orientada a eventos,
 fortemente enraizada nos principais núcleos da plataforma, que, juntamente com as \textit{streams}, possibilita a leitura de arquivos 
 com tamanho na ordem de \textit{gigabytes}. Foram criadas aplicações servidoras com o objetivo de testar a capacidade de lidar com altas 
-demandas em aplicações web. Além disso, será avaliado como os recursos do servidor são utilizados ao lidar com a leitura e processamento 
+demandas em aplicações web. Além disso, foi avaliado como os recursos do servidor são utilizados ao lidar com a leitura e processamento 
 de um arquivo de 1,65 GB. O resultado esperado é demonstrar que a arquitetura orientada a eventos é a solução mais eficaz para o 
 desenvolvimento de aplicações web que lidam com grandes volumes de dados na plataforma Node.JS.
 \end{resumo}
@@ -100,8 +100,8 @@ desenvolvimento de aplicações web que lidam com grandes volumes de dados na pl
 \begin{abstract} 
 The work carries out a study of techniques present in the Node.JS platform for developing web servers that require processing large
 volumes of data. Among the main design patterns, the event-driven architecture stands out, deeply rooted in the core of the platform, 
-which, along with streams, enables the reading of files with sizes in the gigabytes range. Server applications will be created with the 
-goal of testing the ability to handle high demands in web applications. Additionally, an evaluation will be conducted on how server 
+which, along with streams, enables the reading of files with sizes in the gigabytes range. Server applications were created with the 
+goal of testing the ability to handle high demands in web applications. Additionally, an evaluation was conducted on how server 
 resources are utilized when dealing with the reading and processing of a 1.65 GB file. The expected outcome is to demonstrate that the 
 event-driven architecture is the most effective solution for developing web applications that deal with large volumes of data on the Node.JS platform.
 \end{abstract}
@@ -496,10 +496,7 @@ a implementação de leitura assíncrona (\autoref{cod:async}).
 	if (cluster.isPrimary) {
 		const numCPUs = os.cpus().length;
 
-		for (let i = 0; i < numCPUs; i += 1) {
-			cluster.fork();
-		}
-
+		for (let i = 0; i < numCPUs; i += 1) cluster.fork();
 		console.log(`Number of workers: ${Object.keys(cluster.workers).length}`);
 
 		cluster.on("exit", (worker) => {
