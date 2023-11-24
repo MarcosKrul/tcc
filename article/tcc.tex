@@ -109,11 +109,11 @@ event-driven architecture is the most effective solution for developing web appl
 
 \section{Introdução}
 
-O desenvolvimento de aplicações \textit{web} bem como a migração de aplicações existentes para este ambiente,
-é a realidade atual encontrada no mercado de \textit{software}. É considerado o meio mais utilizado
+O desenvolvimento de aplicações bem como a migração de existentes para o ambiente da \textit{web},
+é a realidade atual encontrada no mercado de \textit{software}. Considerado o meio mais utilizado
 para comunicação e troca de informações atualmente, com mais de 2,5 quintilhões de \textit{bytes} de dados
 carregados por diferentes serviços ofertados. Dentre outras, até janeiro de 2020, foram 
-contabilizados cerca de 4,45 bilhões de usuários de \textit{internet} \cite{WEBUSAGE}. 
+contabilizados cerca de 4,45 bilhões de usuários na \textit{Internet} \cite{WEBUSAGE}. 
 Existem benefícios que justificam esse comportamento, como facilidades em instalações e atualizações, 
 alcance global instantâneo e alta portabilidade. Porém, sob outra perspectiva, apresentam-se questões 
 críticas que devem ser analisadas antes de aderir à plataforma, como o desempenho em situações com 
@@ -138,7 +138,7 @@ assíncrono (\textit{streams}) e \textit{caching}. Faz-se necessário, portanto,
 técnicas escolhidas para aumentar o desempenho em alta demanda de dados utilizando a plataforma do \textit{Node.JS}.
 
 
-\section{Revisão de bibliografia}
+\section{Revisão da literatura}
 
 \subsection{Escalabilidade}
 
@@ -195,7 +195,7 @@ de leitura e escrita em arquivos \cite{UDESC}.
 
 Operações envolvendo \textit{sockets}, \textit{streams} e arquivos são, em grande parte, 
 realizados de forma assíncrona em aplicações escritas na plataforma do \textit{Node.JS}, da forma que o processamento
-dos ouvintes é executado diante de algum disparo de evento. \cite{MFO} Ao adotar este tipo de arquitetura em um projeto, 
+das requisições é executado diante de algum disparo de evento. \cite{MFO} Ao adotar este tipo de arquitetura em um projeto, 
 a aplicação passa a ter o fluxo de informação controlado pelo envio de eventos, o que, dependendo do caso, pode ser a melhor 
 escolha de padrão. Contudo, ainda é preciso se atentar a alguns detalhes e desvantagens ao utilizar esta abordagem,
 visto que diversos erros de programação podem ser observados como, por exemplo, eventos não tratados e ouvintes
@@ -252,7 +252,10 @@ recebida pelo servidor é atribuida à uma nova \textit{thread} para processamen
 problemas relacionados à interferências. Contudo, cada requisição recebida resulta em sobrecarga no uso de
 recursos de máquina e em trocas de contexto \cite{JGD}. Dessa forma, os custos computacionais aumentam
 à medida que novos clientes realizam suas requisições, fazendo com que os sistemas limitem o número máximo de
-\textit{threads} e, consequentemente, bloqueiem a escalabilidade do servidor \cite{ZRHR}.
+\textit{threads} e, consequentemente, bloqueiem a escalabilidade do servidor \cite{ZRHR}. Dessa forma, na arquitetura 
+EDA o limite de escalabilidade não está diretamente relacionado ao número de \textit{threads}, como 
+ocorre na arquitetura OTCP. Em vez disso, é mais relacionado 
+à eficiência do \textit{loop} de eventos e ao tratamento de operações de forma assíncrona.
 
 
 \subsection{\textit{Stream}}
@@ -270,7 +273,7 @@ em plataformas baseadas em eventos, a maneira mais eficiente para tratamento de 
 Dessa forma, a aplicação irá consumir os dados de entrada a medida que estes estão disponíveis, e o envio dos dados
 de saída será de acordo com o ritmo de produção da aplicação \cite[p. 119]{MARIO}.
 
-As \textit{streams}, além das características apresentadas, são utilizadas em problemas que não apresentam soluções tecnicamente
+As \textit{streams}, além das características apresentadas, são utilizadas em problemas que não admitem soluções tecnicamente
 possíveis com outras interfaces presentes na plataforma do \textit{Node.JS}, como, por exemplo, a leitura de 
 arquivos suficientemente grandes com funções que retornam um \textit{buffer} ao término da leitura completa. Arquivos com 
 centenas de \textit{megabytes} ou até mesmo \textit{gigabytes}, precisariam ser carregados em um único 
@@ -319,7 +322,7 @@ técnica de \textit{clustering}. Essa abordagem se alinha diretamente com o noss
 de recursos afeta o desempenho em sistemas \textit{web} com \textit{Node.js}, especialmente sob alta demanda de dados.
 Da mesma forma, \cite{CLUSTERTCC} explorou otimizações em funções de cálculo de custos em sistemas 
 semelhantes. Observou-se que melhorias substanciais foram alcançadas ao aprimorar a eficiência na 
-iteração de matrizes e no gerenciamento de memória. Esses resultados ressaltam a importância de abordar o 
+iteração em matrizes e no gerenciamento de memória. Esses resultados ressaltam a importância de abordar o 
 processamento intensivo de dados para melhorar o desempenho geral do sistema, uma consideração crucial em 
 nossa investigação sobre sistemas \textit{web} de alta demanda.
 
@@ -345,22 +348,22 @@ pesquisa, ampliando assim o conhecimento sobre estratégias de otimização e ge
 em ambientes de alta demanda.
 
 
-\section{Metodologia}
+\section{Materiais e métodos}
 
-A metodologia aplicada apresenta caráter semi-experimental, qualitativo
+O método aplicado apresenta caráter experimental, quantitativo
 e escopo exploratório, para análise do desempenho de sistemas \textit{web} baseados em \textit{Node.JS} 
 quando será gerada uma condição de tráfego de fluxo intenso de dados,
 com tamanhos de arquivo na ordem de \textit{gigabytes}.
 
-O estudo será realizado em um ambiente controlado, onde serão desenvolvidos cenários de teste com diferentes 
-implementações de arquitetura para a resolução do problema de envio de dados, a fim de aferir métricas de desempenho do servidor, 
+O estudo foi realizado em um ambiente controlado, onde foram desenvolvidos cenários de teste com diferentes 
+implementações de arquitetura para a resolução do problema de envio de dados, a fim de aferir medidas de desempenho do servidor, 
 como o consumo de memória \textit{RAM}, \textit{CPU}, \textit{throughput} (quantidade de requisições processadas por unidade 
 de tempo - vazão) e a média do tempo de resposta do servidor, que se refere ao tempo total que uma requisição leva
 para ser completa. Uma implementação utilizará uma arquitetura não escalável e não 
 pensada para o caso específico de transferência de um grande volume de dados, na ordem de \textit{gigabytes}, e outra aplicará técnicas focadas na 
 manipulação de dados na mesma grandeza.
 
-Por meio da análise das implementações a serem definidas em seguida, procura-se salientar a melhora de performance,
+Por meio da análise das implementações a serem definidas em seguida, procura-se salientar a melhoria de desempenho,
 principalmente no que diz respeito à múltiplas requisições paralelas, visto que uma implementação síncrona de operações
 \textit{I/O} causa o bloqueio da \textit{thread} principal do \textit{Node.js}, não permitindo processamento paralelo.
 
@@ -432,7 +435,7 @@ deve ser inserido dentro do servidor previamente implementado (\autoref{cod:base
 \end{lstlisting}
 
 Para a implementação inicial da leitura do arquivo de 1.65 GB de forma assíncrona,
-onde o conteúdo será processado sob demanada em pequenas porções (\textit{chunks}), é utilizada
+onde o conteúdo será processado sob demanda em pequenas porções (\textit{chunks}), é utilizada
 a função \textit{createReadStream} presente no módulo \textit{fs} (nativo da plataforma do \textit{Node.JS}) para
 criar um \textit{stream} de leitura (\autoref{cod:async}). Este trecho de código deve ser inserido dentro do servidor previamente 
 implementado (\autoref{cod:base}).
@@ -536,9 +539,9 @@ nomeados da seguinte forma:
 \item Cenário 1: Implementação com arquitetura não específica para transferências da ordem de \textit{gigabytes}, 
 ou seja, realização da leitura de arquivos de forma síncrona (\autoref{cod:sync}).
 \item Cenário 2: Implementação com arquitetura escalável para transferências da ordem de \textit{gigabytes}, 
-utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma assíncrona (\autoref{cod:async}).
+utilizando métodos da arquitetura baseada em eventos e \textit{streams} para ler arquivos de forma assíncrona (\autoref{cod:async}).
 \item Cenário 3: Implementação com arquitetura escalável para transferências da ordem de \textit{gigabytes}, 
-utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma assíncrona somada à utilização de
+utilizando métodos da arquitetura baseada em eventos e \textit{streams} para ler arquivos de forma assíncrona somada à utilização de
 \textit{clusters} (\autoref{cod:async-cluster}).
 \end{enumerate}
 
@@ -548,7 +551,7 @@ utilizando métodos da arquitetura baseada em eventos para ler arquivos de forma
 Será configurado um ambiente de teste composto por uma aplicação servidor, com o intuito de registrar e avaliar as seguintes métricas:
 Consumo de recursos de máquina, como memória \textit{RAM} e \textit{CPU}, \textit{throughput}, que se refere à quantidade de requisições feitas à aplicação por unidade de tempo,
 e a média do tempo tempo de resposta do servidor nos três cenários propostos. 
-O servidor de aplicação será baseado em \textit{Node.JS}, utilizando a versão 20.3.0. A aplicação será executada em uma máquina
+O servidor de aplicação será baseado em \textit{Node.JS}, utilizando a versão 20.3.0. A aplicação foi executada em uma máquina
 com 24 \textit{gigabytes} de memória \textit{RAM} e um processador com 4 núcleos.
 
 Para automatizar o envio de requisições ao servidor em diferentes cenários, 
@@ -599,7 +602,7 @@ todas as solicitações respondidas pelo servidor, somada à conversão do tempo
   };
 \end{lstlisting}
 
-Os dados necessários para o cálculo destas duas métricas serão armazenados em arquivos para análise após o fim de uma 
+Os dados necessários para o cálculo destas duas medidas serão armazenados em arquivos para análise após o fim de uma 
 bateria de testes. Para ambos, faz-se necessário a captura do tempo de ínicio de uma requisição
 e o tempo de fim da mesma. Estas duas variáveis serão obtidas utilizando
 o módulo nativo \textit{perf\textunderscore hooks} da plataforma \textit{Node.JS}. 
@@ -786,21 +789,21 @@ dando escalabilidade horizontal.
 \begin{table}[H]
 \footnotesize
 \centering
-\caption{Métrica de tempo calculadas por arquitetura de servidor}\label{tab:metrics}
+\caption{Medidas de tempo calculadas por arquitetura de servidor}\label{tab:metrics}
 \begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{3cm}|}
 \hline
-\textbf{Métrica} & \textbf{Síncrono} & \textbf{Assíncrono} & \textbf{Assíncrono com \textit{clusters}} \\
+\textbf{Medida} & \textbf{Síncrono} & \textbf{Assíncrono} & \textbf{Assíncrono com \textit{clusters}} \\
 \hline
-\textit{Throughput} (req/min) & 0.044 & 0.172 & 0.223\\
+\textit{Throughput} (req/min) & 0,044 & 0,172 & 0,223\\
 \hline
-Média do tempo de resposta (min) & 22.818 & 5.801 & 4.477\\
+Média do tempo de resposta (min) & 22,818 & 5,801 & 4,477\\
 \hline
 \end{tabular}
 \end{table}
 
 
 Para a implementação síncrona, é possível observar que, para a transferência do arquivo de 1.65 \textit{gigabytes}, 
-houve um elevado de memória chegando a valores superiores que 6 GB. Tal comportamento era esperado
+houve um elevado uso de memória chegando a valores superiores que 6 GB. Tal comportamento era esperado
 devido à carga de quatro requisições imposta ao servidor, dessa forma todo o conteúdo do arquivo foi quadruplicado em memória.
 Ainda, observa-se que o uso de memória mantêm-se constante devido ao armazenamento do 
 arquivo em memória (\autoref{fig:sync_memory_usage}).
@@ -950,7 +953,7 @@ levam à mesma conclusão sobre o uso destes recursos da máquina.
 
 Após análise das quatro métricas escolhidas, apresentadas por meio da tabela de comparações
 entre os cenários e gráficos individuais destes, pode-se concluir que das três 
-implementações, a que obteve desempenho inferior e elavado uso dos recursos, quando confrontada 
+implementações, a que obteve desempenho inferior e uso elevado dos recursos, quando confrontada 
 com a base de dados de 1.65 \textit{gigabytes}, foi a síncrona. O uso da memória \textit{RAM}
 foi o mais elevado, e, mesmo assim, o cenário teve um desempenho reduzido em relação ao 
 \textit{throughput} e média do tempo de resposta do servidor, levando, aproximadamente,
@@ -965,7 +968,7 @@ a importância da escolha da estratégia correta para operações de leitura em 
 
 Como observado, a leitura síncrona de arquivos demonstrou ser ineficiente em situações de alta demanda, resultando em 
 tempos de resposta insatisfatórios, e, quando confrontada com a leitura e transferência de um arquivo de 1.65 \textit{gigabytes},
-apresentou um desempenho, no geral, insatisfatório. Por outro lado, o método assíncrono se mostrou um caminho possível para a manipulção de um arquivo de
+apresentou um desempenho, no geral, insatisfatório. Por outro lado, o método assíncrono se mostrou um caminho possível para a manipulação de um arquivo de
 grandes proporções, mesmo consumindo recursos, ainda que reduzidos em relação à leitura síncrona, como é o caso do uso de
 memória \textit{RAM}, este cenário demonstrou a possibilidade do \textit{Node.js} para tais casos. Ainda, a implementação 
 de leitura assíncrona combinada com o uso de \textit{clusters} se destacou como a abordagem mais eficiente e escalável, otimizando 
