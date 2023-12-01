@@ -358,7 +358,7 @@ com tamanhos de arquivo na ordem de \textit{gigabytes}.
 O estudo foi realizado em um ambiente controlado, onde foram desenvolvidos cenários de teste com diferentes 
 implementações de arquitetura para a resolução do problema de envio de dados, a fim de aferir medidas de desempenho do servidor, 
 como o consumo de memória \textit{RAM}, \textit{CPU}, \textit{throughput} (quantidade de requisições processadas por unidade 
-de tempo - vazão) e a média do tempo de resposta do servidor, que se refere ao tempo total que uma requisição leva
+de tempo - vazão) e a média do tempo de processamento do servidor, que se refere ao tempo total que uma requisição leva
 para ser completa. Uma implementação utilizará uma arquitetura não escalável e não 
 pensada para o caso específico de transferência de um grande volume de dados, na ordem de \textit{gigabytes}, e outra aplicará técnicas focadas na 
 manipulação de dados na mesma grandeza.
@@ -550,7 +550,7 @@ utilizando métodos da arquitetura baseada em eventos e \textit{streams} para le
 
 Será configurado um ambiente de teste composto por uma aplicação servidor, com o intuito de registrar e avaliar as seguintes métricas:
 Consumo de recursos de máquina, como memória \textit{RAM} e \textit{CPU}, \textit{throughput}, que se refere à quantidade de requisições feitas à aplicação por unidade de tempo,
-e a média do tempo tempo de resposta do servidor nos três cenários propostos. 
+e a média do tempo de processamento do servidor nos três cenários propostos. 
 O servidor de aplicação será baseado em \textit{Node.JS}, utilizando a versão 20.3.0. A aplicação foi executada em uma máquina
 com 24 \textit{gigabytes} de memória \textit{RAM} e um processador com 4 núcleos.
 
@@ -573,17 +573,17 @@ Em resumo, serão enviadas quatro requisições ao mesmo tempo ao servidor, repe
 
 Os indicadores de desempenho a serem coletados e analisados para cada uma das implementações, durante a transferência
 dos dados contidos na base previamente citada serão: Uso de memória \textit{RAM}, uso de \textit{CPU}, \textit{throughput}
-e a média do tempo de resposta do servidor.
+e a média do tempo de processamento do servidor.
 
 Para que as análises do consumo de recursos de máquina, como \textit{RAM} e \textit{CPU}, em relação
 ao tempo de vida do servidor sejam coerentes, as coletas serão iniciadas e estendidas em cinco 
 minutos antes e após a finalização da bateria de requisições.
 
 O \textit{script} abaixo é utilizado para calcular as métricas \textit{throughput} e 
-média do tempo de resposta do servidor (\textit{avg}). Para ambas, torna-se essencial definir a soma dos tempos de processamento de
+média do tempo de processamento do servidor (\textit{avg}). Para ambas, torna-se essencial definir a soma dos tempos de processamento de
 todas as solicitações respondidas pelo servidor, somada à conversão do tempo em milissegundos para minutos (\autoref{cod:analytics}).
 
-\begin{lstlisting}[caption={Implementação do cálculo das métricas \textit{throughput} e média do tempo de resposta}, label=cod:analytics]
+\begin{lstlisting}[caption={Implementação do cálculo das métricas \textit{throughput} e média do tempo de processamento}, label=cod:analytics]
 	const timeProcessingInSeconds =
     data.requests.reduce(
       (acc, current) => acc + (current.endTime - current.startTime),
@@ -612,7 +612,7 @@ do servidor, e será invocado no ínicio da
 fechamento destas, o valor de ínicio, o valor de tempo atual e
 uma identificação única da requisição serão armazenados em um arquivo \textit{JSON}. Após o encerramento do servidor, será 
 possível, utilizando a soma da diferença dos tempos de início e fim de cada requisição, e a quantidade de requisições realizadas, calcular o 
-\textit{throughput}, que terá a unidade requisições por minuto. Para o cálculo da média simples de tempo de resposta do servidor, 
+\textit{throughput}, que terá a unidade requisições por minuto. Para o cálculo da média simples de tempo de processamento do servidor, 
 as mesmas variáveis serão utilizadas, desta maneira, o valor pode ser calculado pelo somatório da 
 divisão entre a diferença dos tempos de início e fim pelo número de requisições.
 
@@ -771,7 +771,7 @@ acordo com a metodologia previamente descrita. Nesta seção, os dados coletados
 e as descobertas são discutidas à luz das questões de pesquisa estabelecidas. Os itens aqui apresentados representam o 
 resultado de análises rigorosas e constituem uma contribuição significativa para a compreensão do tópico em questão.
 
-Foram extraídos valores de \textit{throughput} e tempo de resposta do servidor,
+Foram extraídos valores de \textit{throughput} e tempo de processamento do servidor,
 entre os três cenários estipulados, síncrono, assíncrono e assíncrono com uso de \textit{clusters}, quando confrontados
 com 12 requisições, sendo quatro simultâneas, até atingir o total de requisições. Todas as requisições realizam a leitura
 do arquivo de 1.65 \textit{gigabytes} (\autoref{tab:metrics}). 
@@ -796,7 +796,7 @@ dando escalabilidade horizontal.
 \hline
 \textit{Throughput} (req/min) & 0,044 & 0,172 & 0,223\\
 \hline
-Média do tempo de resposta (min) & 22,818 & 5,801 & 4,477\\
+Média do tempo de processamento (min) & 22,818 & 5,801 & 4,477\\
 \hline
 \end{tabular}
 \end{table}
@@ -863,7 +863,7 @@ que apresenta um uso bem mais elevado e superior ao 100\text{\%} (\autoref{fig:a
 
 
 A implementação assíncrona somada ao uso de \textit{clusters} teve os melhores resultados
-em relação às métricas de \textit{throughput} e média de tempo de resposta do servidor (\autoref{tab:metrics}). 
+em relação às métricas de \textit{throughput} e média de tempo de processamento do servidor (\autoref{tab:metrics}). 
 Para o uso de memória \textit{RAM} (\autoref{fig:async-cluster_usage_0a}), esta implementação
 apresentou os menores valores se analisarmos cada processo filho isoladamente, porém, se os
 agregarmos, o uso deste recurso torna-se mais elevado que o da implementação assíncrona, mas
@@ -873,7 +873,7 @@ O uso de \textit{CPU} (\autoref{fig:async-cluster_usage_0b}) se comporta da mesm
 maneira, mantendo valores mais brandos se observado apenas um processo filho de forma isolada.
 Nota-se que o consumo de recursos que os processos filhos utilizam (somados) a mais que o único processo
 da implementação assíncrona, se traduz para a melhora das métricas de desempenho de 
-\textit{throughput} e média de tempo de resposta do servidor.
+\textit{throughput} e média de tempo de processamento do servidor.
 
 
 \begin{figure}[H]
@@ -956,7 +956,7 @@ entre os cenários e gráficos individuais destes, pode-se concluir que das trê
 implementações, a que obteve desempenho inferior e uso elevado dos recursos, quando confrontada 
 com a base de dados de 1.65 \textit{gigabytes}, foi a síncrona. O uso da memória \textit{RAM}
 foi o mais elevado, e, mesmo assim, o cenário teve um desempenho reduzido em relação ao 
-\textit{throughput} e média do tempo de resposta do servidor, levando, aproximadamente,
+\textit{throughput} e média do tempo de processamento do servidor, levando, aproximadamente,
 o quádruplo do tempo para atender às requisições do que os outros cenários.
 
 
