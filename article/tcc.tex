@@ -189,7 +189,7 @@ mudanças nos dados recebidos \cite[p. 27]{DIOGORESENDE}.
 Os sistemas operacionais oferecem operações bloqueantes para leitura e gravação em arquivos, fazendo com que ocorra
 um bloqueio na execução do programa principal até que haja uma resposta das solicitações. Nesse contexto, até pequenos
 bloqueios podem resultar no travamento de aplicações baseadas no modelo cliente/servidor e, dessa forma, novas requisições
-deverão esperar. Para tal problema, operações de I/O não bloqueantes - também conhecidos como I/O assíncrono - oferecem
+deverão esperar. Para tal problema, operações de E/S não bloqueantes - também conhecidos como E/S assíncrono - oferecem
 uma solução elegante, com o uso de \textit{callbacks} que serão invocadas ao fim das solicitações 
 de leitura e escrita em arquivos \cite{UDESC}.
 
@@ -217,7 +217,7 @@ das próprias \textit{callbacks} definidas para as respostas dos disparos de eve
 é executado em uma única \textit{thread}, o \textit{Node.JS} transfere certas operações mais custosas à \textit{worker pool}, 
 com o objetivo de não travar a \textit{thread} principal responsável por receber novas solicitações de 
 clientes \cite{BUGS} \cite{ATOMICITY}, 
-como, por exemplo, operações de I/O para as quais sistemas operacionais não oferecem uma versão não-bloqueante 
+como, por exemplo, operações de E/S para as quais sistemas operacionais não oferecem uma versão não-bloqueante 
 \cite{NODEBLOCKEVENTLOOP}. 
 
 \begin{figure}[H]
@@ -235,8 +235,8 @@ Ainda, é possível observar este comportamento nas etapas 1.1 e 1.2, onde as a�
 um arquivo são transferidas à \textit{worker pool}, visto que são operações custosas e bloqueantes. Dada 
 a transferência, a \textit{thread} principal permanece não-bloqueada e pode continuar seu processamento. 
 Dentro da \textit{worker pool}, novas \textit{threads} podem ser criadas para realizar a execução das operações
-assíncronas de I/O e, ao término, os eventos serão inseridos na fila específica para I/O (\textit{Node.JS} 
-possui sete filas de eventos para diferentes tipos, sendo eles: temporizador, I/O, pendente, ocioso, preparação, 
+assíncronas de E/S e, ao término, os eventos serão inseridos na fila específica para E/S (\textit{Node.JS} 
+possui sete filas de eventos para diferentes tipos, sendo eles: temporizador, E/S, pendente, ocioso, preparação, 
 verificação e fechamento \cite{NODEEVENTLOOP}). As etapas 2.1 e 2.2 representam este comportamento.
 Por fim, a \textit{loop thread} busca estes novos eventos na fila e executa suas 
 \textit{callbacks} (etapas 3.1 e 3.2) \cite{BUGS}.
@@ -269,7 +269,7 @@ relacionada com os eventos, visto que utilizam destes para enviar notificações
 quando os dados estão prontos para consumo ou quando o processamento chegou ao fim \cite[p. 28]{DIOGORESENDE}.
 
 O modelo da arquitetura baseada em eventos do \textit{Node.JS} aumenta a eficácia no uso das \textit{streams}, visto que,
-em plataformas baseadas em eventos, a maneira mais eficiente para tratamento de I/O é com processamento em tempo real.
+em plataformas baseadas em eventos, a maneira mais eficiente para tratamento de E/S é com processamento em tempo real.
 Dessa forma, a aplicação irá consumir os dados de entrada a medida que estes estão disponíveis, e o envio dos dados
 de saída será de acordo com o ritmo de produção da aplicação \cite[p. 119]{MARIO}.
 
@@ -335,10 +335,10 @@ consideração crítica, enfatizando a necessidade de garantir a estabilidade e 
 Outro estudo anterior por \cite{NODEJVERSUSIIS} realizou uma comparação e avaliação do desempenho entre \textit{Node.js}, a mais recente 
 tecnologia, e o servidor \textit{IIS}, por meio de testes objetivos e sistemáticos. Os resultados 
 destacaram que o \textit{Node.js} apresenta um bom desempenho em relação ao servidor tradicional \textit{IIS} na 
-execução de tarefas intensivas de I/O. Além disso, o estudo sugeriu que o \textit{Node.js} é preferencialmente utilizado 
-em situações de I/O intensivo, em vez de serviços intensivos em CPU. Ao observar os resultados de desempenho em 
+execução de tarefas intensivas de E/S. Além disso, o estudo sugeriu que o \textit{Node.js} é preferencialmente utilizado 
+em situações de E/S intensivo, em vez de serviços intensivos em CPU. Ao observar os resultados de desempenho em 
 termos de \textit{throughput}, o \textit{Node.js} emergiu como uma tecnologia amplamente adotada por muitas organizações, 
-especialmente devido às suas vantagens em cenários de I/O intensivo.
+especialmente devido às suas vantagens em cenários de E/S intensivo.
 
 Esses estudos não apenas contribuem para o entendimento do contexto em que o presente trabalho se insere, 
 mas também fornecem um ponto de partida sólido para nosso próprio estudo sobre o desempenho em função 
@@ -365,7 +365,7 @@ manipulação de dados na mesma grandeza.
 
 Por meio da análise das implementações a serem definidas em seguida, procura-se salientar a melhoria de desempenho,
 principalmente no que diz respeito à múltiplas requisições paralelas, visto que uma implementação síncrona de operações
-\textit{I/O} causa o bloqueio da \textit{thread} principal do \textit{Node.js}, não permitindo processamento paralelo.
+\textit{E/S} causa o bloqueio da \textit{thread} principal do \textit{Node.js}, não permitindo processamento paralelo.
 
 
 \subsection{Implementações}
