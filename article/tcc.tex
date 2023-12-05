@@ -92,7 +92,8 @@ que exijam processamento de grandes volumes de dados. Dentre os principais padr�
 fortemente enraizada nos principais núcleos da plataforma, que, juntamente com as \textit{streams}, possibilita a leitura de arquivos 
 com tamanho na ordem de \textit{gigabytes}. Foram criadas aplicações servidoras com o objetivo de testar a capacidade de lidar com altas 
 demandas em aplicações web. Além disso, foi avaliado como os recursos do servidor são utilizados ao lidar com a leitura e processamento 
-de um arquivo de 1,65 GB. O resultado esperado é demonstrar que a arquitetura orientada a eventos é a solução mais eficaz para o 
+de um arquivo de 1,65 GB, e como a técnica aplicada no servidor tem um papel fundamental no funcionamento de uma aplicação cliente para a exibição de dados. 
+O resultado esperado é demonstrar que a arquitetura orientada a eventos é a solução mais eficaz para o 
 desenvolvimento de aplicações web que lidam com grandes volumes de dados na plataforma Node.JS.
 \end{resumo}
 
@@ -164,7 +165,7 @@ de dois ou mais. Os padrões apresentam diversos benefícios, como aumento da pr
 entre a equipe de desenvolvimento. Contudo, a definição das soluções arquiteturais adotadas deve ser 
 cuidadosa, visto que escolhas incorretas podem acarretar em novos empecilhos como, por exemplo, a adição de
 camadas extras de processamento para obter maior flexibilidade, podendo, dessa forma, 
-afetar as métricas de desempenho do sistema final, como o tempo de execução \cite[p. 13 - p. 14]{DIOGORESENDE}.
+afetar as medidas de desempenho do sistema final, como o tempo de execução \cite[p. 13 - p. 14]{DIOGORESENDE}.
 
 Dentre a maioria dos padrões de projeto conhecidos, existem aqueles que são amplamente utilizados no 
 \textit{Node.JS}, devido à sua estrutura e ao seu modelo de interface. Dentre eles, evidenciam-se
@@ -358,8 +359,8 @@ com tamanhos de arquivo na ordem de \textit{gigabytes}.
 O estudo foi realizado em um ambiente controlado, onde foram desenvolvidos cenários de teste com diferentes 
 implementações de arquitetura para a resolução do problema de envio de dados, a fim de aferir medidas de desempenho do servidor, 
 como o consumo de memória \textit{RAM}, \textit{CPU}, \textit{throughput} (quantidade de requisições processadas por unidade 
-de tempo - vazão) e a média do tempo de processamento do servidor, que se refere ao tempo total que uma requisição leva
-para ser completa. Uma implementação utilizará uma arquitetura não escalável e não 
+de tempo - vazão) e tempo médio em que o cliente consegue lidar os dados recebidos do servidor, que se refere ao tempo total que uma requisição leva
+para ser completada. Uma implementação utilizará uma arquitetura não escalável e não 
 pensada para o caso específico de transferência de um grande volume de dados, na ordem de \textit{gigabytes}, e outra aplicará técnicas focadas na 
 manipulação de dados na mesma grandeza.
 
@@ -424,7 +425,10 @@ A sua \textit{callback} recebe os objetos de requisição e resposta para tratam
 de valores de entrada e escrita de valores de saída. Dessa forma, o servidor para este estudo irá responder à chamadas
 realizadas no caminho raíz da aplicação, em determinada porta arbitrária.
 
-O módulo nativo \textit{perf\textunderscore hooks} da plataforma \textit{Node.JS}, é utilizado em todas as implementações para a obtenção dos valores de tempo de início e fim da requisição. O tempo inicial, em milissegundos, é registrado assim que uma requisição é recebida, e o tempo final é registrado uma vez que a requisição é encerrada pelo servidor, ou seja, no evento de finalização (\autoref{cod:base}, linha 11).
+O módulo nativo \textit{perf\textunderscore hooks} da plataforma \textit{Node.JS}, é utilizado em todas as implementações para a obtenção 
+dos valores de tempo de início e fim da requisição. O tempo inicial, em milissegundos, é registrado assim que uma requisição é recebida, 
+e o tempo final é registrado uma vez que a finalização da requisição é observada pelo servidor, ou seja, no evento de finalização (\autoref{cod:base},' linha 11),
+quando, dentre outros motivos, o arquivo é transferido inteiramente ao solicitante.
 
 A primeira implementação desenvolvida (\autoref{cod:sync}), realiza a leitura do arquivo de 1.65 GB
 de forma síncrona utilizando chamadas do módulo \textit{fs} (\textit{file system}), ou seja, todo o conteúdo será
@@ -550,9 +554,9 @@ utilizando métodos da arquitetura baseada em eventos e \textit{streams} para le
 
 \subsection{Construção do ambiente de teste}
 
-Será configurado um ambiente de teste composto por uma aplicação servidor, com o intuito de registrar e avaliar as seguintes métricas:
+Será configurado um ambiente de teste composto por uma aplicação servidor, com o intuito de registrar e avaliar as seguintes medidas:
 Consumo de recursos de máquina, como memória \textit{RAM} e \textit{CPU}, \textit{throughput}, que se refere à quantidade de requisições feitas à aplicação por unidade de tempo,
-e a média do tempo de processamento do servidor nos três cenários propostos. 
+e tempo médio em que o cliente consegue lidar com os dados recebidos nos três cenários propostos. 
 O servidor de aplicação será baseado em \textit{Node.JS}, utilizando a versão 20.3.0. A aplicação foi executada em uma máquina
 com 24 \textit{gigabytes} de memória \textit{RAM} e um processador com 4 núcleos.
 
@@ -575,17 +579,17 @@ Em resumo, serão enviadas quatro requisições ao mesmo tempo ao servidor, repe
 
 Os indicadores de desempenho a serem coletados e analisados para cada uma das implementações, durante a transferência
 dos dados contidos na base previamente citada serão: Uso de memória \textit{RAM}, uso de \textit{CPU}, \textit{throughput}
-e a média do tempo de processamento do servidor.
+e o tempo médio em que o cliente consegue lidar os dados recebidos do servidor.
 
 Para que as análises do consumo de recursos de máquina, como \textit{RAM} e \textit{CPU}, em relação
 ao tempo de vida do servidor sejam coerentes, as coletas serão iniciadas e estendidas em cinco 
 minutos antes e após a finalização da bateria de requisições.
 
-O \textit{script} abaixo é utilizado para calcular as métricas \textit{throughput} e 
-média do tempo de processamento do servidor (\textit{avg}). Para ambas, torna-se essencial definir a soma dos tempos de processamento de
+O \textit{script} abaixo é utilizado para calcular as medidas de \textit{throughput} e 
+tempo médio em que o cliente consegue lidar os dados recebidos do servidor (\textit{avg}). Para ambas, torna-se essencial definir a soma dos tempos de processamento de
 todas as solicitações respondidas pelo servidor, somada à conversão do tempo em milissegundos para minutos (\autoref{cod:analytics}).
 
-\begin{lstlisting}[caption={Implementação do cálculo das métricas \textit{throughput} e média do tempo de processamento}, label=cod:analytics]
+\begin{lstlisting}[caption={Implementação do cálculo das medidas de \textit{throughput} e tempo médio em que o cliente consegue lidar com os dados recebidos}, label=cod:analytics]
 	const timeProcessingInSeconds =
     data.requests.reduce(
       (acc, current) => acc + (current.endTime - current.startTime),
@@ -614,12 +618,12 @@ do servidor, e será invocado no ínicio da
 fechamento destas, o valor de ínicio, o valor de tempo atual e
 uma identificação única da requisição serão armazenados em um arquivo \textit{JSON}. Após o encerramento do servidor, será 
 possível, utilizando a soma da diferença dos tempos de início e fim de cada requisição, e a quantidade de requisições realizadas, calcular o 
-\textit{throughput}, que terá a unidade requisições por minuto. Para o cálculo da média simples de tempo de processamento do servidor, 
+\textit{throughput}, que terá a unidade requisições por minuto. Para o cálculo do tempo médio em que o cliente consegue lidar com os dados recebidos, 
 as mesmas variáveis serão utilizadas, desta maneira, o valor pode ser calculado pelo somatório da 
 divisão entre a diferença dos tempos de início e fim pelo número de requisições.
 
 \textit{Scripts} foram implementados com o objetivo de executar o servidor e armazenar, em tempo real,
-as métricas de uso de recursos de máquina, como consumos de memória \textit{RAM} e \textit{CPU}. Os valores 
+as medidas de uso de recursos de máquina, como consumos de memória \textit{RAM} e \textit{CPU}. Os valores 
 são obtidos através da ferramenta \textit{ps} (relatório dos processos atuais), buscando através do 
 \textit{PID} (\textit{process identifier}, identificador de processo). Os valores são salvos em tempo real em um arquivo 
 \textit{CSV} a cada segundo (\textit{sleep 1}), enquanto o processo estiver ativo. 
@@ -773,17 +777,18 @@ acordo com a metodologia previamente descrita. Nesta seção, os dados coletados
 e as descobertas são discutidas à luz das questões de pesquisa estabelecidas. Os itens aqui apresentados representam o 
 resultado de análises rigorosas e constituem uma contribuição significativa para a compreensão do tópico em questão.
 
-Foram extraídos valores de \textit{throughput} e tempo de processamento do servidor,
+Foram extraídos valores de \textit{throughput} e tempo médio em que o cliente consegue lidar com os dados recebidos,
 entre os três cenários estipulados, síncrono, assíncrono e assíncrono com uso de \textit{clusters}, quando confrontados
 com 12 requisições, sendo quatro simultâneas, até atingir o total de requisições. Todas as requisições realizam a leitura
 do arquivo de 1.65 \textit{gigabytes} (\autoref{tab:metrics}). 
 
 É evidente que, assim como
 esperado, o cenário síncrono apresentou um \textit{throughput} inferior aos cenários assíncronos, ou seja, esta implementação
-teve menos poder para processar requisições simultâneas. Também o tempo médio de resposta do servidor foi superior no caso
-síncrono, estas duas métricas são justificadas devido à limitação de bloqueio da \textit{thread} principal do 
-\textit{Node.js} durante uma leitura de arquivo síncrona, coisa que não ocorre em leituras assíncronas e permite que o
-servidor execute tarefas paralelas. Comparando os dois métodos assíncronos, é também notável a melhora na performance da 
+teve menos poder para processar requisições simultâneas. Também, o tempo médio em que o cliente consegue lidar com os dados recebidos foi superior no caso
+síncrono, o tempo calculado para cada implementação se justifica pela forma com que o cliente consegue receber os dados do servidor e comportá-los, ou seja,
+o cliente necessita que o servidor envie os dados volumosos de uma forma adequada para sua recepção e exibição, caso contrário, este não funcionará corretamente
+e a quantidade massiva de dados a serem apresentados em tela ocasionará uso excessivo de memória e travamentos.
+Comparando os dois métodos assíncronos, é também notável a melhora na performance da 
 implementação que utiliza \textit{clusters} para obter mais poder de processamento paralelo, pois esta aproveita
 os núcleos disponíveis do processador para que o servidor consiga atender à mais solicitações simultaneamente,
 dando escalabilidade horizontal.
@@ -798,7 +803,7 @@ dando escalabilidade horizontal.
 \hline
 \textit{Throughput} (req/min) & 0,044 & 0,172 & 0,223\\
 \hline
-Média do tempo de processamento  & 22m e 49s & 5m e 48s & 4m e 29s\\
+Tempo médio em que o cliente consegue lidar com os dados recebidos & 22m e 49s & 5m e 48s & 4m e 29s\\
 \hline
 \end{tabular}
 \end{table}
@@ -865,7 +870,7 @@ que apresenta um uso bem mais elevado e superior ao 100\text{\%} (\autoref{fig:a
 
 
 A implementação assíncrona somada ao uso de \textit{clusters} teve os melhores resultados
-em relação às métricas de \textit{throughput} e média de tempo de processamento do servidor (\autoref{tab:metrics}). 
+em relação às medidas de \textit{throughput} e tempo médio em que o cliente consegue lidar com os dados recebidos (\autoref{tab:metrics}). 
 Para o uso de memória \textit{RAM} (\autoref{fig:async-cluster_usage_0a}), esta implementação
 apresentou os menores valores se analisarmos cada processo filho isoladamente, porém, se os
 agregarmos, o uso deste recurso torna-se mais elevado que o da implementação assíncrona, mas
@@ -874,8 +879,8 @@ ainda assim menor que o da implementação assíncrona.
 O uso de \textit{CPU} (\autoref{fig:async-cluster_usage_0b}) se comporta da mesma
 maneira, mantendo valores mais brandos se observado apenas um processo filho de forma isolada.
 Nota-se que o consumo de recursos que os processos filhos utilizam (somados) a mais que o único processo
-da implementação assíncrona, se traduz para a melhora das métricas de desempenho de 
-\textit{throughput} e média de tempo de processamento do servidor.
+da implementação assíncrona, se traduz para a melhora das medidas de desempenho de 
+\textit{throughput} e tempo médio em que o cliente consegue lidar com os dados recebidos.
 
 
 \begin{figure}[H]
@@ -953,12 +958,12 @@ levam à mesma conclusão sobre o uso destes recursos da máquina.
 		\caption{Implementação assíncrona: Quarto \textit{cluster}}\label{fig:async-cluster_usage_3}
 \end{figure}
 
-Após análise das quatro métricas escolhidas, apresentadas por meio da tabela de comparações
+Após análise das quatro medidas escolhidas, apresentadas por meio da tabela de comparações
 entre os cenários e gráficos individuais destes, pode-se concluir que das três 
 implementações, a que obteve desempenho inferior e uso elevado dos recursos, quando confrontada 
 com a base de dados de 1.65 \textit{gigabytes}, foi a síncrona. O uso da memória \textit{RAM}
 foi o mais elevado, e, mesmo assim, o cenário teve um desempenho reduzido em relação ao 
-\textit{throughput} e média do tempo de processamento do servidor, levando, aproximadamente,
+\textit{throughput} e tempo médio em que o cliente consegue lidar com os dados recebidos, levando, aproximadamente,
 o quádruplo do tempo para atender às requisições do que os outros cenários.
 
 
@@ -966,10 +971,10 @@ o quádruplo do tempo para atender às requisições do que os outros cenários.
 
 Este estudo investigou o desempenho de sistemas \textit{web} desenvolvidos com \textit{Node.js} em cenários com transferência de dados
 na ordem de \textit{gigabytes}, considerando três abordagens diferentes de leitura de arquivos. Os resultados destacam
-a importância da escolha da estratégia correta para operações de leitura em sistemas feitos com \textit{Node.js}.
+a importância da escolha da estratégia correta para operações de leitura e transferência em sistemas feitos com \textit{Node.js}.
 
 Como observado, a leitura síncrona de arquivos demonstrou ser ineficiente em situações de alta demanda, resultando em 
-tempos de resposta insatisfatórios, e, quando confrontada com a leitura e transferência de um arquivo de 1.65 \textit{gigabytes},
+medidas de tempo insatisfatórias, e, quando confrontada com a leitura e transferência de um arquivo de 1.65 \textit{gigabytes},
 apresentou um desempenho, no geral, insatisfatório. Por outro lado, o método assíncrono se mostrou um caminho possível para a manipulação de um arquivo de
 grandes proporções, mesmo consumindo recursos, ainda que reduzidos em relação à leitura síncrona, como é o caso do uso de
 memória \textit{RAM}, este cenário demonstrou a possibilidade do \textit{Node.js} para tais casos. Ainda, a implementação 
@@ -977,7 +982,9 @@ de leitura assíncrona combinada com o uso de \textit{clusters} se destacou como
 significativamente o desempenho em cenários de alta concorrência, por realizar o processamento necessário de forma distribuída. 
 É fundamental destacar um dos principais benefícios proporcionados pelo uso do método assíncrono, que é a capacidade de lidar 
 com múltiplas solicitações concorrentes, ao contrário do método síncrono, este não impede a execução normal 
-de outras instruções, permitindo que várias tarefas sejam processadas simultaneamente de forma eficiente.
+de outras instruções, permitindo que várias tarefas sejam processadas simultaneamente de forma eficiente. Ademais, os tempos obtidos 
+e discutidos na seção de resultados demonstram a importância de se escolher um método de leitura e transferência de dados compatível
+com o volume destes, fazendo com que sua utilização seja possível por parte do cliente.
 
 \bibliographystyle{sbc}
 \bibliography{referencias}
