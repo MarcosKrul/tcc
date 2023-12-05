@@ -170,7 +170,7 @@ Dentre a maioria dos padrões de projeto conhecidos, existem aqueles que são am
 \textit{Node.JS}, devido à sua estrutura e ao seu modelo de interface. Dentre eles, evidenciam-se
 os padrões orientados a eventos, já presentes e fundamentados na interface principal 
 da plataforma. É possível, por exemplo, substituir o modo de leitura de um arquivo de 
-uma simples função somada à uma \textit{callback}, que irá consumir mais recursos de máquina, como memória \textit{RAM}, 
+uma simples função somada à uma \textit{callback} (função que é chamada em resposta a um evento ou após a conclusão de uma tarefa assíncrona), que irá consumir mais recursos de máquina, como memória \textit{RAM}, 
 para um fluxo de leitura onde é possível verificar os eventos de dados e de conclusão, 
 ou até mesmo encaminhar o fluxo para outra camada de processamento. Da mesma forma que ocorre com os 
 arquivos, o controle dos eventos 
@@ -423,6 +423,8 @@ Para tal, é utilizada a função \textit{createServer} do módulo nativo \texti
 A sua \textit{callback} recebe os objetos de requisição e resposta para tratamentos como definição de cabeçalhos, leitura
 de valores de entrada e escrita de valores de saída. Dessa forma, o servidor para este estudo irá responder à chamadas
 realizadas no caminho raíz da aplicação, em determinada porta arbitrária.
+
+O módulo nativo \textit{perf\textunderscore hooks} da plataforma \textit{Node.JS}, é utilizado em todas as implementações para a obtenção dos valores de tempo de início e fim da requisição. O tempo inicial, em milissegundos, é registrado assim que uma requisição é recebida, e o tempo final é registrado uma vez que a requisição é encerrada pelo servidor, ou seja, no evento de finalização (\autoref{cod:base}, linha 11).
 
 A primeira implementação desenvolvida (\autoref{cod:sync}), realiza a leitura do arquivo de 1.65 GB
 de forma síncrona utilizando chamadas do módulo \textit{fs} (\textit{file system}), ou seja, todo o conteúdo será
@@ -796,7 +798,7 @@ dando escalabilidade horizontal.
 \hline
 \textit{Throughput} (req/min) & 0,044 & 0,172 & 0,223\\
 \hline
-Média do tempo de processamento (min) & 22,818 & 5,801 & 4,477\\
+Média do tempo de processamento  & 22m e 49s & 5m e 48s & 4m e 29s\\
 \hline
 \end{tabular}
 \end{table}
