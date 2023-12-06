@@ -579,7 +579,8 @@ Em resumo, serão enviadas quatro requisições ao mesmo tempo ao servidor, repe
 
 Os indicadores de desempenho a serem coletados e analisados para cada uma das implementações, durante a transferência
 dos dados contidos na base previamente citada serão: Uso de memória \textit{RAM}, uso de \textit{CPU}, \textit{throughput}
-e o tempo médio em que o cliente consegue lidar os dados recebidos do servidor.
+e o tempo médio em que o cliente consegue lidar os dados recebidos do servidor, ou seja, o tempo de recebimento do arquivo até
+que o cliente esteja apto a manipulá-lo por completo.
 
 Para que as análises do consumo de recursos de máquina, como \textit{RAM} e \textit{CPU}, em relação
 ao tempo de vida do servidor sejam coerentes, as coletas serão iniciadas e estendidas em cinco 
@@ -785,8 +786,8 @@ do arquivo de 1.65 \textit{gigabytes} (\autoref{tab:metrics}).
 É evidente que, assim como
 esperado, o cenário síncrono apresentou um \textit{throughput} inferior aos cenários assíncronos, ou seja, esta implementação
 teve menos poder para processar requisições simultâneas. Também, o tempo médio em que o cliente consegue lidar com os dados recebidos foi superior no caso
-síncrono, o tempo calculado para cada implementação se justifica pela forma com que o cliente consegue receber os dados do servidor e comportá-los, ou seja,
-o cliente necessita que o servidor envie os dados volumosos de uma forma adequada para sua recepção e exibição, caso contrário, este não funcionará corretamente
+síncrono. O tempo calculado para cada implementação se justifica pela forma com que o cliente consegue receber os dados do servidor e comportá-los, ou seja,
+o cliente necessita que o servidor envie os dados de uma forma adequada para sua recepção e exibição, caso contrário, este não funcionará corretamente
 e a quantidade massiva de dados a serem apresentados em tela ocasionará uso excessivo de memória e travamentos.
 Comparando os dois métodos assíncronos, é também notável a melhora na performance da 
 implementação que utiliza \textit{clusters} para obter mais poder de processamento paralelo, pois esta aproveita
